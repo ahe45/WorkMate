@@ -1,0 +1,851 @@
+
+.workmate-schedule-user-filter-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  left: auto;
+  z-index: 40;
+  width: min(460px, calc(100vw - 48px));
+  max-height: min(560px, 68vh);
+}
+
+.workmate-schedule-user-filter-list {
+  max-height: min(330px, 42vh);
+}
+
+.workmate-schedule-user-filter-option {
+  width: 100%;
+}
+
+.workmate-schedule-user-filter .table-filter-footer-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.workmate-schedule-view-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.workmate-schedule-view-button {
+  min-width: 42px;
+  min-height: 40px;
+  padding: 0 14px;
+}
+
+.workmate-schedule-view-button.is-active {
+  border-color: rgba(45, 99, 245, 0.58);
+  background: rgba(234, 242, 255, 0.98);
+  color: #1a6ac8;
+}
+
+.workmate-schedule-month-all-button.is-active {
+  border-color: rgba(15, 118, 110, 0.46);
+  background: rgba(204, 251, 241, 0.74);
+  color: #0f766e;
+}
+
+.workmate-schedule-board {
+  min-height: 0;
+}
+
+.workmate-schedule-month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border: 1px solid rgba(223, 229, 240, 0.92);
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.workmate-schedule-grid-head {
+  padding: 14px 12px;
+  border-bottom: 1px solid rgba(223, 229, 240, 0.92);
+  background: rgba(245, 247, 251, 0.96);
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.workmate-schedule-month-cell {
+  display: grid;
+  gap: 10px;
+  min-height: 170px;
+  padding: 12px;
+  border-right: 1px solid rgba(223, 229, 240, 0.92);
+  border-bottom: 1px solid rgba(223, 229, 240, 0.92);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.workmate-schedule-month-cell:nth-child(7n) {
+  border-right: 0;
+}
+
+.workmate-schedule-month-cell.outside-month {
+  background: rgba(248, 250, 252, 0.92);
+}
+
+.workmate-schedule-month-cell.is-today {
+  box-shadow: inset 0 0 0 2px rgba(45, 99, 245, 0.18);
+}
+
+.workmate-schedule-month-cell.is-expanded {
+  background: rgba(255, 255, 255, 0.99);
+}
+
+.workmate-schedule-month-cell-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.workmate-schedule-month-cell-head strong {
+  font-size: 0.92rem;
+}
+
+.workmate-schedule-month-cell-head span {
+  color: var(--text-dim);
+  font-size: 0.74rem;
+}
+
+.workmate-schedule-entry-stack {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 0;
+}
+
+.workmate-schedule-entry {
+  --workmate-schedule-compact-entry-height: 34px;
+  display: grid;
+  gap: 4px;
+  padding: 10px 11px;
+  border-radius: 12px;
+  border: 1px solid rgba(203, 213, 225, 0.72);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.workmate-schedule-entry strong {
+  font-size: 0.8rem;
+}
+
+.workmate-schedule-entry span,
+.workmate-schedule-entry small {
+  color: rgba(15, 23, 42, 0.76);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.workmate-schedule-entry.compact {
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: 3px;
+  min-height: var(--workmate-schedule-compact-entry-height);
+  padding: 8px 9px;
+}
+
+.workmate-schedule-entry.compact strong,
+.workmate-schedule-entry.compact span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-schedule-entry.tone-sky {
+  background: linear-gradient(180deg, rgba(214, 237, 255, 0.98), rgba(242, 248, 255, 0.98));
+}
+
+.workmate-schedule-entry.tone-violet {
+  background: linear-gradient(180deg, rgba(232, 220, 250, 0.98), rgba(244, 238, 252, 0.98));
+}
+
+.workmate-schedule-entry.tone-salmon {
+  background: linear-gradient(180deg, rgba(255, 219, 214, 0.98), rgba(255, 241, 239, 0.98));
+}
+
+.workmate-schedule-entry.tone-lilac {
+  background: linear-gradient(180deg, rgba(224, 214, 246, 0.98), rgba(242, 238, 252, 0.98));
+}
+
+.workmate-schedule-entry.tone-leave,
+.workmate-schedule-entry.tone-holiday {
+  background: linear-gradient(180deg, rgba(228, 234, 242, 0.98), rgba(243, 246, 250, 0.98));
+}
+
+.workmate-schedule-more-button {
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px dashed rgba(156, 163, 175, 0.9);
+  background: rgba(248, 250, 252, 0.98);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.workmate-schedule-more-button:hover,
+.workmate-schedule-more-button:focus-visible {
+  border-color: rgba(45, 99, 245, 0.55);
+  background: rgba(234, 242, 255, 0.98);
+  color: #1a6ac8;
+}
+.workmate-attendance-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 18px;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.workmate-attendance-toolbar {
+  min-width: 0;
+}
+
+.workmate-attendance-filter-group {
+  display: flex;
+  align-items: center;
+  flex: 1 1 520px;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.workmate-attendance-board {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.workmate-attendance-month-scroll,
+.workmate-attendance-list-scroll {
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid rgba(223, 229, 240, 0.92);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.workmate-attendance-grid-card .workmate-dashboard-table-shell {
+  min-height: 0;
+}
+
+.workmate-attendance-month-board {
+  --attendance-day-width: 58px;
+  display: grid;
+  grid-template-columns: 75px repeat(var(--attendance-days), minmax(var(--attendance-day-width), 1fr)) 76px;
+  min-width: calc(151px + (var(--attendance-days) * var(--attendance-day-width)));
+}
+
+.workmate-attendance-month-head,
+.workmate-attendance-user-cell,
+.workmate-attendance-month-cell,
+.workmate-attendance-total-cell {
+  min-width: 0;
+  min-height: 54px;
+  border-right: 1px solid rgba(223, 229, 240, 0.92);
+  border-bottom: 1px solid rgba(223, 229, 240, 0.92);
+}
+
+.workmate-attendance-month-head {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  padding: 8px 6px;
+  background: rgba(245, 247, 251, 0.98);
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.workmate-attendance-month-head strong {
+  color: var(--text-main);
+  font-size: 0.82rem;
+}
+
+.workmate-attendance-month-head.is-weekend strong,
+.workmate-attendance-month-head.is-weekend span {
+  color: #d14343;
+}
+
+.workmate-attendance-month-head.sticky-user,
+.workmate-attendance-user-cell {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+.workmate-attendance-month-head.sticky-user {
+  z-index: 4;
+}
+
+.workmate-attendance-user-cell {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 3px;
+  padding: 9px 10px;
+  background: rgba(248, 250, 252, 0.98);
+  text-align: center;
+}
+
+.workmate-attendance-user-cell span,
+.workmate-attendance-user-cell small {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-dim);
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-attendance-user-cell strong {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.84rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-attendance-month-cell {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 3px;
+  padding: 6px 4px;
+  background: rgba(255, 255, 255, 0.98);
+  text-align: center;
+}
+
+.workmate-attendance-month-cell.has-record {
+  background: linear-gradient(180deg, rgba(240, 249, 255, 0.94), rgba(255, 255, 255, 0.98));
+}
+
+.workmate-attendance-month-cell.tone-green {
+  box-shadow: inset 0 -4px 0 rgba(132, 204, 22, 0.42);
+}
+
+.workmate-attendance-month-cell.tone-blue {
+  box-shadow: inset 0 -4px 0 rgba(59, 130, 246, 0.36);
+}
+
+.workmate-attendance-month-cell.tone-orange {
+  box-shadow: inset 0 -4px 0 rgba(251, 146, 60, 0.44);
+}
+
+.workmate-attendance-month-cell.tone-red {
+  box-shadow: inset 0 -4px 0 rgba(239, 68, 68, 0.42);
+}
+
+.workmate-attendance-time-pair {
+  display: grid;
+  gap: 2px;
+  color: var(--text-main);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.workmate-attendance-month-cell small {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--text-dim);
+  font-size: 0.62rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-attendance-absent,
+.workmate-attendance-leave,
+.workmate-attendance-list-table .is-alert,
+.workmate-attendance-time-pair .is-alert,
+.workmate-attendance-grid-alert {
+  color: #d14343;
+}
+
+.workmate-attendance-leave {
+  color: #1a6ac8;
+}
+
+.workmate-attendance-total-cell {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 2px;
+  padding: 8px 6px;
+  background: rgba(248, 250, 252, 0.98);
+  font-size: 0.74rem;
+}
+
+.workmate-attendance-total-cell span {
+  color: var(--text-dim);
+  font-size: 0.66rem;
+}
+
+.workmate-attendance-list-table {
+  width: 100%;
+  min-width: 1180px;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.workmate-attendance-list-table th,
+.workmate-attendance-list-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(223, 229, 240, 0.92);
+  color: var(--text-main);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.workmate-attendance-list-table th {
+  background: rgba(245, 247, 251, 0.98);
+  color: var(--text-dim);
+  font-size: 0.74rem;
+  font-weight: 900;
+}
+
+.workmate-attendance-list-table tbody tr:hover {
+  background: rgba(248, 250, 252, 0.84);
+}
+
+.workmate-report-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 16px;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.workmate-report-toolbar {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.workmate-report-title-row,
+.workmate-report-control-row,
+.workmate-report-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.workmate-report-title-row {
+  justify-content: space-between;
+}
+
+.workmate-report-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.workmate-report-title h3 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.workmate-report-title span {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #9aa8b8;
+  border-radius: 999px;
+  color: #637083;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.workmate-report-control-row {
+  flex-wrap: wrap;
+}
+
+.workmate-report-range-control {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  border: 1px solid #d7e1eb;
+  background: #f8fafc;
+}
+
+.workmate-report-range-control .workmate-schedule-nav-button {
+  min-width: 36px;
+  min-height: 36px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.workmate-report-range-control strong {
+  padding: 0 14px;
+  color: #1f2a38;
+  font-size: 0.84rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.workmate-report-spacer {
+  flex: 1 1 auto;
+}
+
+.workmate-report-note {
+  justify-content: flex-end;
+  min-width: min(100%, 440px);
+  color: #5c6b7d;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.workmate-report-note span + span::before {
+  margin: 0 6px 0 0;
+  color: #9aa8b8;
+  content: "/";
+}
+
+.workmate-report-grid-panel {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.workmate-report-grid-panel .workmate-dashboard-table-shell {
+  min-height: 0;
+}
+
+.workmate-report-grid-panel table {
+  min-width: 1460px;
+}
+
+.workmate-report-grid-panel thead th,
+.workmate-report-grid-panel tbody td {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.workmate-report-leave-value {
+  color: #1a6ac8;
+  font-weight: 900;
+}
+
+.workmate-schedule-week-board {
+  display: grid;
+  grid-template-columns: 132px repeat(7, minmax(0, 1fr));
+  border: 1px solid rgba(223, 229, 240, 0.92);
+  border-radius: 20px;
+  overflow: auto;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.workmate-schedule-week-head,
+.workmate-schedule-week-user,
+.workmate-schedule-week-cell,
+.workmate-schedule-week-summary,
+.workmate-schedule-week-summary-label {
+  min-width: 0;
+  padding: 7px 8px;
+  border-right: 1px solid rgba(223, 229, 240, 0.92);
+  border-bottom: 1px solid rgba(223, 229, 240, 0.92);
+}
+
+.workmate-schedule-week-head {
+  display: grid;
+  gap: 2px;
+  background: rgba(245, 247, 251, 0.96);
+  text-align: center;
+}
+
+.workmate-schedule-week-head span {
+  color: var(--text-dim);
+  font-size: 0.74rem;
+}
+
+.workmate-schedule-week-user {
+  display: grid;
+  gap: 2px;
+  align-content: center;
+  justify-items: center;
+  background: rgba(248, 250, 252, 0.96);
+  text-align: center;
+}
+
+.workmate-schedule-week-user strong {
+  overflow: hidden;
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-schedule-week-user span,
+.workmate-schedule-week-summary span {
+  color: var(--text-dim);
+  font-size: 0.68rem;
+}
+
+.workmate-schedule-week-cell {
+  display: grid;
+  align-content: start;
+  min-height: 48px;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.workmate-schedule-week-cell .workmate-schedule-entry.compact {
+  min-height: var(--workmate-schedule-compact-entry-height);
+  padding: 8px 9px;
+  border-radius: 12px;
+}
+
+.workmate-schedule-week-cell .workmate-schedule-entry.compact strong {
+  font-size: 0.8rem;
+}
+
+.workmate-schedule-week-cell .workmate-schedule-entry.compact span {
+  font-size: 0.72rem;
+}
+
+.workmate-schedule-week-summary,
+.workmate-schedule-week-summary-label {
+  display: grid;
+  gap: 4px;
+  align-content: center;
+  background: rgba(245, 247, 251, 0.96);
+  text-align: center;
+}
+
+.workmate-schedule-week-summary-label {
+  font-weight: 800;
+}
+
+.workmate-schedule-week-empty {
+  grid-column: 1 / -1;
+  padding: 18px;
+}
+
+.workmate-schedule-cell-empty {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.workmate-schedule-day-board {
+  display: grid;
+}
+
+.workmate-schedule-day-axis,
+.workmate-schedule-day-body {
+  display: grid;
+  grid-template-columns: 132px minmax(960px, 1fr);
+}
+
+.workmate-schedule-day-corner,
+.workmate-schedule-day-user {
+  display: grid;
+  gap: 2px;
+  padding: 7px 8px;
+  border: 1px solid rgba(223, 229, 240, 0.92);
+  border-right: 0;
+  background: rgba(248, 250, 252, 0.96);
+  text-align: center;
+}
+
+.workmate-schedule-day-corner {
+  align-content: center;
+  justify-items: center;
+}
+
+.workmate-schedule-day-user {
+  align-content: center;
+  justify-items: center;
+}
+
+.workmate-schedule-day-user strong {
+  overflow: hidden;
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-schedule-day-corner span,
+.workmate-schedule-day-user span {
+  color: var(--text-dim);
+  font-size: 0.74rem;
+}
+
+.workmate-schedule-day-hour-strip,
+.workmate-schedule-day-track {
+  display: grid;
+  grid-template-columns: repeat(24, minmax(42px, 1fr));
+}
+
+.workmate-schedule-day-hour-strip {
+  border: 1px solid rgba(223, 229, 240, 0.92);
+  background: rgba(245, 247, 251, 0.96);
+}
+
+.workmate-schedule-day-hour-strip span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  font-weight: 800;
+  border-left: 1px solid rgba(223, 229, 240, 0.92);
+}
+
+.workmate-schedule-day-hour-strip span:first-child {
+  border-left: 0;
+}
+
+.workmate-schedule-day-track {
+  position: relative;
+  min-height: 48px;
+  border: 1px solid rgba(223, 229, 240, 0.92);
+  background: rgba(255, 255, 255, 0.96);
+  align-items: center;
+}
+
+.workmate-schedule-day-gridline {
+  min-height: 100%;
+  border-left: 1px solid rgba(236, 240, 247, 0.98);
+}
+
+.workmate-schedule-day-gridline:first-child {
+  border-left: 0;
+}
+
+.workmate-schedule-timeline-entry {
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0 4px;
+  min-width: 0;
+  min-height: var(--workmate-schedule-compact-entry-height);
+  padding: 8px 9px;
+  border-radius: 12px;
+}
+
+.workmate-schedule-timeline-entry strong {
+  font-size: 0.8rem;
+}
+
+.workmate-schedule-timeline-entry span {
+  font-size: 0.72rem;
+  color: rgba(15, 23, 42, 0.78);
+}
+
+.workmate-schedule-timeline-entry.is-full-row {
+  justify-content: center;
+  margin: 0 6px;
+}
+
+.workmate-schedule-timeline-entry strong,
+.workmate-schedule-timeline-entry span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.metric-card.tone-blue {
+  background: linear-gradient(180deg, rgba(234, 242, 255, 0.98), rgba(255, 255, 255, 0.94));
+}
+
+.metric-card.tone-green {
+  background: linear-gradient(180deg, rgba(233, 250, 242, 0.98), rgba(255, 255, 255, 0.94));
+}
+
+.metric-card.tone-orange {
+  background: linear-gradient(180deg, rgba(255, 246, 228, 0.98), rgba(255, 255, 255, 0.94));
+}
+
+.metric-card.tone-purple {
+  background: linear-gradient(180deg, rgba(243, 238, 255, 0.98), rgba(255, 255, 255, 0.94));
+}
+
+.metric-card.tone-red {
+  background: linear-gradient(180deg, rgba(255, 239, 240, 0.98), rgba(255, 255, 255, 0.94));
+}
+.workmate-leave-grid-card .workmate-dashboard-table-shell {
+  min-height: 0;
+}
+
+.workmate-leave-day-value {
+  color: var(--text-main);
+  font-weight: 850;
+}
+
+.workmate-leave-day-value.is-total {
+  color: var(--accent-strong);
+}
+
+.workmate-leave-day-value.is-used {
+  color: var(--text-dim);
+}
+
+.workmate-company-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.workmate-company-card {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 22px;
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.workmate-company-card.is-active {
+  box-shadow: 0 18px 36px rgba(45, 99, 245, 0.12);
+  border-color: rgba(45, 99, 245, 0.32);
+}
+
+.workmate-company-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.workmate-company-card-head strong {
+  display: block;
+  font-size: 1.05rem;
+}
+
+.workmate-company-card-head span {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+
+.workmate-company-card-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.workmate-company-card-meta > div,
+.workmate-info-card {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(245, 247, 251, 0.92);
+}

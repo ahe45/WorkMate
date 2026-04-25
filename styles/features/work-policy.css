@@ -1,0 +1,384 @@
+﻿/* Work policy and work schedule settings */
+.workmate-work-schedule-stage-metrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: 0;
+}
+
+.workmate-work-policy-metric-card {
+  align-content: start;
+  gap: 12px;
+}
+
+.workmate-work-policy-metric-head {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.workmate-work-policy-metric-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.workmate-work-policy-metric-control span {
+  color: #17324a;
+  font-size: 0.94rem;
+  font-weight: 800;
+}
+
+.workmate-work-policy-metric-control input {
+  width: min(150px, 100%);
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid rgba(203, 213, 225, 0.88);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #17324a;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.workmate-work-policy-metric-range {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-work-policy-metric-values {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.workmate-work-policy-metric-values div {
+  min-width: 0;
+}
+
+.workmate-work-policy-metric-values dt {
+  margin: 0 0 4px;
+  color: var(--text-dim);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.workmate-work-policy-metric-values dd {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: #18324b;
+  font-size: 1.02rem;
+  font-weight: 900;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-work-policy-metric-breakdown {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.workmate-work-policy-metric-breakdown span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-work-policy-form {
+  margin-top: 20px;
+  padding-top: 4px;
+}
+
+.workmate-work-policy-section {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(223, 229, 240, 0.92);
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.82);
+}
+
+.workmate-work-policy-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 0;
+}
+
+.workmate-work-policy-section-head h5 {
+  margin: 0;
+  color: #17324a;
+  font-size: 0.96rem;
+}
+
+.workmate-work-policy-section-head span {
+  min-width: 0;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.workmate-work-policy-day-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.workmate-work-policy-day-option {
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid rgba(203, 213, 225, 0.76);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #17324a;
+}
+
+.workmate-work-policy-field-grid,
+.workmate-work-policy-toggle-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.workmate-work-policy-toggle-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.workmate-work-policy-target-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.workmate-work-policy-target-grid > div {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(223, 229, 240, 0.92);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.workmate-work-policy-target-grid strong {
+  color: #17324a;
+  font-size: 0.84rem;
+}
+
+.workmate-work-policy-target-grid > div > div {
+  display: grid;
+  gap: 8px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.workmate-work-policy-target-option,
+.workmate-work-policy-target-empty {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid rgba(203, 213, 225, 0.62);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #17324a;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.workmate-work-policy-target-empty {
+  display: flex;
+  align-items: center;
+  color: var(--text-dim);
+}
+
+.workmate-work-policy-adjustment-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workmate-work-policy-section-actions {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.workmate-work-policy-adjustment-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.2fr) minmax(110px, 0.7fr) minmax(110px, 0.7fr) minmax(110px, 0.7fr) minmax(110px, 0.7fr) minmax(150px, 0.9fr);
+  gap: 12px;
+  align-items: start;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(223, 229, 240, 0.92);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.workmate-work-policy-adjustment-options {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.workmate-work-policy-form .field {
+  min-width: 0;
+}
+
+.workmate-work-policy-form .field > span {
+  color: #374151;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.workmate-work-policy-time-field {
+  gap: 8px;
+  position: relative;
+}
+
+.workmate-work-policy-time-field > span {
+  color: #374151;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.workmate-duration-picker {
+  position: relative;
+  min-width: 0;
+}
+
+.workmate-duration-picker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 46px;
+  padding: 13px 38px 13px 14px;
+  border: 1px solid rgba(203, 213, 225, 0.76);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  text-align: left;
+}
+
+.workmate-duration-picker-trigger::after {
+  content: "";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-right: 1.6px solid #5e6a80;
+  border-bottom: 1.6px solid #5e6a80;
+  pointer-events: none;
+  transform: translateY(-58%) rotate(45deg);
+}
+
+.workmate-duration-picker.is-open .workmate-duration-picker-trigger {
+  border-color: rgba(45, 99, 245, 0.38);
+  box-shadow: 0 0 0 3px rgba(45, 99, 245, 0.1);
+}
+
+.workmate-duration-picker-panel {
+  position: absolute;
+  z-index: 45;
+  top: calc(100% + 8px);
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: min(280px, calc(100vw - 48px));
+  padding: 12px;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 18px 36px rgba(17, 24, 39, 0.16);
+}
+
+.workmate-duration-picker-panel[hidden] {
+  display: none;
+}
+
+.workmate-duration-picker-column {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.workmate-duration-picker-column > span {
+  color: var(--text-dim);
+  font-size: 0.74rem;
+  font-weight: 900;
+}
+
+.workmate-duration-picker-options {
+  display: grid;
+  gap: 4px;
+  max-height: 176px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.workmate-duration-picker-option {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #17324a;
+  font: inherit;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  text-align: center;
+}
+
+.workmate-duration-picker-option:hover,
+.workmate-duration-picker-option:focus-visible {
+  border-color: rgba(45, 99, 245, 0.2);
+  background: rgba(239, 246, 255, 0.92);
+}
+
+.workmate-duration-picker-option.is-active {
+  border-color: rgba(45, 99, 245, 0.34);
+  background: rgba(45, 99, 245, 0.1);
+  color: var(--accent-strong);
+}
+
+.workmate-duration-picker-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.workmate-work-policy-toggle {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid rgba(203, 213, 225, 0.76);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #17324a;
+}
+
+.workmate-work-policy-modal-panel .workmate-work-policy-form {
+  margin-top: 0;
+}
+

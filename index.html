@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WorkMate Login</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/pages/auth.css" />
+  </head>
+  <body data-page="login">
+    <div class="app-shell auth-locked" id="appShell">
+      <div class="auth-background-media" aria-hidden="true">
+        <img class="auth-background-media-image" src="/client/assets/bg.png" alt="" />
+      </div>
+      <main class="content-area">
+        <div class="login-shell login-single-shell workmate-auth-shell">
+          <div class="login-brand-lockup" aria-hidden="true">
+            <img class="login-brand-mark" src="/client/assets/logo.png" alt="" width="42" height="42" />
+            <img class="login-brand-wordmark" src="/client/assets/workmate-wordmark.png" alt="" />
+          </div>
+          <article class="login-panel-card login-stage-panel login-composition-panel">
+            <div class="login-stage-panel-inner">
+              <form class="login-stage-form login-form login-composition-form" id="login-form">
+                <h3 class="login-composition-title">로그인</h3>
+
+                <div class="field login-field">
+                  <div class="login-field-heading">
+                    <label for="login-email">이메일</label>
+                    <button class="login-inline-link" type="button">이메일 찾기</button>
+                  </div>
+                  <input id="login-email" type="email" autocomplete="username" required />
+                </div>
+
+                <div class="field login-field">
+                  <div class="login-field-heading">
+                    <label for="login-password">비밀번호</label>
+                    <button class="login-inline-link" type="button">비밀번호 찾기</button>
+                  </div>
+                  <input id="login-password" type="password" autocomplete="current-password" required />
+                </div>
+
+                <label class="checkbox-field login-remember-field" for="login-remember">
+                  <input id="login-remember" type="checkbox" />
+                  <span>로그인 상태 유지</span>
+                </label>
+                <p class="login-error hidden" id="login-error" aria-live="polite"></p>
+                <button class="primary-button login-submit-button" type="submit">로그인</button>
+
+                <div class="login-divider" aria-hidden="true">
+                  <span>or</span>
+                </div>
+
+                <div class="login-social-stack" aria-label="소셜 로그인">
+                  <button class="outline-button login-social-button" type="button">
+                    <span class="login-social-icon google" aria-hidden="true">G</span>
+                    <span>구글 계정으로 로그인</span>
+                  </button>
+                  <button class="outline-button login-social-button" type="button">
+                    <span class="login-social-icon naver" aria-hidden="true">N</span>
+                    <span>네이버 계정으로 로그인</span>
+                  </button>
+                </div>
+                <p class="workmate-auth-footer">
+                  계정이 없으면 <a href="/signup">회원가입</a>으로 이동하세요.
+                </p>
+              </form>
+            </div>
+          </article>
+        </div>
+      </main>
+    </div>
+
+    <script src="/client/boot/asset-manifest.js"></script>
+    <script src="/client/boot/load-page-assets.js"></script>
+  </body>
+</html>

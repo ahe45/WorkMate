@@ -1,0 +1,333 @@
+/* Authentication surfaces */
+
+.login-shell {
+  position: relative;
+  isolation: isolate;
+  width: min(1240px, 100%);
+  min-height: 600px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(340px, 420px);
+  grid-template-rows: minmax(0, 600px) auto;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.login-shell::before {
+  content: "";
+  position: absolute;
+  inset: -20px;
+  z-index: -1;
+  border-radius: 38px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.32), rgba(236, 242, 248, 0.16)),
+    radial-gradient(circle at top left, rgba(111, 152, 255, 0.12), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(81, 203, 170, 0.1), transparent 24%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.38);
+}
+
+.login-shell > .login-panel-card {
+  grid-row: 1;
+}
+
+.login-panel-card {
+  border: 1px solid rgba(203, 213, 225, 0.44);
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+}
+
+.login-panel-card {
+  display: grid;
+  align-content: center;
+  padding: 32px;
+  border-radius: 28px;
+}
+
+.login-stage-panel {
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: stretch;
+  gap: 26px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 248, 253, 0.94)),
+    var(--panel);
+}
+
+.login-stage-panel-inner {
+  display: grid;
+  align-items: center;
+}
+
+.login-stage-form {
+  width: min(100%, 360px);
+  justify-self: center;
+}
+
+.login-stage-form h3 {
+  margin: 0;
+  font-size: 1.85rem;
+  color: #173d5d;
+}
+
+.login-stage-description {
+  margin: -2px 0 6px;
+  color: #66788c;
+  line-height: 1.6;
+}
+
+.login-form {
+  display: grid;
+  gap: 14px;
+}
+
+.login-shell.login-single-shell {
+  width: min(560px, 100%);
+  min-height: auto;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  gap: 14px;
+}
+
+.login-shell.login-single-shell.signup-shell {
+  width: min(620px, 100%);
+}
+
+.login-shell.login-single-shell::before {
+  inset: -18px;
+}
+
+.login-shell.login-single-shell > .login-panel-card {
+  grid-row: auto;
+}
+
+.login-shell.login-single-shell > .login-brand-lockup {
+  grid-row: 1;
+  justify-self: center;
+}
+
+.login-composition-panel {
+  min-height: auto;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 0;
+  padding: 40px 36px;
+}
+
+.login-composition-panel .login-stage-panel-inner {
+  align-items: stretch;
+}
+
+.login-composition-form {
+  width: min(100%, 444px);
+  gap: 18px;
+}
+
+.signup-composition-panel {
+  padding: 36px;
+}
+
+.signup-composition-form {
+  width: min(100%, 444px);
+  gap: 16px;
+}
+
+.signup-stage-description {
+  margin: -8px 0 6px;
+  text-align: center;
+}
+
+.login-brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-self: start;
+}
+
+.login-brand-mark {
+  width: 42px;
+  height: 42px;
+  display: block;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.login-brand-wordmark {
+  height: 28px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.login-stage-form h3.login-composition-title {
+  margin: 0 0 14px;
+  color: #173d5d;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  text-align: center;
+}
+
+.login-field {
+  gap: 8px;
+}
+
+.login-field-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.login-field-heading label {
+  color: var(--text);
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.login-field span {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-dim);
+}
+
+.login-field input {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(203, 213, 225, 0.92);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.login-field input:focus {
+  outline: none;
+  border-color: rgba(45, 99, 245, 0.72);
+  box-shadow: 0 0 0 3px rgba(45, 99, 245, 0.12);
+}
+
+.login-field input:disabled {
+  background: rgba(241, 245, 249, 0.92);
+  color: #8391a3;
+}
+
+.login-inline-link {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent-strong);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.login-inline-link:hover {
+  transform: none;
+  box-shadow: none;
+  text-decoration: underline;
+}
+
+.login-inline-link:focus-visible {
+  outline: 2px solid rgba(45, 99, 245, 0.2);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.login-remember-field {
+  margin: -2px 0 2px;
+}
+
+.login-submit-button {
+  width: 100%;
+  min-height: 48px;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #66788c;
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(203, 213, 225, 0.92);
+}
+
+.login-divider span {
+  line-height: 1;
+}
+
+.login-social-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.login-social-button {
+  width: 100%;
+  min-height: 48px;
+  justify-content: center;
+  border-color: rgba(203, 213, 225, 0.92);
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.login-social-button:hover {
+  border-color: rgba(45, 99, 245, 0.28);
+}
+
+.login-social-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.login-social-icon.google {
+  color: #db4437;
+}
+
+.login-social-icon.naver {
+  border-radius: 6px;
+  color: #03c75a;
+  font-size: 0.94rem;
+}
+
+@media (max-width: 980px) {
+  .login-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    height: auto;
+  }
+
+  .login-shell > .login-panel-card {
+    grid-row: auto;
+  }
+
+  .login-panel-card {
+    min-height: auto;
+  }
+
+  .login-shell.login-single-shell {
+    width: min(560px, 100%);
+    grid-template-rows: auto;
+  }
+
+  .login-composition-panel {
+    padding: 32px 24px;
+  }
+
+  .login-composition-form {
+    width: 100%;
+  }
+
+  .signup-composition-panel {
+    padding: 32px 24px;
+  }
+}

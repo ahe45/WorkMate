@@ -1,0 +1,194 @@
+.account-management-table .table-column-editAction .table-inline-actions-dual {
+  gap: 3px;
+}
+
+.account-management-table .table-column-editAction .table-inline-actions-reserved::before,
+.account-management-table .table-column-editAction .table-inline-actions-reserved::after,
+.account-management-table .table-column-editAction .table-inline-button,
+.account-management-table .table-column-resetAction .table-inline-button,
+.account-management-table .table-column-deleteAction .table-inline-button {
+  padding: 0 8px;
+}
+
+.account-management-table .table-column-editAction .table-inline-button-span-2 {
+  width: auto;
+  justify-self: center;
+}
+
+.account-management-table .table-column-editAction .table-inline-icon-button,
+.account-management-table .table-column-resetAction .table-inline-icon-button,
+.account-management-table .table-column-deleteAction .table-inline-icon-button {
+  margin: 0 auto;
+}
+
+.account-management-table .table-inline-input,
+.account-management-table .table-inline-select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.account-management-table .table-inline-field-shell {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--account-inline-field-height);
+}
+
+.account-management-table .table-inline-field-shell > .table-inline-input,
+.account-management-table .table-inline-field-shell > .table-inline-select {
+  position: absolute;
+  inset: 0;
+}
+
+.account-management-table td.table-column-id,
+.account-management-table td.table-column-name,
+.account-management-table td.table-column-role,
+.account-management-table td.table-column-recentAccess {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-management-table td.table-column-name strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-pagination {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 12px 9px 14px;
+}
+
+.table-page-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.table-page-size > span {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.table-page-size-select {
+  position: relative;
+  min-width: 90px;
+}
+
+.page-size-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 38px;
+  min-width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #cfd8e3;
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.page-size-caret {
+  color: #5b6a7c;
+  font-size: 0.65rem;
+}
+
+.page-size-menu {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  min-width: max(100%, 90px);
+  display: grid;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid #cfd8e3;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 18px 30px rgba(12, 22, 34, 0.14);
+  z-index: 5;
+}
+
+.page-size-option {
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #445466;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.page-size-option.active,
+.page-size-option:hover {
+  background: #eff5fb;
+  color: #17324a;
+}
+
+.table-pagination-actions {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.table-pagination-summary {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  text-align: right;
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.table-pagination-ellipsis {
+  padding: 0 2px;
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.page-btn {
+  min-width: 36px;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid #d7e1eb;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #445466;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.page-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+.page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

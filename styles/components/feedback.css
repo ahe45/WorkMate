@@ -1,0 +1,9 @@
+/* Shared inline feedback states */
+
+.inline-error,
+.login-error {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.82rem;
+  font-weight: 700;
+}

@@ -1,0 +1,151 @@
+/* Shared form, lookup, and panel layouts */
+
+.search-grid.five {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.search-grid.three,
+.form-grid.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.search-grid.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field label {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(203, 213, 225, 0.76);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text);
+}
+
+select {
+  padding-right: 36px !important;
+  background-image: none !important;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.header-chip::after,
+.field.select-field::after {
+  content: "";
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-right: 1.6px solid #5e6a80;
+  border-bottom: 1.6px solid #5e6a80;
+  pointer-events: none;
+}
+
+.header-chip::after {
+  top: 50%;
+  right: 14px;
+  transform: translateY(-58%) rotate(45deg);
+}
+
+.topbar-center .header-chip::after {
+  content: none;
+}
+
+.field.select-field {
+  position: relative;
+}
+
+.field.select-field::after {
+  right: 16px;
+  bottom: 18px;
+  transform: rotate(45deg);
+}
+
+.field textarea {
+  min-height: 122px;
+  resize: vertical;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-dim);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.checkbox-field input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+.system-settings-form {
+  display: grid;
+  gap: 14px;
+}
+
+.system-settings-field {
+  gap: 10px;
+  padding: 14px;
+}
+
+.system-settings-field + .system-settings-field {
+  border-top: 1px solid rgba(203, 213, 225, 0.72);
+}
+
+.system-settings-status {
+  margin: 16px 0 0;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.system-settings-status.warning {
+  color: #b42318;
+}
+
+.lookup-filter-card .field.select-field::after {
+  bottom: 15px;
+}
+
+.lookup-search-grid-actions {
+  align-items: end;
+}
+
+.lookup-search-grid-actions .lookup-filter-actions {
+  grid-column: 3 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.form-actions,
+.toolbar-actions,
+.inline-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.split-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr);
+  gap: 22px;
+}

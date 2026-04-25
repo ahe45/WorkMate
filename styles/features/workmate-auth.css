@@ -1,0 +1,12 @@
+/* Auth page bridge styles */
+
+.workmate-auth-shell {
+  width: min(1240px, 100%);
+}
+
+.workmate-auth-footer {
+  margin-top: 8px;
+  color: var(--text-dim);
+  font-size: 0.76rem;
+  text-align: center;
+}

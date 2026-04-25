@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WorkMate 회원가입</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/pages/auth.css" />
+  </head>
+  <body data-page="signup">
+    <div class="app-shell auth-locked" id="appShell">
+      <div class="auth-background-media" aria-hidden="true">
+        <img class="auth-background-media-image" src="/client/assets/bg.png" alt="" />
+      </div>
+      <main class="content-area">
+        <div class="login-shell login-single-shell workmate-auth-shell signup-shell">
+          <div class="login-brand-lockup" aria-hidden="true">
+            <img class="login-brand-mark" src="/client/assets/logo.png" alt="" width="42" height="42" />
+            <img class="login-brand-wordmark" src="/client/assets/workmate-wordmark.png" alt="" />
+          </div>
+          <article class="login-panel-card login-stage-panel login-composition-panel signup-composition-panel">
+            <div class="login-stage-panel-inner">
+              <form class="login-stage-form login-form login-composition-form signup-composition-form" id="account-form">
+                <h3 class="login-composition-title">회원가입</h3>
+                <p class="login-stage-description signup-stage-description">관리자 계정을 생성하고 바로 워크스페이스를 시작합니다.</p>
+
+                <div class="field login-field">
+                  <label for="account-email">이메일</label>
+                  <input id="account-email" type="email" placeholder="admin@company.local" required />
+                </div>
+
+                <div class="field login-field">
+                  <label for="account-name">이름</label>
+                  <input id="account-name" type="text" placeholder="관리자 이름" required />
+                </div>
+
+                <div class="field login-field">
+                  <label for="account-password">비밀번호</label>
+                  <input id="account-password" type="password" placeholder="8자 이상" required />
+                </div>
+
+                <div class="field login-field">
+                  <label for="account-confirm-password">비밀번호 재확인</label>
+                  <input id="account-confirm-password" type="password" placeholder="비밀번호 재입력" required />
+                </div>
+
+                <p class="login-error hidden" id="account-error" aria-live="polite"></p>
+                <button class="primary-button login-submit-button" type="submit">가입하기</button>
+                <p class="workmate-auth-footer">
+                  이미 계정이 있으면 <a href="/login">로그인</a>으로 이동하세요.
+                </p>
+              </form>
+            </div>
+          </article>
+        </div>
+      </main>
+    </div>
+
+    <script src="/client/boot/asset-manifest.js"></script>
+    <script src="/client/boot/load-page-assets.js"></script>
+  </body>
+</html>

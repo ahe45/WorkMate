@@ -1,0 +1,26 @@
+{
+  "name": "workmate",
+  "version": "0.1.0",
+  "description": "WorkMate integrated workforce management system",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "db:setup": "node scripts/setup-db.js",
+    "db:prune-unused-tables": "node scripts/prune-unused-tables.js",
+    "db:seed-workforce": "node scripts/seed-demo-workforce.js",
+    "start": "node server.js",
+    "dev": "node server.js",
+    "check": "node scripts/check-syntax.js",
+    "test": "node scripts/smoke-test.js",
+    "verify:ui": "node scripts/verify-ui.js",
+    "verify:all": "npm run check && npm run verify:ui"
+  },
+  "devDependencies": {
+    "playwright": "^1.54.2"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.20.0"
+  }
+}

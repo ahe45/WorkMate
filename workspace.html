@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WorkMate Workspace</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/pages/workspace.css" />
+  </head>
+  <body data-page="workspace">
+    <div class="app-shell" id="appShell">
+      <aside class="sidebar" id="sidebar">
+        <button class="brand workmate-brand-home workmate-company-brand" id="brandHome" type="button" aria-label="WORKMATE">
+          <img class="brand-badge" src="/client/assets/logo.png" alt="" width="54" height="54" />
+          <div class="workmate-company-brand-copy">
+            <h1 class="workmate-company-brand-label">
+              <img class="workmate-company-brand-wordmark" src="/client/assets/workmate-wordmark.png" alt="" />
+            </h1>
+          </div>
+        </button>
+
+        <nav class="nav-group" id="workspaceNavRoot" aria-label="주 메뉴"></nav>
+      </aside>
+
+      <div class="page-shell">
+        <header class="topbar workmate-company-topbar" id="topbar">
+          <div class="workmate-topbar-left">
+            <button class="menu-toggle" id="menuToggle" type="button" aria-label="메뉴 열기">
+              <span></span><span></span><span></span>
+            </button>
+            <h2 class="workmate-company-topbar-title" id="topbarPageTitle">대시보드</h2>
+          </div>
+          <div class="topbar-right workmate-topbar-right">
+            <label class="workmate-topbar-scope-switch" for="personalScopeToggle">
+              <input class="workmate-topbar-scope-input" id="personalScopeToggle" type="checkbox" />
+              <span class="workmate-topbar-scope-track" aria-hidden="true"><span></span></span>
+              <strong id="personalScopeToggleLabel">모두의 일정 보기</strong>
+            </label>
+            <div class="workmate-topbar-account-actions">
+              <div class="user-meta workmate-topbar-user-meta">
+                <strong id="currentUserName">로그인 필요</strong>
+                <span id="currentUserRole">권한 정보 없음</span>
+              </div>
+              <button class="outline-button topbar-logout-button workmate-topbar-switch-button" id="switchCompanyButton" type="button">
+                <svg class="button-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M9 7h10"></path>
+                  <path d="M9 12h10"></path>
+                  <path d="M9 17h10"></path>
+                  <path d="M5 7h.01"></path>
+                  <path d="M5 12h.01"></path>
+                  <path d="M5 17h.01"></path>
+                </svg>
+                <span>회사 선택</span>
+              </button>
+              <button class="outline-button topbar-logout-button" id="logoutButton" type="button">
+                <svg class="button-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M14 7.5V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5a2 2 0 0 0 2-2v-1.5"></path>
+                  <path d="M10 12h9"></path>
+                  <path d="m16 8 4 4-4 4"></path>
+                </svg>
+                <span>로그아웃</span>
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <main class="content-area" id="viewRoot"></main>
+      </div>
+    </div>
+
+    <script src="/client/boot/asset-manifest.js"></script>
+    <script src="/client/boot/load-page-assets.js"></script>
+  </body>
+</html>

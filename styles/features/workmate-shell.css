@@ -1,0 +1,854 @@
+﻿.workmate-topbar-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.workmate-topbar-copy h2 {
+  font-size: 1.45rem;
+}
+
+.workmate-topbar-copy p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.workmate-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.workmate-company-topbar {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.workmate-company-topbar-title {
+  margin: 0;
+  font-size: 1.45rem;
+  line-height: 1.15;
+}
+
+.workmate-topbar-right {
+  min-width: 0;
+}
+
+.workmate-topbar-account-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding-left: 18px;
+  border-left: 1px solid rgba(203, 213, 225, 0.65);
+}
+
+.workmate-topbar-scope-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(203, 213, 225, 0.72);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    color 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.workmate-topbar-scope-switch:has(.workmate-topbar-scope-input:checked) {
+  border-color: rgba(45, 99, 245, 0.32);
+  background: rgba(234, 242, 255, 0.94);
+  color: var(--accent-strong);
+  box-shadow: 0 10px 22px rgba(45, 99, 245, 0.12);
+}
+
+.workmate-topbar-scope-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.workmate-topbar-scope-track {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #cbd5e1;
+  transition: background-color 0.18s ease;
+}
+
+.workmate-topbar-scope-track span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.22);
+  transition: transform 0.18s ease;
+}
+
+.workmate-topbar-scope-input:checked + .workmate-topbar-scope-track {
+  background: linear-gradient(135deg, var(--accent), #4b7bf8);
+}
+
+.workmate-topbar-scope-input:checked + .workmate-topbar-scope-track span {
+  transform: translateX(16px);
+}
+
+.workmate-topbar-scope-input:focus-visible + .workmate-topbar-scope-track {
+  outline: 2px solid rgba(45, 99, 245, 0.34);
+  outline-offset: 3px;
+}
+
+.workmate-topbar-user-meta {
+  display: grid;
+  gap: 2px;
+  line-height: 1.35;
+}
+
+.workmate-topbar-user-meta strong,
+.workmate-topbar-user-meta span {
+  overflow: hidden;
+  max-width: 260px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-topbar-switch-button {
+  white-space: nowrap;
+}
+
+.workmate-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.workmate-inline-badges {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+}
+
+.workmate-hero-side {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.workmate-dashboard-hero {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-areas: "company leave summary";
+  gap: 22px;
+  align-items: stretch;
+}
+
+.workmate-dashboard-company-card {
+  grid-area: company;
+  min-height: 0;
+  height: 100%;
+  padding: 24px 26px;
+}
+
+.workmate-dashboard-company-card h3 {
+  margin: 0;
+  font-size: clamp(2rem, 3.4vw, 2.65rem);
+  line-height: 1.05;
+}
+
+.workmate-dashboard-company-card p:not(.page-kicker) {
+  margin: 0;
+  max-width: 44ch;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.workmate-dashboard-company-card .hero-tags {
+  margin-top: 6px;
+}
+
+.workmate-dashboard-leave-panel {
+  grid-area: leave;
+  display: grid;
+  gap: 16px;
+  min-height: 0;
+  height: 100%;
+}
+
+.workmate-dashboard-leave-list {
+  min-height: 0;
+  max-height: 100%;
+  overflow: auto;
+}
+
+.workmate-dashboard-leave-list .mini-item {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.workmate-dashboard-summary-panel {
+  grid-area: summary;
+  min-height: 0;
+  height: 100%;
+}
+
+.workmate-dashboard-summary-panel .section-header {
+  align-items: start;
+}
+
+.workmate-stat-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.workmate-dashboard-summary-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 18px;
+}
+
+.workmate-dashboard-top-stack {
+  width: 100%;
+  align-content: stretch;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  justify-self: start;
+  min-height: 100%;
+  padding: 18px;
+}
+
+.workmate-dashboard-hero .workmate-stat-stack {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.workmate-dashboard-hero .workmate-dashboard-summary-panel .workmate-stat-stack {
+  grid-template-columns: 1fr;
+}
+
+.workmate-stat-card {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--panel-muted);
+  border: 1px solid rgba(223, 229, 240, 0.9);
+}
+
+.workmate-stat-card span {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.workmate-stat-card strong {
+  font-size: 1.35rem;
+}
+
+.workmate-dashboard-status-card {
+  width: 100%;
+  border: 1px solid rgba(223, 229, 240, 0.9);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.workmate-dashboard-status-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 24px rgba(15, 23, 42, 0.08);
+}
+
+.workmate-dashboard-status-card.tone-green {
+  background: linear-gradient(180deg, rgba(233, 250, 242, 0.98), rgba(255, 255, 255, 0.94));
+}
+
+.workmate-dashboard-status-card.tone-orange {
+  background: linear-gradient(180deg, rgba(255, 246, 228, 0.98), rgba(255, 255, 255, 0.94));
+}
+
+.workmate-dashboard-status-card.tone-gray {
+  background: linear-gradient(180deg, rgba(245, 247, 251, 0.98), rgba(255, 255, 255, 0.94));
+}
+
+.workmate-dashboard-status-card.tone-blue {
+  background: linear-gradient(180deg, rgba(234, 242, 255, 0.98), rgba(255, 255, 255, 0.94));
+}
+
+.workmate-dashboard-status-card.is-active {
+  border-color: rgba(45, 99, 245, 0.38);
+  box-shadow: 0 18px 30px rgba(45, 99, 245, 0.12);
+}
+
+.workmate-dashboard-status-panel-head {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.workmate-dashboard-status-panel-head h3 {
+  margin: 0;
+  font-size: 1.12rem;
+}
+
+.workmate-dashboard-status-panel-head > span {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.workmate-dashboard-top-stack .workmate-dashboard-status-card {
+  --status-card-border: rgba(203, 213, 225, 0.72);
+  --status-card-shadow: rgba(15, 23, 42, 0.08);
+  min-height: 0;
+  padding: 12px;
+  border-radius: 14px;
+  border-color: var(--status-card-border);
+  box-shadow: inset 0 -4px 0 var(--status-card-shadow);
+}
+
+.workmate-dashboard-top-stack .workmate-dashboard-status-card.tone-green {
+  --status-card-border: rgba(34, 197, 94, 0.26);
+  --status-card-shadow: rgba(34, 197, 94, 0.32);
+  background: linear-gradient(180deg, rgba(228, 250, 239, 0.98), rgba(247, 254, 251, 0.96));
+}
+
+.workmate-dashboard-top-stack .workmate-dashboard-status-card.tone-gray {
+  --status-card-border: rgba(148, 163, 184, 0.26);
+  --status-card-shadow: rgba(148, 163, 184, 0.3);
+  background: linear-gradient(180deg, rgba(241, 245, 249, 0.98), rgba(255, 255, 255, 0.96));
+}
+
+.workmate-dashboard-top-stack .workmate-dashboard-status-card.tone-blue {
+  --status-card-border: rgba(45, 99, 245, 0.24);
+  --status-card-shadow: rgba(45, 99, 245, 0.3);
+  background: linear-gradient(180deg, rgba(226, 238, 255, 0.98), rgba(247, 250, 255, 0.96));
+}
+
+.workmate-dashboard-top-stack .workmate-dashboard-status-card:hover {
+  border-color: color-mix(in srgb, var(--status-card-border) 72%, #0f172a 28%);
+  transform: translateY(-2px);
+  box-shadow: inset 0 -4px 0 var(--status-card-shadow), 0 16px 28px rgba(15, 23, 42, 0.1);
+}
+
+.workmate-dashboard-top-stack .workmate-dashboard-status-card.is-active {
+  border-color: rgba(45, 99, 245, 0.38);
+  background: rgba(234, 242, 255, 0.92);
+  box-shadow: inset 0 -4px 0 rgba(45, 99, 245, 0.34), 0 14px 26px rgba(45, 99, 245, 0.12);
+}
+
+.workmate-dashboard-top-stack .workmate-dashboard-status-card.is-active:hover {
+  border-color: rgba(45, 99, 245, 0.5);
+  box-shadow: inset 0 -4px 0 rgba(45, 99, 245, 0.4), 0 18px 30px rgba(45, 99, 245, 0.16);
+}
+
+.workmate-dashboard-top-stack .workmate-stat-card span {
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.workmate-dashboard-top-stack .workmate-stat-card strong {
+  color: var(--text-main);
+  font-size: 1rem;
+}
+
+.workmate-dashboard-my-stats-card {
+  display: grid;
+  align-content: stretch;
+  gap: 16px;
+  min-height: 100%;
+  padding: 18px;
+}
+
+.workmate-dashboard-my-stats-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.workmate-dashboard-my-stats-head h3 {
+  margin: 0;
+  font-size: 1.12rem;
+}
+
+.workmate-dashboard-my-stats-head > span {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.workmate-dashboard-my-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.workmate-dashboard-my-stats-grid > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(245, 247, 251, 0.92);
+}
+
+.workmate-dashboard-my-stats-grid span,
+.workmate-dashboard-my-stats-progress span {
+  color: var(--text-dim);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.workmate-dashboard-my-stats-grid strong {
+  overflow: hidden;
+  color: var(--text-main);
+  font-size: 1rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-dashboard-my-stats-progress {
+  display: grid;
+  gap: 8px;
+}
+
+.workmate-dashboard-my-stats-progress > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.workmate-dashboard-my-stats-progress strong {
+  color: var(--accent-strong);
+  font-size: 0.86rem;
+}
+
+.workmate-dashboard-my-stats-progress i {
+  display: block;
+  height: 10px;
+  max-width: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(45, 99, 245, 0.95), rgba(15, 118, 110, 0.72));
+  box-shadow: 0 8px 18px rgba(45, 99, 245, 0.12);
+}
+
+.workmate-dashboard-filter-hint,
+.workmate-dashboard-filter-preview p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+.workmate-dashboard-filter-hint {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(245, 247, 251, 0.92);
+  border: 1px solid rgba(223, 229, 240, 0.9);
+}
+
+.workmate-dashboard-filter-preview {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(245, 247, 251, 0.92);
+  border: 1px solid rgba(223, 229, 240, 0.9);
+}
+
+.workmate-dashboard-filter-preview span {
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.workmate-dashboard-filter-reset {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.workmate-dashboard-dual-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.workmate-dashboard-grid-card {
+  min-height: 0;
+}
+
+.workmate-dashboard-table-panel {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 16px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.workmate-dashboard-table-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.workmate-dashboard-table-shell .table-wrap {
+  grid-row: 2;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+  margin: 0;
+}
+
+.workmate-dashboard-table-shell .table-pagination {
+  grid-row: 3;
+  min-height: 0;
+}
+
+.table-filter-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.workmate-dashboard-filter-menu {
+  z-index: 1501;
+}
+
+.table-filter-option-button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.table-filter-option-button.is-active {
+  background: #eaf4ff;
+  color: #1a6ac8;
+  font-weight: 800;
+}
+
+.table-filter-footer-button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid #cfd8e3;
+  border-radius: 10px;
+  background: #17324a;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.table-filter-footer-button.subtle {
+  background: #ffffff;
+  color: #445466;
+}
+
+.table-filter-footer-button:hover {
+  border-color: #88b4e4;
+  background: #1a6ac8;
+  color: #ffffff;
+}
+
+.workmate-dashboard-summary-modal-sheet {
+  width: min(960px, calc(100vw - 48px));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.workmate-dashboard-summary-modal-body {
+  min-height: 0;
+  display: grid;
+  gap: 16px;
+  padding-top: 20px;
+}
+
+.workmate-dashboard-summary-list {
+  min-height: 0;
+  max-height: min(56vh, 640px);
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.workmate-dashboard-summary-list .mini-item {
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.workmate-dashboard-worker-cell {
+  display: grid;
+  gap: 4px;
+}
+
+.workmate-dashboard-worker-cell span {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.workmate-dashboard-detail-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0;
+  gap: 0;
+  border-radius: 14px;
+  vertical-align: middle;
+}
+
+.workmate-dashboard-detail-button .button-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.workmate-dashboard-table-shell td[style*="text-align: center"] .badge {
+  justify-content: center;
+}
+
+.workmate-dashboard-detail-modal-sheet {
+  width: min(1040px, calc(100vw - 48px));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.workmate-dashboard-detail-modal-body {
+  min-height: 0;
+  display: grid;
+  gap: 18px;
+  padding-top: 20px;
+}
+
+.workmate-dashboard-detail-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: rgba(245, 247, 251, 0.92);
+  border: 1px solid rgba(223, 229, 240, 0.9);
+}
+
+.workmate-dashboard-detail-identity {
+  display: grid;
+  gap: 6px;
+}
+
+.workmate-dashboard-detail-identity strong {
+  font-size: 1.08rem;
+}
+
+.workmate-dashboard-detail-identity p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.84rem;
+}
+
+.workmate-dashboard-detail-grid {
+  min-height: 0;
+}
+
+.workmate-dashboard-detail-field {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(223, 229, 240, 0.92);
+}
+
+.workmate-dashboard-detail-field span {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.workmate-dashboard-detail-field strong {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  word-break: break-word;
+}
+.workmate-schedule-shell {
+  display: grid;
+  gap: 18px;
+  min-height: 0;
+}
+
+.workmate-schedule-toolbar {
+  display: grid;
+  gap: 12px;
+}
+
+.workmate-schedule-toolbar-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.workmate-schedule-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.workmate-schedule-nav strong {
+  margin-left: 6px;
+  font-size: 1.1rem;
+}
+
+.workmate-schedule-nav-button {
+  min-width: 38px;
+  min-height: 38px;
+  padding: 0 12px;
+}
+
+.workmate-schedule-filter-group {
+  display: flex;
+  align-items: center;
+  flex: 1 1 420px;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.workmate-schedule-month-all-slot {
+  flex: 0 0 94px;
+  display: inline-flex;
+  justify-content: flex-start;
+}
+
+.workmate-schedule-toolbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.workmate-schedule-user-filter {
+  position: relative;
+  flex: 0 0 auto;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.workmate-schedule-user-filter-trigger {
+  width: auto;
+  min-height: 40px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+}
+
+.secondary-button.workmate-schedule-user-filter-trigger,
+.secondary-button.workmate-schedule-nav-button,
+.secondary-button.workmate-schedule-view-button,
+.secondary-button.workmate-schedule-month-all-button,
+.secondary-button.workmate-workspace-settings-button,
+.workmate-schedule-toolbar-actions > .secondary-button {
+  border: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--text);
+  box-shadow: none;
+}
+
+.secondary-button.workmate-schedule-user-filter-trigger:hover,
+.secondary-button.workmate-schedule-nav-button:hover,
+.secondary-button.workmate-schedule-view-button:hover,
+.secondary-button.workmate-schedule-month-all-button:hover,
+.secondary-button.workmate-workspace-settings-button:hover,
+.workmate-schedule-toolbar-actions > .secondary-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+.workmate-schedule-toolbar-actions > .secondary-button:disabled {
+  transform: none;
+  box-shadow: none;
+}
+
+.workmate-schedule-month-all-button {
+  min-width: 88px;
+}
+
+.workmate-schedule-month-all-button.is-placeholder {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.workmate-schedule-user-filter-trigger.is-active {
+  border-color: rgba(45, 99, 245, 0.58);
+  background: rgba(234, 242, 255, 0.98);
+  color: #1a6ac8;
+}
+
+.workmate-schedule-user-filter-trigger strong {
+  min-width: 0;
+  flex: 0 1 auto;
+  max-width: 92px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.88rem;
+  line-height: 1.2;
+}
+
+.workmate-schedule-user-filter-icon,
+.workmate-schedule-user-filter-caret {
+  flex: 0 0 auto;
+  color: currentColor;
+}
+
+.workmate-schedule-user-filter-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.workmate-schedule-user-filter-icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.workmate-schedule-user-filter-caret {
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  font-weight: 900;
+}

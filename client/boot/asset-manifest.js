@@ -1,0 +1,153 @@
+(function (globalScope, factory) {
+  if (typeof module === "object" && module.exports) {
+    module.exports = factory();
+    return;
+  }
+
+  globalScope.WorkMateAssetManifest = factory();
+})(typeof globalThis !== "undefined" ? globalThis : this, () => {
+  const companiesScripts = Object.freeze([
+    "/shared/app-config.js",
+    "/client/app/api-client.js",
+    "/client/app/html-utils.js",
+    "/client/app/state-factory.js",
+    "/client/app/runtime-context.js",
+    "/client/app/navigation.js",
+    "/client/renderers/common/formatters.js",
+    "/client/renderers/common/display.js",
+    "/client/renderers/shell.js",
+    "/client/renderers/companies.js",
+    "/client/renderers/workspace/stats.js",
+    "/client/renderers/module-resolver.js",
+    "/client/renderers/shared-bundle.js",
+    "/client/renderers/renderer-registry.js",
+    "/client/controllers/app-shell-controller.js",
+    "/client/controllers/app-lifecycle-controller.js",
+    "/client/controllers/app-form-controller.js",
+    "/client/controllers/app-interaction-click-companies.js",
+    "/client/controllers/app-interaction-click-handler.js",
+    "/client/controllers/app-interaction-input-handler.js",
+    "/client/controllers/app-interaction-key-companies.js",
+    "/client/controllers/app-interaction-key-handler.js",
+    "/client/controllers/app-interaction-controller.js",
+    "/client/app/module-resolver.js",
+    "/client/app/controller-shared-bundle.js",
+    "/client/app/controller-page-shell.js",
+    "/client/app/controller-page-lifecycle.js",
+    "/client/app/controller-page-bindings.js",
+    "/client/app/controller-page-bundle.js",
+    "/client/app/controller-registry.js",
+    "/client/app/page-bootstrap.js",
+  ]);
+  const workspaceScripts = Object.freeze([
+    "/shared/app-config.js",
+    "/client/app/api-client.js",
+    "/client/app/html-utils.js",
+    "/client/app/state-factory.js",
+    "/client/app/runtime-context.js",
+    "/client/app/navigation.js",
+    "/client/renderers/common/formatters.js",
+    "/client/renderers/common/display.js",
+    "/client/renderers/common/status-meta.js",
+    "/client/renderers/shell.js",
+    "/client/renderers/workspace/schedule-utils.js",
+    "/client/renderers/workspace/schedules.js",
+    "/client/renderers/workspace/dashboard-grid-state.js",
+    "/client/renderers/workspace/dashboard-record-models.js",
+    "/client/renderers/workspace/dashboard-table.js",
+    "/client/renderers/workspace/dashboard-grid.js",
+    "/client/renderers/workspace/dashboard.js",
+    "/client/renderers/workspace/leave.js",
+    "/client/renderers/workspace/attendance.js",
+    "/client/renderers/workspace/reports.js",
+    "/client/renderers/workspace/summary.js",
+    "/client/renderers/workspace/stats.js",
+    "/client/renderers/management/work-policy-normalizer.js",
+    "/client/renderers/management/work-policy-utils.js",
+    "/client/renderers/management/work-policy-metrics.js",
+    "/client/renderers/management/work-schedule-list.js",
+    "/client/renderers/management/work-policy-form-controls.js",
+    "/client/renderers/management/work-policy-form-sections.js",
+    "/client/renderers/management/work-policy-form.js",
+    "/client/renderers/management/work-schedules.js",
+    "/client/renderers/management/worksites.js",
+    "/client/renderers/management/units.js",
+    "/client/renderers/management/job-titles.js",
+    "/client/renderers/management/holidays.js",
+    "/client/renderers/management/settings.js",
+    "/client/renderers/module-resolver.js",
+    "/client/renderers/shared-bundle.js",
+    "/client/renderers/workspace-bundle.js",
+    "/client/renderers/management-bundle.js",
+    "/client/renderers/renderer-registry.js",
+    "/client/controllers/app-shell-controller.js",
+    "/client/controllers/app-lifecycle-controller.js",
+    "/client/controllers/app-form-controller.js",
+    "/client/controllers/app-interaction-click-management.js",
+    "/client/controllers/app-interaction-click-workspace.js",
+    "/client/controllers/app-interaction-click-handler.js",
+    "/client/controllers/app-interaction-input-management.js",
+    "/client/controllers/app-interaction-input-workspace.js",
+    "/client/controllers/app-interaction-input-handler.js",
+    "/client/controllers/app-interaction-key-workspace.js",
+    "/client/controllers/app-interaction-key-handler.js",
+    "/client/controllers/app-interaction-controller.js",
+    "/client/controllers/management-worksite-draft.js",
+    "/client/controllers/management-worksite-search.js",
+    "/client/controllers/management-worksite-map.js",
+    "/client/controllers/management-worksite-actions.js",
+    "/client/controllers/management-worksite-controller.js",
+    "/client/controllers/management-unit-controller.js",
+    "/client/controllers/management-job-title-controller.js",
+    "/client/controllers/management-holiday-controller.js",
+    "/client/controllers/management-section-context.js",
+    "/client/controllers/management-controller-composition.js",
+    "/client/controllers/management-controller.js",
+    "/client/controllers/table-filter-controller.js",
+    "/client/controllers/schedule-filter-controller.js",
+    "/client/controllers/dashboard-grid-controller.js",
+    "/client/controllers/workspace-data-range-loader.js",
+    "/client/controllers/workspace-data-schedule-loader.js",
+    "/client/controllers/workspace-data-session-loader.js",
+    "/client/controllers/workspace-data-holiday-loader.js",
+    "/client/controllers/workspace-data-controller.js",
+    "/client/controllers/work-policy-controller.js",
+    "/client/app/module-resolver.js",
+    "/client/app/controller-shared-workspace.js",
+    "/client/app/controller-shared-management.js",
+    "/client/app/controller-shared-bundle.js",
+    "/client/app/controller-page-shell.js",
+    "/client/app/controller-page-lifecycle.js",
+    "/client/app/controller-page-bindings.js",
+    "/client/app/controller-page-bundle.js",
+    "/client/app/controller-registry.js",
+    "/client/app/page-bootstrap.js",
+  ]);
+  const authPageScripts = Object.freeze([
+    "/shared/app-config.js",
+    "/client/app/api-client.js",
+    "/client/pages/auth-page.js",
+  ]);
+  const pageScripts = Object.freeze({
+    companies: companiesScripts,
+    login: authPageScripts,
+    signup: authPageScripts,
+    workspace: workspaceScripts,
+  });
+
+  function normalizePage(page = "") {
+    return String(page || "").trim().toLowerCase();
+  }
+
+  function getPageScripts(page = "") {
+    const normalizedPage = normalizePage(page);
+    return pageScripts[normalizedPage] || [];
+  }
+
+  return Object.freeze({
+    companiesScripts,
+    getPageScripts,
+    pageScripts,
+    workspaceScripts,
+  });
+});

@@ -1,0 +1,419 @@
+.applicant-admin-grid-card {
+  --applicant-history-status-width: 94px;
+  --applicant-history-action-width: 58px;
+}
+
+.applicant-admin-grid-card.is-empty-grid {
+  min-height: clamp(420px, calc(100vh - 240px), 760px);
+}
+
+.table-header-static {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 8px;
+}
+
+.table-inline-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.table-inline-actions-compact {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+.table-inline-actions-dual {
+  display: inline-grid;
+  grid-template-columns: max-content max-content;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.table-inline-actions-reserved::before,
+.table-inline-actions-reserved::after {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+  grid-row: 1;
+  box-sizing: border-box;
+  content: "";
+}
+
+.table-inline-actions-reserved::before {
+  grid-column: 1;
+  content: "저장";
+}
+
+.table-inline-actions-reserved::after {
+  grid-column: 2;
+  content: "취소";
+}
+
+.table-inline-button-span-2 {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  width: 100%;
+}
+
+.table-inline-button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgba(203, 213, 225, 0.92);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.table-inline-icon-button {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0;
+  border-radius: 10px;
+}
+
+.table-inline-icon-button .button-icon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.8;
+}
+
+.table-inline-button:hover,
+.table-inline-button:focus-visible {
+  border-color: rgba(45, 99, 245, 0.62);
+  box-shadow: 0 0 0 3px rgba(45, 99, 245, 0.12);
+}
+
+.table-inline-button.primary {
+  color: #ffffff;
+  border-color: rgba(45, 99, 245, 0.94);
+  background: linear-gradient(180deg, #2d63f5, #1f53e5);
+}
+
+.table-inline-button.danger {
+  color: #a61b35;
+  border-color: rgba(210, 65, 91, 0.28);
+  background: rgba(255, 238, 242, 0.98);
+}
+
+.table-inline-input,
+.table-inline-select {
+  width: 100%;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid rgba(203, 213, 225, 0.95);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.table-inline-input:focus,
+.table-inline-select:focus {
+  outline: none;
+  border-color: rgba(45, 99, 245, 0.72);
+  box-shadow: 0 0 0 3px rgba(45, 99, 245, 0.12);
+}
+
+.result-grid-card th:first-child,
+.result-grid-card td:first-child {
+  width: 64px;
+  min-width: 64px;
+  text-align: center;
+}
+
+.result-grid-card th.row-number-col,
+.result-grid-card td.row-number-col {
+  width: 64px;
+  min-width: 64px;
+  text-align: center;
+}
+
+.result-grid-card th.select-col,
+.result-grid-card td.select-col {
+  width: 64px;
+  min-width: 64px;
+  text-align: center;
+}
+
+.result-grid-card .select-col input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.result-grid-card th.table-action-column,
+.result-grid-card td.table-action-column {
+  width: 1%;
+  min-width: 0;
+  padding-left: 5px;
+  padding-right: 5px;
+  text-align: center;
+}
+
+.result-grid-card th.table-action-column .table-header-static {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.applicant-admin-grid-card th.table-column-detailAction .table-header-static,
+.applicant-admin-grid-card th.table-column-deleteAction .table-header-static,
+.applicant-admin-grid-card th.table-column-promoteAction .table-header-static {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.applicant-admin-grid-card th.table-column-statusLabel,
+.applicant-admin-grid-card td.table-column-statusLabel {
+  width: var(--applicant-history-status-width);
+  min-width: var(--applicant-history-status-width);
+  max-width: var(--applicant-history-status-width);
+}
+
+.applicant-admin-grid-card th.table-column-detailAction,
+.applicant-admin-grid-card td.table-column-detailAction,
+.applicant-admin-grid-card th.table-column-deleteAction,
+.applicant-admin-grid-card td.table-column-deleteAction {
+  width: var(--applicant-history-action-width);
+  min-width: var(--applicant-history-action-width);
+  max-width: var(--applicant-history-action-width);
+}
+
+.applicant-admin-grid-card td.table-column-statusLabel,
+.applicant-admin-grid-card td.table-column-detailAction,
+.applicant-admin-grid-card td.table-column-deleteAction {
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.applicant-admin-grid-card .table-column-statusLabel .applicant-status-chip {
+  min-width: 72px;
+  padding: 6px 8px;
+}
+
+.applicant-admin-grid-card .table-column-detailAction .table-inline-icon-button,
+.applicant-admin-grid-card .table-column-deleteAction .table-inline-icon-button {
+  margin: 0 auto;
+}
+
+.result-grid-card.has-print-column th:last-child,
+.result-grid-card.has-print-column td:last-child {
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+  text-align: center;
+}
+
+.result-grid-card table {
+  width: 100%;
+  min-width: 720px;
+  table-layout: fixed;
+}
+
+.table-cell-text {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: inherit;
+}
+
+.table-cell-text strong {
+  font: inherit;
+  font-weight: 800;
+}
+
+.table-cell-tooltip {
+  position: fixed;
+  z-index: 1200;
+  max-width: min(480px, calc(100vw - 24px));
+  padding: 10px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.94);
+  color: #f8fafc;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.45;
+  white-space: normal;
+  word-break: break-word;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.28);
+  pointer-events: none;
+}
+.account-management-table {
+  --account-inline-field-height: 34px;
+  --account-edit-action-width: 96px;
+  --account-reset-action-width: 70px;
+  --account-delete-action-width: 58px;
+}
+
+.examinee-data-table th.table-column-date,
+.examinee-data-table td.table-column-date {
+  width: 96px;
+}
+
+.examinee-data-table th.table-column-time,
+.examinee-data-table td.table-column-time {
+  width: 82px;
+}
+
+.examinee-data-table th.table-column-track,
+.examinee-data-table td.table-column-track {
+  width: 116px;
+}
+
+.examinee-data-table th.table-column-admission,
+.examinee-data-table td.table-column-admission {
+  width: 112px;
+}
+
+.examinee-data-table th.table-column-series,
+.examinee-data-table td.table-column-series {
+  width: 80px;
+}
+
+.examinee-data-table th.table-column-unit,
+.examinee-data-table td.table-column-unit {
+  width: 116px;
+}
+
+.examinee-data-table th.table-column-major,
+.examinee-data-table td.table-column-major {
+  width: 92px;
+}
+
+.examinee-data-table th.table-column-building,
+.examinee-data-table td.table-column-building {
+  width: 116px;
+}
+
+.examinee-data-table th.table-column-room,
+.examinee-data-table td.table-column-room {
+  width: 88px;
+}
+
+.examinee-data-table th.table-column-group,
+.examinee-data-table td.table-column-group {
+  width: 68px;
+}
+
+.examinee-data-table th.table-column-examineeNo,
+.examinee-data-table td.table-column-examineeNo {
+  width: 122px;
+}
+
+.examinee-data-table th.table-column-name,
+.examinee-data-table td.table-column-name {
+  width: 86px;
+}
+
+.examinee-data-table th.table-column-birth,
+.examinee-data-table td.table-column-birth {
+  width: 112px;
+}
+
+.examinee-data-table th.table-column-hasPhoto,
+.examinee-data-table td.table-column-hasPhoto {
+  width: 68px;
+}
+
+.print-history-table th.table-column-printedAt,
+.print-history-table td.table-column-printedAt {
+  width: 136px;
+}
+
+.examinee-registration-table table {
+  min-width: 1360px;
+}
+
+.admit-card-lookup-table table {
+  min-width: 1490px;
+}
+
+.print-history-table table {
+  min-width: 1450px;
+}
+
+.account-management-table table {
+  min-width: 1120px;
+}
+
+.account-management-table th.table-column-id,
+.account-management-table td.table-column-id {
+  width: 130px;
+}
+
+.account-management-table th.table-column-name,
+.account-management-table td.table-column-name {
+  width: 160px;
+}
+
+.account-management-table th.table-column-role,
+.account-management-table td.table-column-role {
+  width: 120px;
+}
+
+.account-management-table th.table-column-recentAccess,
+.account-management-table td.table-column-recentAccess {
+  width: 210px;
+}
+
+.account-management-table th.table-column-editAction,
+.account-management-table td.table-column-editAction {
+  width: var(--account-edit-action-width);
+  min-width: var(--account-edit-action-width);
+  max-width: var(--account-edit-action-width);
+}
+
+.account-management-table th.table-column-resetAction,
+.account-management-table td.table-column-resetAction {
+  width: var(--account-reset-action-width);
+  min-width: var(--account-reset-action-width);
+  max-width: var(--account-reset-action-width);
+}
+
+.account-management-table th.table-column-deleteAction,
+.account-management-table td.table-column-deleteAction {
+  width: var(--account-delete-action-width);
+  min-width: var(--account-delete-action-width);
+  max-width: var(--account-delete-action-width);
+}
+
+.account-management-table td.table-column-editAction,
+.account-management-table td.table-column-resetAction,
+.account-management-table td.table-column-deleteAction {
+  padding-left: 4px;
+  padding-right: 4px;
+}
