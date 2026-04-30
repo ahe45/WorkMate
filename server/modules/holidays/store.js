@@ -1,17 +1,14 @@
 const { createHttpError } = require("../common/http-error");
-const { generateId } = require("../common/ids");
-const {
-  DEFAULT_HOLIDAY_CALENDAR_CODE,
-  DEFAULT_HOLIDAY_CALENDAR_NAME,
-  DEFAULT_TIMEZONE,
-  HOLIDAY_SOURCE,
-} = require("./calendar");
+const { HOLIDAY_SOURCE } = require("./calendar");
 
 function createHolidayStore() {
   async function ensureOrganizationExists(queryRunner, organizationId) {
     const [rows] = await queryRunner(
       `
-        SELECT id
+        SELECT
+          id,
+          name,
+          timezone
         FROM organizations
         WHERE id = ?
           AND deleted_at IS NULL
@@ -23,59 +20,11 @@ function createHolidayStore() {
     if (!rows[0]) {
       throw createHttpError(404, "회사를 찾을 수 없습니다.", "ORG_NOT_FOUND");
     }
+
+    return rows[0];
   }
 
-  async function findOrCreateDefaultCalendar(queryRunner, organizationId) {
-    const [existingRows] = await queryRunner(
-      `
-        SELECT
-          id,
-          code,
-          name,
-          timezone
-        FROM holiday_calendars
-        WHERE organization_id = ?
-          AND code = ?
-        LIMIT 1
-      `,
-      [organizationId, DEFAULT_HOLIDAY_CALENDAR_CODE],
-    );
-
-    if (existingRows[0]) {
-      return existingRows[0];
-    }
-
-    const calendarId = generateId();
-
-    await queryRunner(
-      `
-        INSERT INTO holiday_calendars (
-          id,
-          organization_id,
-          code,
-          name,
-          timezone
-        )
-        VALUES (?, ?, ?, ?, ?)
-      `,
-      [
-        calendarId,
-        organizationId,
-        DEFAULT_HOLIDAY_CALENDAR_CODE,
-        DEFAULT_HOLIDAY_CALENDAR_NAME,
-        DEFAULT_TIMEZONE,
-      ],
-    );
-
-    return {
-      code: DEFAULT_HOLIDAY_CALENDAR_CODE,
-      id: calendarId,
-      name: DEFAULT_HOLIDAY_CALENDAR_NAME,
-      timezone: DEFAULT_TIMEZONE,
-    };
-  }
-
-  async function listCustomHolidayRowsByYear(queryRunner, calendarId, year) {
+  async function listCustomHolidayRowsByYear(queryRunner, organizationId, year) {
     const [rows] = await queryRunner(
       `
         SELECT
@@ -85,12 +34,12 @@ function createHolidayStore() {
           is_paid_holiday AS isPaidHoliday,
           COALESCE(repeat_unit, 'NONE') AS repeatUnit
         FROM holiday_dates
-        WHERE holiday_calendar_id = ?
+        WHERE organization_id = ?
           AND holiday_source = ?
           AND holiday_date <= ?
         ORDER BY holiday_date ASC, name ASC, id ASC
       `,
-      [calendarId, HOLIDAY_SOURCE.CUSTOM, `${year}-12-31`],
+      [organizationId, HOLIDAY_SOURCE.CUSTOM, `${year}-12-31`],
     );
 
     return rows;
@@ -101,12 +50,10 @@ function createHolidayStore() {
       `
         SELECT
           hd.id,
-          hd.holiday_calendar_id AS holidayCalendarId,
+          hd.organization_id AS organizationId,
           DATE_FORMAT(hd.holiday_date, '%Y-%m-%d') AS holidayDate
         FROM holiday_dates hd
-        INNER JOIN holiday_calendars hc
-          ON hc.id = hd.holiday_calendar_id
-        WHERE hc.organization_id = ?
+        WHERE hd.organization_id = ?
           AND hd.id = ?
           AND hd.holiday_source = ?
         LIMIT 1
@@ -117,10 +64,10 @@ function createHolidayStore() {
     return rows[0] || null;
   }
 
-  async function findCustomHolidayByDate(queryRunner, calendarId, holidayDate, excludedHolidayId = "") {
-    const params = [calendarId, holidayDate, HOLIDAY_SOURCE.CUSTOM];
+  async function findCustomHolidayByDate(queryRunner, organizationId, holidayDate, excludedHolidayId = "") {
+    const params = [organizationId, holidayDate, HOLIDAY_SOURCE.CUSTOM];
     let whereClause = `
-      WHERE holiday_calendar_id = ?
+      WHERE organization_id = ?
         AND holiday_date = ?
         AND holiday_source = ?
     `;
@@ -149,7 +96,6 @@ function createHolidayStore() {
     ensureOrganizationExists,
     findCustomHolidayByDate,
     findCustomHolidayById,
-    findOrCreateDefaultCalendar,
     listCustomHolidayRowsByYear,
   });
 }

@@ -124,35 +124,62 @@ CREATE TABLE sites (
   CONSTRAINT fk_sites_unit FOREIGN KEY (primary_unit_id) REFERENCES units(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE accounts (
+  id CHAR(36) NOT NULL,
+  login_email VARCHAR(150) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  name VARCHAR(100) NULL,
+  phone VARCHAR(30) NULL,
+  role_code VARCHAR(50) NULL,
+  created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at DATETIME(3) NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_accounts_login_email (login_email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE users (
   id CHAR(36) NOT NULL,
-  organization_id CHAR(36) NOT NULL,
+  organization_id CHAR(36) NULL,
+  account_id CHAR(36) NULL,
   employee_no VARCHAR(50) NOT NULL,
   login_email VARCHAR(150) NULL,
   password_hash VARCHAR(255) NULL,
   name VARCHAR(100) NOT NULL,
+  first_name VARCHAR(80) NULL,
+  last_name VARCHAR(80) NULL,
   phone VARCHAR(30) NULL,
   employment_status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
   employment_type VARCHAR(30) NULL,
   join_date DATE NOT NULL,
+  retire_date DATE NULL,
   timezone VARCHAR(64) NOT NULL DEFAULT 'Asia/Seoul',
-  primary_unit_id CHAR(36) NOT NULL,
+  primary_unit_id CHAR(36) NULL,
+  job_title_id CHAR(36) NULL,
   default_site_id CHAR(36) NULL,
   track_type VARCHAR(30) NULL,
-  work_policy_id CHAR(36) NOT NULL,
+  work_policy_id CHAR(36) NULL,
   manager_user_id CHAR(36) NULL,
+  note TEXT NULL,
+  personnel_card_json JSON NULL,
+  invite_channels_json JSON NULL,
+  join_request_status VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
   metadata_json JSON NULL,
   created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   deleted_at DATETIME(3) NULL,
   PRIMARY KEY (id),
   UNIQUE KEY uk_users_org_employee_no (organization_id, employee_no),
-  UNIQUE KEY uk_users_login_email (login_email),
+  UNIQUE KEY uk_users_org_login_email (organization_id, login_email),
+  KEY idx_users_account (account_id),
   KEY idx_users_org_status (organization_id, employment_status),
   KEY idx_users_org_unit (organization_id, primary_unit_id),
+  KEY idx_users_org_job_title (organization_id, job_title_id),
   KEY idx_users_manager (manager_user_id),
   CONSTRAINT fk_users_org FOREIGN KEY (organization_id) REFERENCES organizations(id),
+  CONSTRAINT fk_users_account FOREIGN KEY (account_id) REFERENCES accounts(id),
   CONSTRAINT fk_users_primary_unit FOREIGN KEY (primary_unit_id) REFERENCES units(id),
+  CONSTRAINT fk_users_job_title FOREIGN KEY (job_title_id) REFERENCES job_titles(id),
   CONSTRAINT fk_users_default_site FOREIGN KEY (default_site_id) REFERENCES sites(id),
   CONSTRAINT fk_users_work_policy FOREIGN KEY (work_policy_id) REFERENCES work_policies(id),
   CONSTRAINT fk_users_manager FOREIGN KEY (manager_user_id) REFERENCES users(id)
@@ -187,31 +214,46 @@ CREATE TABLE user_roles (
   CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roles(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE holiday_calendars (
+CREATE TABLE user_join_invitations (
   id CHAR(36) NOT NULL,
   organization_id CHAR(36) NOT NULL,
-  code VARCHAR(50) NOT NULL,
-  name VARCHAR(150) NOT NULL,
-  timezone VARCHAR(64) NOT NULL DEFAULT 'Asia/Seoul',
+  user_id CHAR(36) NOT NULL,
+  created_by_user_id CHAR(36) NULL,
+  invite_token_hash CHAR(64) NOT NULL,
+  invite_channels_json JSON NULL,
+  delivery_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+  delivery_mode VARCHAR(20) NULL,
+  delivery_message_id VARCHAR(255) NULL,
+  delivery_error VARCHAR(500) NULL,
+  expires_at DATETIME(3) NOT NULL,
+  sent_at DATETIME(3) NULL,
+  failed_at DATETIME(3) NULL,
+  consumed_at DATETIME(3) NULL,
+  revoked_at DATETIME(3) NULL,
+  replaced_by_invitation_id CHAR(36) NULL,
   created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   PRIMARY KEY (id),
-  UNIQUE KEY uk_holiday_calendars_org_code (organization_id, code),
-  CONSTRAINT fk_holiday_calendars_org FOREIGN KEY (organization_id) REFERENCES organizations(id)
+  UNIQUE KEY uk_user_join_invitations_token_hash (invite_token_hash),
+  KEY idx_user_join_invitations_user (user_id, expires_at),
+  KEY idx_user_join_invitations_org_user (organization_id, user_id, created_at),
+  CONSTRAINT fk_user_join_invitations_org FOREIGN KEY (organization_id) REFERENCES organizations(id),
+  CONSTRAINT fk_user_join_invitations_user FOREIGN KEY (user_id) REFERENCES users(id),
+  CONSTRAINT fk_user_join_invitations_created_by FOREIGN KEY (created_by_user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE holiday_dates (
   id CHAR(36) NOT NULL,
-  holiday_calendar_id CHAR(36) NOT NULL,
+  organization_id CHAR(36) NOT NULL,
   holiday_date DATE NOT NULL,
   name VARCHAR(150) NOT NULL,
   is_paid_holiday TINYINT(1) NOT NULL DEFAULT 1,
-  holiday_source VARCHAR(20) NOT NULL DEFAULT 'SYSTEM',
+  holiday_source VARCHAR(20) NOT NULL DEFAULT 'CUSTOM',
   repeat_unit VARCHAR(20) NOT NULL DEFAULT 'NONE',
   created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   PRIMARY KEY (id),
-  UNIQUE KEY uk_holiday_dates_calendar_date_source (holiday_calendar_id, holiday_date, holiday_source),
-  CONSTRAINT fk_holiday_dates_calendar FOREIGN KEY (holiday_calendar_id) REFERENCES holiday_calendars(id)
+  UNIQUE KEY uk_holiday_dates_org_date_source (organization_id, holiday_date, holiday_source),
+  CONSTRAINT fk_holiday_dates_org FOREIGN KEY (organization_id) REFERENCES organizations(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE schedule_templates (
@@ -301,9 +343,30 @@ CREATE TABLE shift_instances (
   CONSTRAINT fk_shift_instances_site FOREIGN KEY (site_id) REFERENCES sites(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE leave_groups (
+  id CHAR(36) NOT NULL,
+  organization_id CHAR(36) NOT NULL,
+  parent_leave_group_id CHAR(36) NULL,
+  code VARCHAR(50) NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  negative_limit_days DECIMAL(8,2) NOT NULL DEFAULT 0.00,
+  description TEXT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+  created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at DATETIME(3) NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_leave_groups_org_code (organization_id, code),
+  KEY idx_leave_groups_org_parent (organization_id, parent_leave_group_id),
+  KEY idx_leave_groups_org_status (organization_id, status),
+  CONSTRAINT fk_leave_groups_org FOREIGN KEY (organization_id) REFERENCES organizations(id),
+  CONSTRAINT fk_leave_groups_parent FOREIGN KEY (parent_leave_group_id) REFERENCES leave_groups(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE leave_types (
   id CHAR(36) NOT NULL,
   organization_id CHAR(36) NOT NULL,
+  leave_group_id CHAR(36) NULL,
   code VARCHAR(50) NOT NULL,
   name VARCHAR(100) NOT NULL,
   unit_type VARCHAR(20) NOT NULL DEFAULT 'DAY',
@@ -312,7 +375,9 @@ CREATE TABLE leave_types (
   updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   PRIMARY KEY (id),
   UNIQUE KEY uk_leave_types_org_code (organization_id, code),
-  CONSTRAINT fk_leave_types_org FOREIGN KEY (organization_id) REFERENCES organizations(id)
+  KEY idx_leave_types_group (leave_group_id),
+  CONSTRAINT fk_leave_types_org FOREIGN KEY (organization_id) REFERENCES organizations(id),
+  CONSTRAINT fk_leave_types_group FOREIGN KEY (leave_group_id) REFERENCES leave_groups(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE leave_balances (
@@ -332,6 +397,76 @@ CREATE TABLE leave_balances (
   CONSTRAINT fk_leave_balances_org FOREIGN KEY (organization_id) REFERENCES organizations(id),
   CONSTRAINT fk_leave_balances_user FOREIGN KEY (user_id) REFERENCES users(id),
   CONSTRAINT fk_leave_balances_leave_type FOREIGN KEY (leave_type_id) REFERENCES leave_types(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE leave_accrual_rules (
+  id CHAR(36) NOT NULL,
+  organization_id CHAR(36) NOT NULL,
+  rule_set_id CHAR(36) NULL,
+  rule_set_name VARCHAR(120) NULL,
+  leave_group_id CHAR(36) NOT NULL,
+  leave_type_id CHAR(36) NOT NULL,
+  name VARCHAR(120) NOT NULL,
+  frequency VARCHAR(20) NOT NULL DEFAULT 'YEARLY',
+  amount_days DECIMAL(8,2) NOT NULL DEFAULT 0.00,
+  basis_date_type VARCHAR(20) NOT NULL DEFAULT 'FISCAL_YEAR',
+  tenure_months INT NULL,
+  tenure_years INT NULL,
+  annual_month TINYINT NOT NULL DEFAULT 1,
+  annual_day TINYINT NOT NULL DEFAULT 1,
+  monthly_day TINYINT NOT NULL DEFAULT 1,
+  effective_from DATE NOT NULL,
+  effective_to DATE NULL,
+  expires_after_months INT NULL,
+  monthly_accrual_method VARCHAR(30) NULL,
+  reference_daily_minutes INT NULL,
+  attendance_accrual_method VARCHAR(30) NULL,
+  attendance_rate_threshold DECIMAL(5,2) NULL,
+  immediate_accrual_type VARCHAR(20) NULL,
+  proration_basis VARCHAR(20) NULL,
+  proration_unit VARCHAR(20) NULL,
+  rounding_method VARCHAR(20) NULL,
+  rounding_increment DECIMAL(8,2) NULL,
+  min_amount_days DECIMAL(8,2) NULL,
+  max_amount_days DECIMAL(8,2) NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+  created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  deleted_at DATETIME(3) NULL,
+  PRIMARY KEY (id),
+  KEY idx_leave_accrual_rules_org_status (organization_id, status),
+  KEY idx_leave_accrual_rules_rule_set (organization_id, rule_set_id),
+  KEY idx_leave_accrual_rules_group (leave_group_id),
+  CONSTRAINT fk_leave_accrual_rules_org FOREIGN KEY (organization_id) REFERENCES organizations(id),
+  CONSTRAINT fk_leave_accrual_rules_group FOREIGN KEY (leave_group_id) REFERENCES leave_groups(id),
+  CONSTRAINT fk_leave_accrual_rules_type FOREIGN KEY (leave_type_id) REFERENCES leave_types(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE leave_accrual_entries (
+  id CHAR(36) NOT NULL,
+  organization_id CHAR(36) NOT NULL,
+  user_id CHAR(36) NOT NULL,
+  leave_group_id CHAR(36) NOT NULL,
+  leave_type_id CHAR(36) NOT NULL,
+  balance_year SMALLINT NOT NULL,
+  source_type VARCHAR(20) NOT NULL DEFAULT 'MANUAL',
+  source_ref_id CHAR(36) NULL,
+  accrual_date DATE NOT NULL,
+  expires_at DATE NULL,
+  amount_days DECIMAL(8,2) NOT NULL DEFAULT 0.00,
+  memo TEXT NULL,
+  created_by_user_id CHAR(36) NULL,
+  created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_leave_accrual_entries_rule_run (organization_id, user_id, leave_type_id, source_type, source_ref_id, accrual_date),
+  KEY idx_leave_accrual_entries_org_date (organization_id, accrual_date),
+  KEY idx_leave_accrual_entries_user_year (user_id, balance_year),
+  CONSTRAINT fk_leave_accrual_entries_org FOREIGN KEY (organization_id) REFERENCES organizations(id),
+  CONSTRAINT fk_leave_accrual_entries_user FOREIGN KEY (user_id) REFERENCES users(id),
+  CONSTRAINT fk_leave_accrual_entries_group FOREIGN KEY (leave_group_id) REFERENCES leave_groups(id),
+  CONSTRAINT fk_leave_accrual_entries_type FOREIGN KEY (leave_type_id) REFERENCES leave_types(id),
+  CONSTRAINT fk_leave_accrual_entries_created_by FOREIGN KEY (created_by_user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE attendance_sessions (

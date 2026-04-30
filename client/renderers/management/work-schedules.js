@@ -17,6 +17,7 @@
       getDashboardGridState,
       getScheduleTypeMeta,
       hasDashboardGridFilter,
+      renderManagementModalHeaderActions,
       renderBadge,
       renderDashboardFilterMenu,
       renderEmptyState,
@@ -64,7 +65,6 @@
       normalizeManagementPolicyDayOfMonth: normalizer.normalizeManagementPolicyDayOfMonth,
       normalizeManagementPolicyHolidayDateRules: normalizer.normalizeManagementPolicyHolidayDateRules,
       normalizeManagementPolicyMaximumRule: normalizer.normalizeManagementPolicyMaximumRule,
-      normalizeManagementPolicyMinimumRule: normalizer.normalizeManagementPolicyMinimumRule,
       normalizeManagementPolicySettlementRule: normalizer.normalizeManagementPolicySettlementRule,
       normalizeManagementPolicyStandardRule: normalizer.normalizeManagementPolicyStandardRule,
       normalizeManagementPolicyWorkingDays: normalizer.normalizeManagementPolicyWorkingDays,
@@ -88,9 +88,11 @@
       formatManagementWorkScheduleDayLabel: scheduleListRenderer.formatManagementWorkScheduleDayLabel,
       getManagementWorkPolicyInformation: normalizer.getManagementWorkPolicyInformation,
       getManagementWorkScheduleDayName: scheduleListRenderer.getManagementWorkScheduleDayName,
-      normalizeManagementPolicyBoolean: normalizer.normalizeManagementPolicyBoolean,
+      normalizeManagementPolicyContractualRule: normalizer.normalizeManagementPolicyContractualRule,
+      normalizeManagementPolicyDayRules: normalizer.normalizeManagementPolicyDayRules,
       normalizeManagementPolicyMaximumRule: normalizer.normalizeManagementPolicyMaximumRule,
-      normalizeManagementPolicyMinimumRule: normalizer.normalizeManagementPolicyMinimumRule,
+      normalizeManagementPolicyBoolean: normalizer.normalizeManagementPolicyBoolean,
+      normalizeManagementPolicyMaximumWorkRule: normalizer.normalizeManagementPolicyMaximumWorkRule,
       normalizeManagementPolicySettlementRule: normalizer.normalizeManagementPolicySettlementRule,
       normalizeManagementPolicyStandardRule: normalizer.normalizeManagementPolicyStandardRule,
       normalizeManagementPolicyStringList: normalizer.normalizeManagementPolicyStringList,
@@ -139,154 +141,146 @@
           filterable: true,
           getFilterValue: (record) => String(record?.displayName || "").trim(),
           key: "name",
-          label: "정책명",
+          label: "근로정책명",
           sortable: false,
         },
-        { filterable: false, key: "type", label: "근로제 / 범위", sortable: false },
-        { filterable: false, key: "rules", label: "기준 요약", sortable: false },
-        { filterable: false, key: "templates", label: "연결 일정", sortable: false },
-        { filterable: false, key: "settings", label: "설정", sortable: false },
+        { filterable: false, key: "employment", label: "적용대상", sortable: false },
+        { filterable: false, key: "workDays", label: "근로일", sortable: false },
+        { filterable: false, key: "unpaidOffDays", label: "무급 휴무일", sortable: false },
+        { filterable: false, key: "paidHolidays", label: "유급 휴일", sortable: false },
+        { filterable: false, key: "contractualRule", label: "소정근로규칙", sortable: false },
+        { filterable: false, key: "maximumRule", label: "최대근로규칙", sortable: false },
+        { filterable: false, key: "settings", label: "관리", sortable: false },
         { filterable: false, key: "delete", label: "삭제", sortable: false },
       ];
     }
 
-    function getManagementWorkPolicyTypeMeta(workType = "") {
-      const normalizedWorkType = String(workType || "").trim().toUpperCase();
-      const labels = {
-        DEEMED: { label: "간주근로", tone: "orange" },
-        DISCRETIONARY: { label: "재량근로", tone: "purple" },
-        FIXED: { label: "고정근로", tone: "blue" },
-        FLEXIBLE: { label: "탄력근로", tone: "green" },
-        SCHEDULE_BASED: { label: "스케줄 기반", tone: "gray" },
-        SELECTIVE: { label: "선택근로", tone: "teal" },
-      };
-
-      return labels[normalizedWorkType] || {
-        label: normalizedWorkType || "근로정책",
-        tone: "gray",
-      };
+    function normalizeManagementWorkPolicyUnit(value = "", fallback = "DAY") {
+      const normalizedValue = String(value || "").trim().toUpperCase();
+      return ["DAY", "WEEK", "MONTH"].includes(normalizedValue) ? normalizedValue : fallback;
     }
 
-    function getManagementWorkPolicyScopeLabel(scope = "") {
-      const normalizedScope = String(scope || "").trim().toUpperCase();
-      const labels = {
-        JOB_TITLES: "직급 선택",
-        MIXED: "혼합 선택",
-        ORGANIZATION: "전체 회사",
-        SITES: "근무지 선택",
-        UNITS: "조직 선택",
-      };
-
-      return labels[normalizedScope] || "적용 범위";
-    }
-
-    function getManagementWorkPolicyTargetNames(targetRule = {}, maps = {}) {
-      const unitNames = toArray(targetRule.unitIds)
-        .map((unitId) => maps.unitNameById.get(String(unitId || "").trim()) || "")
-        .filter(Boolean);
-      const jobTitleNames = toArray(targetRule.jobTitleIds)
-        .map((jobTitleId) => maps.jobTitleNameById.get(String(jobTitleId || "").trim()) || "")
-        .filter(Boolean);
-      const siteNames = toArray(targetRule.siteIds)
-        .map((siteId) => maps.siteNameById.get(String(siteId || "").trim()) || "")
-        .filter(Boolean);
-
-      return Array.from(new Set([...unitNames, ...jobTitleNames, ...siteNames]));
-    }
-
-    function formatManagementWorkPolicyTargetSummary(targetRule = {}, maps = {}) {
-      const scopeLabel = getManagementWorkPolicyScopeLabel(targetRule.scope);
-      const names = getManagementWorkPolicyTargetNames(targetRule, maps);
-
-      if (targetRule.scope === "ORGANIZATION") {
-        return {
-          countLabel: "전체 구성원",
-          label: scopeLabel,
-        };
-      }
-
-      if (names.length === 0) {
-        return {
-          countLabel: "선택 항목 없음",
-          label: scopeLabel,
-        };
-      }
+    function formatManagementWorkPolicyEmploymentSummary(info = {}) {
+      const employmentTargetType = String(info.employmentTargetType || "").trim().toUpperCase();
+      const isPartTime = employmentTargetType === "PART_TIME";
 
       return {
-        countLabel: `${formatNumber(names.length)}개 대상`,
-        label: names.length === 1
-          ? names[0]
-          : `${names[0]} 외 ${formatNumber(names.length - 1)}개`,
+        detail: isPartTime ? `시급 ${formatNumber(info.hourlyWage || 0)}원` : "",
+        label: isPartTime ? "아르바이트" : "임직원",
       };
     }
 
-    function formatManagementWorkPolicyHolidaySummary(info = {}) {
-      const labels = [];
+    function formatManagementWorkPolicyDayRuleRangeLabel(dayNumbers = []) {
+      const dayDisplayOrder = [7, 1, 2, 3, 4, 5, 6];
+      const normalizedDays = Array.from(new Set(toArray(dayNumbers)
+        .map((dayOfWeek) => Number(dayOfWeek))
+        .filter((dayOfWeek) => Number.isInteger(dayOfWeek) && dayDisplayOrder.includes(dayOfWeek))))
+        .sort((left, right) => dayDisplayOrder.indexOf(left) - dayDisplayOrder.indexOf(right));
 
-      if (info.includeWeekends) {
-        labels.push("주말 포함");
+      if (normalizedDays.length === 0) {
+        return "-";
       }
 
-      if (info.settlementRule?.excludePublicHolidays) {
-        labels.push("공휴일 제외");
+      if (normalizedDays.length === dayDisplayOrder.length) {
+        return "매일";
       }
 
-      if (info.settlementRule?.excludeSubstituteHolidays) {
-        labels.push("대체공휴일 제외");
+      const indices = normalizedDays.map((dayOfWeek) => dayDisplayOrder.indexOf(dayOfWeek));
+      const ranges = [];
+      let startIndex = indices[0];
+      let previousIndex = indices[0];
+
+      for (let index = 1; index < indices.length; index += 1) {
+        const currentIndex = indices[index];
+
+        if (currentIndex === previousIndex + 1) {
+          previousIndex = currentIndex;
+          continue;
+        }
+
+        ranges.push({ end: previousIndex, start: startIndex });
+        startIndex = currentIndex;
+        previousIndex = currentIndex;
       }
 
-      if (info.settlementRule?.excludeCustomHolidays) {
-        labels.push("지정 휴일 제외");
+      ranges.push({ end: previousIndex, start: startIndex });
+
+      if (ranges.length > 1 && ranges[0].start === 0 && ranges[ranges.length - 1].end === dayDisplayOrder.length - 1) {
+        const firstRange = ranges.shift();
+        const lastRange = ranges.pop();
+
+        ranges.unshift({
+          end: firstRange?.end ?? 0,
+          start: lastRange?.start ?? 0,
+        });
       }
 
-      return labels.length > 0 ? labels.join(" · ") : "휴일 기본값";
+      return ranges.map((range) => {
+        const startDay = dayDisplayOrder[range.start];
+        const endDay = dayDisplayOrder[range.end];
+        const startLabel = scheduleListRenderer.getManagementWorkScheduleDayName(startDay);
+        const endLabel = scheduleListRenderer.getManagementWorkScheduleDayName(endDay);
+
+        return range.start === range.end
+          ? startLabel
+          : `${startLabel}-${endLabel}`;
+      }).join(", ");
+    }
+
+    function formatManagementWorkPolicyDayRuleSummary(info = {}, type = "WORK") {
+      const dayType = String(type || "").trim().toUpperCase();
+      const matchingDayNumbers = toArray(info.dayRules)
+        .filter((rule) => String(rule?.type || "").trim().toUpperCase() === dayType)
+        .map((rule) => rule?.dayOfWeek);
+      return formatManagementWorkPolicyDayRuleRangeLabel(matchingDayNumbers);
+    }
+
+    function formatManagementWorkPolicyRuleUnitLabel(unit = "WEEK") {
+      const normalizedUnit = normalizeManagementWorkPolicyUnit(unit, "WEEK");
+      return normalizedUnit === "MONTH"
+        ? "월"
+        : normalizedUnit === "DAY"
+          ? "일"
+          : "주";
+    }
+
+    function formatManagementWorkPolicyRuleSummary(unit = "WEEK", minutes = 0) {
+      return `${formatManagementWorkPolicyRuleUnitLabel(unit)} ${metrics.formatManagementPolicyDuration(minutes)}`;
+    }
+
+    function formatManagementWorkPolicyContractualRuleSummary(info = {}) {
+      const rule = info.contractualRule || {};
+
+      return formatManagementWorkPolicyRuleSummary(rule.unit, rule.minutes);
+    }
+
+    function formatManagementWorkPolicyMaximumRuleSummary(info = {}) {
+      const rule = info.contractualRule || {};
+
+      return formatManagementWorkPolicyRuleSummary(rule.overtimeLimitUnit || rule.unit, rule.overtimeLimitMinutes);
     }
 
     function buildManagementWorkPolicyListModel(stats = {}) {
       const policies = sortManagementWorkPolicies(getManagementWorkPolicies(stats));
-      const unitNameById = new Map(toArray(stats.units).map((unit) => [String(unit?.id || "").trim(), String(unit?.name || unit?.code || "").trim()]));
-      const jobTitleNameById = new Map(toArray(stats.jobTitles).map((jobTitle) => [String(jobTitle?.id || "").trim(), String(jobTitle?.name || "").trim()]));
-      const siteNameById = new Map(toArray(stats.sites).map((site) => [String(site?.id || "").trim(), String(site?.name || "").trim()]));
-      const templateCountByPolicyId = toArray(stats.templates).reduce((map, template) => {
-        const policyId = String(template?.workPolicyId || "").trim();
-
-        if (!policyId) {
-          return map;
-        }
-
-        map.set(policyId, Number(map.get(policyId) || 0) + 1);
-        return map;
-      }, new Map());
 
       const records = policies.map((policy, index) => {
         const info = normalizer.getManagementWorkPolicyInformation(policy || {});
-        const typeMeta = getManagementWorkPolicyTypeMeta(info.workType);
-        const targetSummary = formatManagementWorkPolicyTargetSummary(info.targetRule || {}, {
-          jobTitleNameById,
-          siteNameById,
-          unitNameById,
-        });
-        const workingDayLabel = scheduleListRenderer.formatManagementWorkScheduleDayLabel(
-          toArray(info.workingDays).map((dayOfWeek) => ({ dayOfWeek })),
-        );
-        const policyId = String(policy?.id || "").trim();
+        const employmentSummary = formatManagementWorkPolicyEmploymentSummary(info);
+        const contractualRuleSummary = formatManagementWorkPolicyContractualRuleSummary(info);
+        const maximumRuleSummary = formatManagementWorkPolicyMaximumRuleSummary(info);
 
         return {
           ...policy,
-          dailyMaxLabel: metrics.formatManagementPolicyDuration(info.dailyMaxMinutes),
-          dailyMinLabel: metrics.formatManagementPolicyDuration(info.dailyMinMinutes),
-          defaultBadgeLabel: policy?.isDefault ? "기본 정책" : "",
+          contractualRuleSummary,
           displayName: info.policyName || policy?.name || "근로정책",
-          holidaySummary: formatManagementWorkPolicyHolidaySummary(info),
+          employmentDetail: employmentSummary.detail,
+          employmentLabel: employmentSummary.label,
           info,
-          linkedTemplateCount: Number(templateCountByPolicyId.get(policyId) || 0),
+          maximumRuleSummary,
           orderLabel: formatNumber(index + 1),
-          targetCountLabel: targetSummary.countLabel,
-          targetSummary: targetSummary.label,
-          typeLabel: typeMeta.label,
-          typeTone: typeMeta.tone,
-          workingDayLabel,
-          workingRuleSummary: `${workingDayLabel} · 하루 ${metrics.formatManagementPolicyDuration(info.standardDailyMinutes)}`,
+          paidHolidayLabel: formatManagementWorkPolicyDayRuleSummary(info, "PAID_HOLIDAY"),
+          unpaidOffDayLabel: formatManagementWorkPolicyDayRuleSummary(info, "UNPAID_OFF"),
+          workDayLabel: formatManagementWorkPolicyDayRuleSummary(info, "WORK"),
         };
       });
 
@@ -301,7 +295,7 @@
           <span class="workmate-worksite-grid-action-head">순서</span>
           <span class="workmate-work-policy-grid-head-cell${isNameFilterActive ? " is-filter-active" : ""}">
             <span class="table-header-shell has-filter">
-              <span class="table-header-label workmate-work-policy-grid-head-label">정책명</span>
+              <span class="table-header-label workmate-work-policy-grid-head-label">근로정책명</span>
               <button
                 class="table-filter-button"
                 data-dashboard-grid-filter-open="true"
@@ -314,10 +308,13 @@
               </button>
             </span>
           </span>
-          <span>근로제 / 범위</span>
-          <span>기준 요약</span>
-          <span>연결 일정</span>
-          <span class="workmate-worksite-grid-action-head">설정</span>
+          <span>적용대상</span>
+          <span>근로일</span>
+          <span>무급 휴무일</span>
+          <span>유급 휴일</span>
+          <span>소정근로규칙</span>
+          <span>최대근로규칙</span>
+          <span class="workmate-worksite-grid-action-head">관리</span>
           <span class="workmate-worksite-grid-action-head">삭제</span>
         </div>
       `;
@@ -378,29 +375,29 @@
                   ${renderManagementOrderCell(record?.orderLabel || "-")}
                 </div>
                 <div class="workmate-work-policy-record-grid-cell">
-                  <div class="workmate-work-policy-record-name">
-                    <strong>${escapeHtml(record?.displayName || "근로정책")}</strong>
-                    <div class="workmate-work-policy-record-badges">
-                      ${record?.isDefault ? renderBadge("기본 정책", "blue") : ""}
-                      ${renderBadge(record?.typeLabel || "근로정책", record?.typeTone || "gray")}
-                    </div>
-                  </div>
-                  <span>${escapeHtml(record?.isDefault ? "회사 기본 정책" : "추가 정책")}</span>
+                  <strong>${escapeHtml(record?.displayName || "근로정책")}</strong>
                 </div>
                 <div class="workmate-work-policy-record-grid-cell">
-                  <strong>${escapeHtml(record?.targetSummary || "-")}</strong>
-                  <span>${escapeHtml(`${getManagementWorkPolicyScopeLabel(record?.info?.targetRule?.scope)} · ${record?.targetCountLabel || "선택 항목 없음"}`)}</span>
+                  <strong>${escapeHtml(record?.employmentLabel || "-")}</strong>
+                  ${record?.employmentDetail ? `<span>${escapeHtml(record.employmentDetail)}</span>` : ""}
                 </div>
                 <div class="workmate-work-policy-record-grid-cell">
-                  <strong>${escapeHtml(record?.workingRuleSummary || "-")}</strong>
-                  <span>${escapeHtml(`최소 ${record?.dailyMinLabel || "-"} · 최대 ${record?.dailyMaxLabel || "-"} · ${record?.holidaySummary || "휴일 기본값"}`)}</span>
+                  <strong>${escapeHtml(record?.workDayLabel || "-")}</strong>
                 </div>
                 <div class="workmate-work-policy-record-grid-cell">
-                  <strong>${escapeHtml(`${formatNumber(record?.linkedTemplateCount || 0)}개`)}</strong>
-                  <span>${escapeHtml(record?.linkedTemplateCount ? "연결된 근무일정" : "연결 일정 없음")}</span>
+                  <strong>${escapeHtml(record?.unpaidOffDayLabel || "-")}</strong>
+                </div>
+                <div class="workmate-work-policy-record-grid-cell">
+                  <strong>${escapeHtml(record?.paidHolidayLabel || "-")}</strong>
+                </div>
+                <div class="workmate-work-policy-record-grid-cell">
+                  <strong>${escapeHtml(record?.contractualRuleSummary || "-")}</strong>
+                </div>
+                <div class="workmate-work-policy-record-grid-cell">
+                  <strong>${escapeHtml(record?.maximumRuleSummary || "-")}</strong>
                 </div>
                 <div class="workmate-work-policy-record-grid-cell workmate-worksite-grid-actions">
-                  <button class="icon-button table-inline-icon-button workmate-worksite-record-action" data-management-work-policy-open="${escapeAttribute(recordId)}" type="button" aria-label="근로정책 설정">
+                  <button class="icon-button table-inline-icon-button workmate-worksite-record-action" data-management-work-policy-open="${escapeAttribute(recordId)}" type="button" aria-label="근로정책 관리">
                     <svg class="button-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <circle cx="12" cy="12" r="2.6"></circle>
                       <path d="M19 12a7.4 7.4 0 0 0-.08-1.02l2.05-1.58-2-3.46-2.47 1a7.91 7.91 0 0 0-1.76-1.02L14.5 3h-5l-.24 2.92a7.91 7.91 0 0 0-1.76 1.02l-2.47-1-2 3.46 2.05 1.58A7.4 7.4 0 0 0 5 12c0 .34.03.68.08 1.02l-2.05 1.58 2 3.46 2.47-1a7.91 7.91 0 0 0 1.76 1.02L9.5 21h5l.24-2.92a7.91 7.91 0 0 0 1.76-1.02l2.47 1 2-3.46-2.05-1.58c.05-.34.08-.68.08-1.02Z"></path>
@@ -429,28 +426,6 @@
       `;
     }
 
-    function renderManagementWorkPolicyTemplatePanel(model = {}, stats = {}) {
-      const selectedPolicyId = String(model?.policy?.id || "").trim();
-
-      if (!selectedPolicyId) {
-        return `
-          <article class="workmate-grid-empty-row">
-            <div class="workmate-worksite-grid-empty-copy">
-              <strong>저장 후 연결 근무일정을 확인할 수 있습니다.</strong>
-              <p>신규 정책은 저장한 뒤 템플릿과의 연결 현황이 표시됩니다.</p>
-            </div>
-          </article>
-        `;
-      }
-
-      const scheduleModel = scheduleListRenderer.buildManagementWorkScheduleModel({
-        ...stats,
-        templates: toArray(stats.templates).filter((template) => String(template?.workPolicyId || "").trim() === selectedPolicyId),
-      });
-
-      return scheduleListRenderer.renderManagementWorkScheduleRows(scheduleModel.records);
-    }
-
     function renderManagementWorkPolicyModal(state = {}, stats = {}) {
       if (!state.managementWorkPolicyModalOpen) {
         return "";
@@ -470,52 +445,25 @@
         ...(model.info || {}),
         holidayDateRules: normalizer.buildManagementWorkPolicyHolidayDateRules(stats.holidayData || {}),
       };
-      const saveLabel = String(draft.mode || "").trim().toLowerCase() === "edit"
-        ? "근로정책 업데이트"
-        : "근로정책 저장";
-      const modalDescription = String(draft.mode || "").trim().toLowerCase() === "edit"
-        ? "저장된 근로정책의 적용 대상과 계산 기준을 수정합니다."
-        : "현재 근로정책 구성을 기반으로 새 정책을 추가합니다.";
-
       return `
         <div class="modal" id="management-work-policy-modal" aria-hidden="false" role="dialog" aria-modal="true" aria-labelledby="management-work-policy-modal-title">
           <div class="modal-backdrop" data-management-work-policy-close="true" aria-hidden="true"></div>
           <section class="modal-sheet workmate-work-policy-modal-sheet">
             <header class="modal-header">
               <div>
-                <p class="page-kicker">Policy workspace</p>
-                <h3 id="management-work-policy-modal-title">${escapeHtml(String(draft.mode || "").trim().toLowerCase() === "edit" ? "근로정책 설정 수정" : "근로정책 설정 등록")}</h3>
-                <p>${escapeHtml(modalDescription)}</p>
+                <h3 id="management-work-policy-modal-title">${escapeHtml(String(draft.mode || "").trim().toLowerCase() === "edit" ? "근로정책 수정" : "근로정책 추가")}</h3>
               </div>
-              <button class="icon-button" data-management-work-policy-close="true" type="button" aria-label="닫기">×</button>
+              ${renderManagementModalHeaderActions(state, {
+                closeAction: "data-management-work-policy-close",
+                formId: "management-work-policy-form",
+                modalType: "workPolicy",
+              })}
             </header>
-            <div class="modal-toolbar">
-              <div class="page-indicator">
-                ${model?.policy?.isDefault ? renderBadge("기본 정책", "blue") : renderBadge("추가 정책", "gray")}
-                ${renderBadge(getManagementWorkPolicyTypeMeta(info.workType).label, getManagementWorkPolicyTypeMeta(info.workType).tone)}
-              </div>
-              <div class="toolbar-actions">
-                <button class="outline-button" data-management-work-policy-close="true" type="button">취소</button>
-                <button class="outline-button" data-management-work-policy-reset="true" type="button">초기화</button>
-                <button class="primary-button" form="management-work-policy-form" type="submit">${escapeHtml(saveLabel)}</button>
-              </div>
-            </div>
             <div class="modal-body workmate-work-policy-modal-body">
-              <div class="workmate-work-policy-modal-layout">
-                <section class="panel-card workmate-work-policy-modal-panel">
-                  ${metrics.renderManagementWorkPolicyStageMetrics(info)}
-                  ${formRenderer.renderManagementWorkPolicyForm(model, stats)}
-                </section>
-                <section class="panel-card workmate-work-schedule-record-panel">
-                  <div class="workmate-worksite-panel-head">
-                    <div>
-                      <h4>연결 근무일정</h4>
-                      <p>선택한 근로정책을 사용하는 근무일정 템플릿만 표시합니다.</p>
-                    </div>
-                  </div>
-                  ${renderManagementWorkPolicyTemplatePanel(model, stats)}
-                </section>
-              </div>
+              <section class="panel-card workmate-work-policy-modal-panel">
+                ${metrics.renderManagementWorkPolicyStageMetrics(info)}
+                ${formRenderer.renderManagementWorkPolicyForm(model, stats)}
+              </section>
             </div>
           </section>
         </div>
@@ -529,11 +477,11 @@
 
       return `
         <section class="workmate-admin-content-stack">
-          <article class="panel-card workmate-work-schedule-record-panel">
+          <article class="panel-card workmate-work-policy-record-panel">
             <div class="workmate-worksite-panel-head">
               <div>
-                <h4>근로정책 설정</h4>
-                <p>근무지나 직급 설정과 같은 방식으로 정책을 추가하고 상세 기준은 모달에서 편집합니다.</p>
+                <h4>근로정책 관리</h4>
+                <p>적용대상, 요일별 근무 속성, 소정·최대근로 기준으로 근로정책을 관리합니다.</p>
               </div>
               ${hasRecords ? `
                 <div class="workmate-topbar-actions workmate-worksite-panel-controls">
@@ -557,6 +505,7 @@
       buildManagementWorkPolicyHolidayDateRules: normalizer.buildManagementWorkPolicyHolidayDateRules,
       calculateManagementWorkPolicyStageMetrics: metrics.calculateManagementWorkPolicyStageMetrics,
       renderManagementWorkPolicyAdjustmentRow: formRenderer.renderManagementWorkPolicyAdjustmentRow,
+      renderManagementWorkPolicyBreakAutoRangeRow: formRenderer.renderManagementWorkPolicyBreakAutoRangeRow,
       renderManagementWorkSchedulesView,
     });
   }

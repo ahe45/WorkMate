@@ -1,0 +1,187 @@
+﻿/* WorkMate responsive rules up to 900px */
+
+@media (max-width: 900px) {
+  .workmate-dashboard-top-stack,
+  .workmate-dashboard-hero .workmate-stat-stack,
+  .workmate-dashboard-my-stats-grid,
+  .workmate-company-card-meta,
+  .workmate-table-head,
+  .workmate-table-row {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-schedule-month-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-work-policy-period-layout {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .workmate-work-policy-period-range-field {
+    padding-left: 0;
+    padding-top: 14px;
+    border-left: 0;
+    border-top: 1px solid rgba(223, 229, 240, 0.92);
+  }
+
+  .workmate-work-policy-day-rule-grid,
+  .workmate-work-policy-field-grid,
+  .workmate-work-policy-toggle-grid,
+  .workmate-leave-rule-basic-grid,
+  .workmate-leave-rule-frequency-toggle,
+  .workmate-leave-rule-immediate-mode,
+  .workmate-leave-rule-immediate-panel,
+  .workmate-leave-rule-immediate-panel[data-management-leave-rule-immediate-section="PRORATED"],
+  .workmate-leave-rule-monthly-method-options,
+  .workmate-leave-rule-monthly-method-panel,
+  .workmate-leave-rule-monthly-method-panel.is-contractual,
+  .workmate-leave-rule-monthly-method-panel.is-attendance,
+  .workmate-leave-rule-range-head-monthly,
+  .workmate-leave-rule-range-row-monthly,
+  .workmate-leave-rule-range-head-yearly,
+  .workmate-leave-rule-range-row-yearly,
+  .workmate-leave-rule-form,
+  .workmate-work-policy-break-auto-row-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-leave-rule-section-head,
+  .workmate-leave-rule-range-panel-head {
+    flex-direction: column;
+  }
+
+  .workmate-leave-rule-section-head span,
+  .workmate-leave-rule-range-panel-head span {
+    max-width: none;
+    text-align: left;
+  }
+
+  .workmate-leave-rule-range-head {
+    display: none;
+  }
+
+  .workmate-leave-rule-range-row .field > span:first-child:not(.workmate-leave-rule-unit-field) {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  .workmate-leave-rule-method-note p {
+    white-space: normal;
+  }
+
+  .workmate-leave-rule-unit-field {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workmate-leave-rule-attendance-threshold-field .workmate-leave-rule-unit-field input {
+    max-width: none;
+  }
+
+  .workmate-work-policy-contractual-options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-work-policy-identity-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-work-policy-identity-grid > :first-child {
+    padding-right: 0;
+  }
+
+  .workmate-work-policy-identity-grid > :first-child::after {
+    content: none;
+  }
+
+  .workmate-work-policy-contractual-holiday-field {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .workmate-work-policy-contractual-holiday-options {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-work-policy-contractual-time-grid > .workmate-work-policy-time-field {
+    padding: 14px 0 0;
+  }
+
+  .workmate-work-policy-contractual-time-grid > .workmate-work-policy-time-field:first-child {
+    padding-top: 0;
+  }
+
+  .workmate-work-policy-contractual-time-grid > .workmate-work-policy-time-field + .workmate-work-policy-time-field {
+    border-left: 0;
+    border-top: 1px solid rgba(223, 229, 240, 0.92);
+  }
+
+  .workmate-work-policy-break-auto-row-action {
+    justify-content: flex-start;
+  }
+
+  .workmate-schedule-grid-head {
+    display: none;
+  }
+
+  .workmate-schedule-month-cell {
+    min-height: auto;
+    border-right: 0;
+  }
+
+  .workmate-schedule-day-axis,
+  .workmate-schedule-day-body {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-schedule-day-corner,
+  .workmate-schedule-day-user {
+    border-right: 1px solid rgba(223, 229, 240, 0.92);
+  }
+
+  .workmate-dashboard-hero {
+    gap: 18px;
+  }
+
+  .workmate-company-stage-panel {
+    padding: 20px;
+  }
+
+  .workmate-workspace-item,
+  .workmate-workspace-item-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workmate-workspace-item-meta {
+    justify-content: flex-start;
+  }
+
+  .workmate-workspace-item {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-workspace-item-main {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workmate-workspace-item-cta {
+    width: 100%;
+  }
+
+  .workmate-workspace-item-actions,
+  .workmate-workspace-settings-button {
+    width: 100%;
+  }
+
+  .workmate-topbar-actions {
+    width: 100%;
+  }
+}

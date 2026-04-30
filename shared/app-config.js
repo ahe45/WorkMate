@@ -18,27 +18,47 @@
         Object.freeze({
           description: "지도 기반 위치와 반경으로 인정 근무지를 설정합니다.",
           key: "worksites",
-          label: "근무지 설정",
+          label: "근무지 관리",
         }),
         Object.freeze({
           description: "상위 조직과 하위 조직 구조를 단계적으로 구성합니다.",
           key: "units",
-          label: "조직 설정",
+          label: "조직 관리",
         }),
         Object.freeze({
           description: "직원 데이터에 연결된 직급 체계를 확인하고 관리 기준을 준비합니다.",
           key: "job-titles",
-          label: "직급 설정",
+          label: "직급 관리",
         }),
         Object.freeze({
-          description: "적용 대상, 정산 기준, 소정·최소·최대 근로시간 규칙을 설정합니다.",
+          description: "합류 요청, 임시저장, 재직 상태를 포함한 직원 인사 정보를 관리합니다.",
+          key: "employees",
+          label: "직원 관리",
+        }),
+        Object.freeze({
+          description: "적용 대상, 정산 기준, 소정·최대 근로시간 규칙을 설정합니다.",
           key: "work-schedules",
-          label: "근로정책 설정",
+          label: "근로정책 관리",
+        }),
+        Object.freeze({
+          description: "휴가 잔액을 묶는 휴가정책을 생성하고 현황을 관리합니다.",
+          key: "leave-policies",
+          label: "휴가정책 관리",
+        }),
+        Object.freeze({
+          description: "휴가 발생 규칙을 설정하고 직원별 수동 부여를 처리합니다.",
+          key: "leave-accrual-rules",
+          label: "휴가 생성 관리",
+        }),
+        Object.freeze({
+          description: "수동 부여와 자동 발생으로 생성된 휴가 발생 원장을 확인합니다.",
+          key: "leave-accrual-entries",
+          label: "휴가 발생 내역",
         }),
         Object.freeze({
           description: "회사 공휴일과 휴무 기준일을 관리할 수 있는 화면입니다.",
           key: "holidays",
-          label: "공휴일 설정",
+          label: "공휴일 관리",
         }),
       ]),
     }),
@@ -50,14 +70,9 @@
       views: Object.freeze(["dashboard", "schedules", "attendance", "leave", "reports"]),
     }),
     Object.freeze({
-      key: "engagement",
-      title: "커뮤니케이션",
-      views: Object.freeze(["messages", "contracts", "closing"]),
-    }),
-    Object.freeze({
       key: "administration",
       title: "관리",
-      views: Object.freeze(["management", "company-settings", "profile"]),
+      views: Object.freeze(["management"]),
     }),
   ]);
   const pageTitles = Object.freeze({
@@ -69,13 +84,8 @@
     attendance: "출퇴근기록",
     leave: "휴가현황",
     requests: "리포트",
-    messages: "메시지",
-    contracts: "전자계약",
-    closing: "마감 관리",
     reports: "리포트",
     management: "관리",
-    "company-settings": "회사 설정",
-    profile: "프로필",
   });
   const workspaceViewDefinitions = Object.freeze(
     workspaceMenuSections.reduce((definitions, section) => {

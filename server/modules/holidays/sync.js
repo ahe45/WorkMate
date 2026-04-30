@@ -1,6 +1,5 @@
-const { generateId } = require("../common/ids");
 const {
-  HOLIDAY_SOURCE,
+  DEFAULT_TIMEZONE,
   buildHolidaySummary,
   expandCustomHolidayOccurrences,
   generateKoreanPublicHolidays,
@@ -14,57 +13,19 @@ function createHolidaySyncService({ holidayStore, withTransaction }) {
 
     return withTransaction(async (connection) => {
       const queryRunner = connection.query.bind(connection);
-      await holidayStore.ensureOrganizationExists(queryRunner, organizationId);
-      const calendar = await holidayStore.findOrCreateDefaultCalendar(queryRunner, organizationId);
+      const organization = await holidayStore.ensureOrganizationExists(queryRunner, organizationId);
       const generated = generateKoreanPublicHolidays(year);
-      const dateFrom = `${year}-01-01`;
-      const dateTo = `${year}-12-31`;
-
-      await queryRunner(
-        `
-          DELETE FROM holiday_dates
-          WHERE holiday_calendar_id = ?
-            AND holiday_source = ?
-            AND holiday_date BETWEEN ? AND ?
-        `,
-        [calendar.id, HOLIDAY_SOURCE.SYSTEM, dateFrom, dateTo],
-      );
-
-      for (const item of generated.items) {
-        await queryRunner(
-          `
-            INSERT INTO holiday_dates (
-              id,
-              holiday_calendar_id,
-              holiday_date,
-              name,
-              is_paid_holiday,
-              holiday_source
-            )
-            VALUES (?, ?, ?, ?, ?, ?)
-          `,
-          [
-            generateId(),
-            calendar.id,
-            item.date,
-            item.name,
-            item.isPaidHoliday ? 1 : 0,
-            HOLIDAY_SOURCE.SYSTEM,
-          ],
-        );
-      }
-
-      const customItems = (await holidayStore.listCustomHolidayRowsByYear(queryRunner, calendar.id, year))
+      const customItems = (await holidayStore.listCustomHolidayRowsByYear(queryRunner, organizationId, year))
         .flatMap((row) => expandCustomHolidayOccurrences(row, year));
 
       return {
-        calendarCode: calendar.code,
-        calendarId: calendar.id,
-        calendarName: calendar.name,
+        calendarCode: "CUSTOM",
+        calendarId: organization.id,
+        calendarName: `${String(organization.name || "회사").trim() || "회사"} 지정 공휴일`,
         items: mergeHolidayItems(generated.items, customItems),
         notices: generated.notices,
         summary: buildHolidaySummary(generated, customItems),
-        timezone: calendar.timezone,
+        timezone: organization.timezone || DEFAULT_TIMEZONE,
         year,
       };
     });

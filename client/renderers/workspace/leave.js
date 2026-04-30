@@ -95,7 +95,7 @@
     return `
       <section class="view-stack">
         <section class="metric-grid">
-          ${renderMetricCard("대상 직원", formatNumber(records.length), "현재 재직", "tone-blue")}
+          ${renderMetricCard("대상 직원", `${formatNumber(records.length)}명`, "현재 재직", "tone-blue")}
           ${renderMetricCard("전체 휴가 보유", formatLeaveDays(totals.totalHeld), "현재 잔여", "tone-green")}
           ${renderMetricCard("연차휴가 보유", formatLeaveDays(totals.annualHeld), "현재 잔여", "tone-orange")}
           ${renderMetricCard("보상/기타 보유", formatLeaveDays(totals.compensatoryHeld + totals.otherHeld), "현재 잔여", "tone-purple")}

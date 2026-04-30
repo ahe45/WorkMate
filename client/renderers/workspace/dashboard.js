@@ -23,6 +23,24 @@
       renderDashboardSummaryModal,
     } = deps;
 
+    function getOverviewWorkStatusFilterLabel(record = {}) {
+      const normalizedFilterKey = String(record?.workStatusFilterKey || "").trim().toLowerCase();
+
+      if (["working", "remote", "clocked_out"].includes(normalizedFilterKey)) {
+        return "출근";
+      }
+
+      if (normalizedFilterKey === "leave") {
+        return "휴가";
+      }
+
+      if (normalizedFilterKey === "off_duty") {
+        return "휴무";
+      }
+
+      return String(record?.workStatusLabel || "").trim() || "-";
+    }
+
   function renderDashboardView(state = {}) {
     const stats = buildStats(state);
     const { combinedRecords, statusCards, statusRecords } = buildDashboardRecords(stats);
@@ -69,7 +87,7 @@
       },
       {
         align: "center",
-        getFilterValue: (record) => record.workStatusLabel,
+        getFilterValue: (record) => getOverviewWorkStatusFilterLabel(record),
         getSortValue: (record) => record.workStatusLabel,
         key: "workStatusLabel",
         label: "근무 상태",

@@ -9,6 +9,7 @@
   function create(dependencies = {}) {
     const {
       api,
+      createDefaultManagementEmployeeDraft,
       createDefaultManagementHolidayDraft,
       createDefaultManagementJobTitleDraft,
       createDefaultManagementUnitDraft,
@@ -17,12 +18,15 @@
       currentPage,
       CURRENT_YEAR,
       DEFAULT_WORKSITE_COORDS,
+      formatLocalDateKey,
       LEAFLET_CSS_URL,
       LEAFLET_JS_URL,
       loadManagementHolidayData,
       normalizeManagementSection,
       refreshWorkspaceData,
       renderWorkspacePage,
+      setInlineMessage,
+      showToast,
       SOUTH_KOREA_VIEWBOX,
       state,
     } = dependencies;
@@ -64,6 +68,12 @@
       "./management-holiday-controller.js",
       "client/controllers/management-holiday-controller.js must be loaded before client/controllers/management-controller-composition.js.",
     );
+    const managementEmployeeControllerModule = resolve(
+      runtime,
+      "WorkMateManagementEmployeeController",
+      "./management-employee-controller.js",
+      "client/controllers/management-employee-controller.js must be loaded before client/controllers/management-controller-composition.js.",
+    );
 
     const managementWorksiteController = managementWorksiteControllerModule.create({
       api,
@@ -103,8 +113,19 @@
       renderWorkspacePage,
       state,
     });
+    const managementEmployeeController = managementEmployeeControllerModule.create({
+      api,
+      createDefaultManagementEmployeeDraft,
+      formatLocalDateKey,
+      refreshWorkspaceData,
+      renderWorkspacePage,
+      setInlineMessage,
+      showToast,
+      state,
+    });
 
     return Object.freeze({
+      ...managementEmployeeController,
       ...managementWorksiteController,
       ...managementUnitController,
       ...managementJobTitleController,

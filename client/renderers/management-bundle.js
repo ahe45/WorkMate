@@ -47,7 +47,9 @@
       hasDashboardGridFilter: shared.hasDashboardGridFilter,
       renderBadge: shared.renderBadge,
       renderDashboardFilterMenu: shared.renderDashboardFilterMenu,
+      renderDashboardGridTable: shared.renderDashboardGridTable,
       renderEmptyState: shared.renderEmptyState,
+      renderMetricCard: shared.renderMetricCard,
       resolveDashboardGridRecords: shared.resolveDashboardGridRecords,
       toArray: shared.toArray,
     });
@@ -55,6 +57,7 @@
       buildManagementWorkPolicyHolidayDateRules,
       calculateManagementWorkPolicyStageMetrics,
       renderManagementWorkPolicyAdjustmentRow,
+      renderManagementWorkPolicyBreakAutoRangeRow,
       renderManagementView,
     } = managementSettingsRenderer;
 
@@ -62,6 +65,7 @@
       buildManagementWorkPolicyHolidayDateRules,
       calculateManagementWorkPolicyStageMetrics,
       renderManagementWorkPolicyAdjustmentRow,
+      renderManagementWorkPolicyBreakAutoRangeRow,
       renderManagementView,
     });
   }

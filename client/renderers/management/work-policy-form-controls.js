@@ -12,11 +12,11 @@
       escapeHtml,
       formatManagementWorkScheduleDayLabel,
       getManagementWorkScheduleDayName,
-      normalizeManagementPolicyBoolean,
-      normalizeManagementPolicyStringList,
+      normalizeManagementPolicyDayRules,
       normalizeManagementPolicyWorkingDays,
       toArray,
     } = deps;
+    const MANAGEMENT_POLICY_WORKING_DAY_ORDER = [7, 1, 2, 3, 4, 5, 6];
 
     function formatManagementPolicyTimeInput(minutes = 0) {
       const numericMinutes = Number(minutes);
@@ -33,7 +33,14 @@
     }
 
     function formatManagementPolicyDayLabel(dayNumbers = []) {
-      return formatManagementWorkScheduleDayLabel(toArray(dayNumbers).map((dayOfWeek) => ({ dayOfWeek })));
+      const normalizedDayNumbers = Array.from(new Set(toArray(dayNumbers)
+        .map((dayOfWeek) => Number(dayOfWeek))
+        .filter((dayOfWeek) => Number.isInteger(dayOfWeek) && dayOfWeek >= 1 && dayOfWeek <= 7)))
+        .sort((left, right) => MANAGEMENT_POLICY_WORKING_DAY_ORDER.indexOf(left) - MANAGEMENT_POLICY_WORKING_DAY_ORDER.indexOf(right));
+
+      return normalizedDayNumbers.length > 0
+        ? normalizedDayNumbers.map((dayOfWeek) => getManagementWorkScheduleDayName(dayOfWeek)).join(", ")
+        : formatManagementWorkScheduleDayLabel([]);
     }
 
     function formatManagementPolicyHolidayLabel(info = {}) {
@@ -58,24 +65,58 @@
       return labels.length > 0 ? labels.join(", ") : "휴일 제외";
     }
 
-    function renderManagementWorkPolicyDayOptions(info = {}) {
-      const selectedDays = new Set(normalizeManagementPolicyWorkingDays(info.workingDays, [1, 2, 3, 4, 5]).map((day) => Number(day)));
+    function renderManagementWorkPolicyDayRules(info = {}) {
+      const useBlankSelection = Boolean(info?.isCreateBlank);
+      const dayRules = useBlankSelection && Array.isArray(info?.dayRules) && info.dayRules.length > 0
+        ? info.dayRules
+        : typeof normalizeManagementPolicyDayRules === "function"
+          ? normalizeManagementPolicyDayRules(info.dayRules, info)
+          : MANAGEMENT_POLICY_WORKING_DAY_ORDER.map((dayOfWeek) => ({ dayOfWeek, type: dayOfWeek >= 1 && dayOfWeek <= 5 ? "WORK" : dayOfWeek === 7 ? "PAID_HOLIDAY" : "UNPAID_OFF" }));
+      const dayRuleTypeByDay = dayRules.reduce((map, rule) => {
+        map.set(Number(rule?.dayOfWeek || 0), String(rule?.type || "").trim().toUpperCase());
+        return map;
+      }, new Map());
+      const options = [
+        { label: "근로", value: "WORK" },
+        { label: "무급 휴무", value: "UNPAID_OFF" },
+        { label: "유급 휴일", value: "PAID_HOLIDAY" },
+      ];
 
-      return [1, 2, 3, 4, 5, 6, 7].map((dayOfWeek) => `
-      <label class="checkbox-field workmate-work-policy-day-option">
-        <input name="workingDays" type="checkbox" value="${escapeAttribute(dayOfWeek)}"${selectedDays.has(dayOfWeek) ? " checked" : ""} />
-        <span>${escapeHtml(getManagementWorkScheduleDayName(dayOfWeek))}</span>
-      </label>
-    `).join("");
+      return MANAGEMENT_POLICY_WORKING_DAY_ORDER.map((dayOfWeek) => {
+        const selectedType = dayRuleTypeByDay.get(dayOfWeek) || (useBlankSelection ? "" : "UNPAID_OFF");
+
+        return `
+        <article class="workmate-work-policy-day-rule-card">
+          <strong class="workmate-work-policy-day-rule-name">${escapeHtml(getManagementWorkScheduleDayName(dayOfWeek))}</strong>
+          <div class="workmate-work-policy-day-rule-options">
+            ${options.map((option) => `
+              <label class="workmate-work-policy-day-rule-option">
+                <input
+                  class="workmate-work-policy-day-rule-input"
+                  name="dayRule${escapeAttribute(dayOfWeek)}"
+                  type="radio"
+                  value="${escapeAttribute(option.value)}"
+                  ${selectedType === option.value ? "checked" : ""}
+                />
+                <span class="workmate-work-policy-day-rule-button">${escapeHtml(option.label)}</span>
+              </label>
+            `).join("")}
+          </div>
+        </article>
+      `;
+      }).join("");
     }
 
     function renderManagementWorkPolicyDurationOptions(type = "hour", selectedMinutes = 0, maxMinutes = 1440) {
       const normalizedMaxMinutes = Math.max(0, Math.round(Number(maxMinutes) || 1440));
       const maxHour = Math.floor(normalizedMaxMinutes / 60);
       const maxMinute = normalizedMaxMinutes % 60;
-      const normalizedMinutes = Math.max(0, Math.min(normalizedMaxMinutes, Math.round(Number(selectedMinutes) || 0)));
-      const selectedHour = Math.floor(normalizedMinutes / 60);
-      const selectedMinute = normalizedMinutes % 60;
+      const hasSelection = Number.isFinite(Number(selectedMinutes));
+      const normalizedMinutes = hasSelection
+        ? Math.max(0, Math.min(normalizedMaxMinutes, Math.round(Number(selectedMinutes) || 0)))
+        : Number.NaN;
+      const selectedHour = hasSelection ? Math.floor(normalizedMinutes / 60) : null;
+      const selectedMinute = hasSelection ? normalizedMinutes % 60 : null;
       const maxValue = type === "hour" ? maxHour : 59;
 
       return Array.from({ length: maxValue + 1 }, (_, value) => {
@@ -97,13 +138,17 @@
     }
 
     function renderManagementWorkPolicyTimeField({
+      allowBlank = false,
       idBase = "",
       label = "",
       maxMinutes = 1440,
       minutes = 0,
       name = "",
     } = {}) {
-      const value = formatManagementPolicyTimeInput(Math.min(Number(minutes) || 0, Number(maxMinutes) || 1440));
+      const hasValue = Number.isFinite(Number(minutes));
+      const value = allowBlank && !hasValue
+        ? ""
+        : formatManagementPolicyTimeInput(Math.min(Number(minutes) || 0, Number(maxMinutes) || 1440));
       const panelId = `${idBase}-picker`;
 
       return `
@@ -146,68 +191,26 @@
     `;
     }
 
-    function renderManagementWorkPolicySelectOptions(options = [], selectedValue = "") {
+    function renderManagementWorkPolicySelectOptions(options = [], selectedValue = "", placeholderLabel = "") {
       const normalizedSelectedValue = String(selectedValue || "").trim().toUpperCase();
 
-      return toArray(options).map((option) => {
+      const placeholderMarkup = placeholderLabel
+        ? `<option value=""${!normalizedSelectedValue ? " selected" : ""}>${escapeHtml(placeholderLabel)}</option>`
+        : "";
+
+      return `${placeholderMarkup}${toArray(options).map((option) => {
         const value = String(option?.value || "").trim();
 
         return `<option value="${escapeAttribute(value)}"${value === normalizedSelectedValue ? " selected" : ""}>${escapeHtml(option?.label || value)}</option>`;
-      }).join("");
-    }
-
-    function renderManagementWorkPolicyTargetChecklist(name = "", items = [], selectedIds = [], emptyLabel = "선택할 항목이 없습니다.") {
-      const selectedIdSet = new Set(normalizeManagementPolicyStringList(selectedIds));
-      const records = toArray(items).filter((item) => String(item?.id || "").trim());
-
-      if (records.length === 0) {
-        return `<span class="workmate-work-policy-target-empty">${escapeHtml(emptyLabel)}</span>`;
-      }
-
-      return records.map((item) => {
-        const itemId = String(item?.id || "").trim();
-        const itemName = String(item?.pathLabel || item?.name || item?.code || itemId).trim();
-
-        return `
-        <label class="checkbox-field workmate-work-policy-target-option">
-          <input name="${escapeAttribute(name)}" type="checkbox" value="${escapeAttribute(itemId)}"${selectedIdSet.has(itemId) ? " checked" : ""} />
-          <span>${escapeHtml(itemName)}</span>
-        </label>
-      `;
-      }).join("");
-    }
-
-    function renderManagementWorkPolicyAdjustmentOptions(adjustment = {}, index = 0) {
-      const appliesTo = new Set(normalizeManagementPolicyStringList(adjustment.appliesTo || ["WEEK", "MONTH"]));
-
-      return `
-      <div class="workmate-work-policy-adjustment-options">
-        <label class="checkbox-field workmate-work-policy-toggle">
-          <input name="minimumAdjustmentOnlyIfWorkingDay_${escapeAttribute(index)}" type="checkbox"${normalizeManagementPolicyBoolean(adjustment.onlyIfWorkingDay, true) ? " checked" : ""} />
-          <span>근로일인 경우만</span>
-        </label>
-        <label class="checkbox-field workmate-work-policy-toggle">
-          <input name="minimumAdjustmentSkipIfHoliday_${escapeAttribute(index)}" type="checkbox"${normalizeManagementPolicyBoolean(adjustment.skipIfHoliday, true) ? " checked" : ""} />
-          <span>공휴일이면 제외</span>
-        </label>
-        ${["DAY", "WEEK", "MONTH"].map((unit) => `
-          <label class="checkbox-field workmate-work-policy-toggle">
-            <input name="minimumAdjustmentAppliesTo_${escapeAttribute(index)}" type="checkbox" value="${escapeAttribute(unit)}"${appliesTo.has(unit) ? " checked" : ""} />
-            <span>${escapeHtml(unit === "DAY" ? "일 반영" : unit === "WEEK" ? "주 반영" : "월 반영")}</span>
-          </label>
-        `).join("")}
-      </div>
-    `;
+      }).join("")}`;
     }
 
     return Object.freeze({
       formatManagementPolicyDayLabel,
       formatManagementPolicyHolidayLabel,
       formatManagementPolicyTimeInput,
-      renderManagementWorkPolicyAdjustmentOptions,
-      renderManagementWorkPolicyDayOptions,
+      renderManagementWorkPolicyDayRules,
       renderManagementWorkPolicySelectOptions,
-      renderManagementWorkPolicyTargetChecklist,
       renderManagementWorkPolicyTimeField,
     });
   }

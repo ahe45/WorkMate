@@ -374,7 +374,7 @@
 
     return `
       <section class="metric-grid">
-        ${renderMetricCard("대상 직원", formatNumber(records.length), "필터 반영", "tone-blue")}
+        ${renderMetricCard("대상 직원", `${formatNumber(records.length)}명`, "필터 반영", "tone-blue")}
         ${renderMetricCard("소정근로시간", formatReportMinutes(totals.scheduledWorkMinutes), "그리드 합계", "tone-green")}
         ${renderMetricCard("근로시간", formatReportMinutes(totals.actualWorkMinutes), "그리드 합계", "tone-orange")}
         ${renderMetricCard("유급시간", formatReportMinutes(totals.actualPaidMinutes), "그리드 합계", "tone-purple")}

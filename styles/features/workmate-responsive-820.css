@@ -1,0 +1,82 @@
+﻿/* WorkMate responsive rules up to 820px */
+
+@media (max-width: 820px) {
+  .workmate-admin-stage-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-employee-modal-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .workmate-employee-toolbar-actions,
+  .workmate-employee-panel-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .workmate-employee-toolbar-actions > button,
+  .workmate-employee-panel-actions > button {
+    flex: 1 1 auto;
+  }
+
+  .workmate-worksite-search-row,
+  .workmate-worksite-map-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workmate-worksite-search-submit {
+    align-self: flex-end;
+  }
+
+  .workmate-worksite-map-shell,
+  .workmate-worksite-map {
+    min-height: 320px;
+  }
+
+  .workmate-worksite-grid-head,
+  .workmate-worksite-grid-row,
+  .workmate-work-policy-record-grid-head,
+  .workmate-work-policy-record-grid-row,
+  .workmate-work-schedule-grid-head,
+  .workmate-work-schedule-grid-row,
+  .workmate-holiday-grid-head,
+  .workmate-holiday-grid-row,
+  .workmate-leave-policy-record-grid-head,
+  .workmate-leave-policy-record-grid-row,
+  .workmate-leave-rule-record-grid-head,
+  .workmate-leave-rule-record-grid-row,
+  .workmate-title-record-grid-head,
+  .workmate-title-record-grid-row {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-leave-policy-tabs,
+  .workmate-leave-policy-form,
+  .workmate-leave-policy-entry-head,
+  .workmate-leave-policy-entry-row {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-leave-policy-row,
+  .workmate-leave-policy-run {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workmate-leave-policy-run input,
+  .workmate-leave-policy-run button {
+    max-width: none;
+    width: 100%;
+  }
+
+  .workmate-unit-tree-node {
+    padding-left: 22px;
+  }
+
+  .workmate-unit-tree-node::after {
+    width: 14px;
+  }
+}

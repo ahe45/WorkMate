@@ -10,3 +10,27 @@
   font-size: 0.76rem;
   text-align: center;
 }
+
+.workmate-auth-shell input[readonly] {
+  cursor: not-allowed;
+  background: rgba(241, 245, 249, 0.92);
+  color: #475569;
+}
+
+.workmate-auth-action-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 10px;
+}
+
+.workmate-auth-reject-button {
+  color: #a61b35;
+  border-color: rgba(210, 65, 91, 0.28);
+  background: rgba(255, 238, 242, 0.98);
+}
+
+@media (max-width: 560px) {
+  .workmate-auth-action-row {
+    grid-template-columns: 1fr;
+  }
+}

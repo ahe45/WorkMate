@@ -1,0 +1,675 @@
+﻿/* WorkMate management employee styles */
+
+.workmate-employee-excel-modal-body {
+  display: grid;
+  gap: 16px;
+  min-height: 0;
+  padding-top: 20px;
+}
+
+.upload-grid.workmate-employee-excel-upload-grid {
+  display: grid;
+  grid-template-columns: minmax(340px, 0.92fr) minmax(0, 1.08fr);
+  gap: 18px;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.upload-card {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  padding: 22px;
+  border: 1px solid rgba(203, 213, 225, 0.72);
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
+}
+
+.upload-card h4,
+.upload-card p {
+  margin: 0;
+}
+
+.upload-card p {
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.upload-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.upload-template-button {
+  flex: 0 0 auto;
+  color: var(--accent-strong);
+  background: rgba(45, 99, 245, 0.1);
+  border-color: rgba(45, 99, 245, 0.2);
+}
+
+.upload-template-button:hover {
+  background: rgba(45, 99, 245, 0.16);
+}
+
+.workmate-employee-excel-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(245, 247, 251, 0.94);
+  border: 1px solid rgba(223, 229, 240, 0.92);
+}
+
+.workmate-employee-excel-card-meta span {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.workmate-employee-excel-card-meta strong {
+  color: #17324a;
+  font-size: 0.9rem;
+}
+
+.upload-dropzone {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  gap: 10px;
+  padding: 18px;
+  border: 1px dashed rgba(45, 99, 245, 0.28);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(246, 250, 255, 0.98), rgba(238, 244, 255, 0.9));
+}
+
+.upload-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.upload-select-button {
+  min-width: 112px;
+}
+
+.upload-dropzone strong {
+  color: #17324a;
+  font-size: 0.92rem;
+}
+
+.upload-dropzone span {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.workmate-employee-excel-card-hint {
+  display: grid;
+  gap: 8px;
+}
+
+.workmate-employee-excel-card-hint p {
+  font-size: 0.82rem;
+}
+
+.upload-preview-panel.workmate-employee-excel-preview-panel {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  min-height: 0;
+  padding: 22px;
+  border: 1px solid rgba(203, 213, 225, 0.82);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 249, 253, 0.96));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.upload-preview-empty {
+  display: grid;
+  gap: 8px;
+}
+
+.upload-preview-empty strong,
+.workmate-employee-excel-preview-head strong {
+  color: #17324a;
+  font-size: 1rem;
+}
+
+.upload-preview-empty p,
+.workmate-employee-excel-preview-head span,
+.workmate-employee-excel-preview-notes p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+.workmate-employee-excel-preview-head {
+  display: grid;
+  gap: 6px;
+}
+
+.upload-preview-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.upload-preview-summary-item {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(223, 229, 240, 0.92);
+}
+
+.upload-preview-summary-item span {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.upload-preview-summary-item strong {
+  color: #17324a;
+  font-size: 1rem;
+}
+
+.upload-preview-summary-item.is-caution {
+  border-color: rgba(245, 158, 11, 0.32);
+  background: rgba(255, 250, 235, 0.88);
+}
+
+.workmate-employee-excel-preview-notes {
+  display: grid;
+  gap: 8px;
+}
+
+.workmate-employee-excel-preview-notes .is-caution {
+  color: #b54708;
+  font-weight: 700;
+}
+
+.upload-panel-footer.workmate-employee-excel-toolbar {
+  justify-content: space-between;
+}
+
+.workmate-employee-modal-sheet {
+  width: min(980px, calc(100vw - 48px));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.workmate-employee-modal-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.workmate-employee-modal-copy h3,
+.workmate-employee-modal-copy p {
+  margin: 0;
+}
+
+.workmate-employee-modal-copy p {
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.workmate-employee-modal-body {
+  min-height: 0;
+  padding-top: 20px;
+}
+
+.workmate-employee-form-section {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid rgba(203, 213, 225, 0.78);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 253, 0.92));
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.05);
+}
+
+.workmate-employee-section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.workmate-employee-section-head strong {
+  color: #17324a;
+  font-size: 1rem;
+}
+
+.workmate-employee-section-head span {
+  max-width: 360px;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.workmate-employee-section-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+
+.workmate-employee-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+
+.workmate-employee-composite-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.workmate-employee-composite-label {
+  color: #18324b;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.workmate-employee-field-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.workmate-employee-section-grid .is-span-2 {
+  grid-column: 1 / -1;
+}
+
+.workmate-employee-history-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.workmate-employee-tenure-card {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.workmate-employee-tenure-card span {
+  color: #18324b;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.workmate-employee-tenure-card strong {
+  min-height: 47px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid rgba(203, 213, 225, 0.76);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  box-sizing: border-box;
+  color: var(--text);
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.workmate-required-icon {
+  display: inline-flex;
+  width: 7px;
+  height: 7px;
+  margin-left: 5px;
+  border-radius: 999px;
+  background: var(--accent-strong);
+  box-shadow: 0 0 0 3px rgba(45, 99, 245, 0.12);
+  vertical-align: 0.08em;
+}
+
+.workmate-employee-modal-body .field.is-invalid input,
+.workmate-employee-modal-body .field.is-invalid select,
+.workmate-employee-modal-body .field.is-invalid textarea {
+  border-color: rgba(220, 38, 38, 0.72);
+  background: rgba(255, 251, 251, 0.98);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
+}
+
+.workmate-employee-modal-body .field.select-field::after {
+  top: 42px;
+  bottom: auto;
+}
+
+.workmate-field-warning {
+  margin: -2px 0 0;
+  color: #dc2626;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.workmate-employee-upload-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+.workmate-employee-file-field {
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.workmate-employee-card-file-input {
+  display: none;
+}
+
+.workmate-employee-card-dropzone-box {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1.5px dashed rgba(45, 99, 245, 0.34);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(248, 251, 255, 0.98), rgba(240, 246, 255, 0.92));
+  box-sizing: border-box;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.workmate-employee-card-dropzone.is-drag-over .workmate-employee-card-dropzone-box,
+.workmate-employee-card-dropzone:hover .workmate-employee-card-dropzone-box {
+  transform: translateY(-1px);
+  border-color: rgba(45, 99, 245, 0.68);
+  background:
+    linear-gradient(180deg, rgba(238, 246, 255, 0.98), rgba(229, 240, 255, 0.94));
+  box-shadow: 0 16px 30px rgba(45, 99, 245, 0.12);
+}
+
+.workmate-employee-card-dropzone-box strong {
+  min-width: 0;
+  color: #18324b;
+  font-size: 0.94rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.workmate-employee-card-dropzone-box em {
+  flex: 0 0 auto;
+  padding: 7px 12px;
+  border-radius: 12px;
+  background: rgba(45, 99, 245, 0.1);
+  color: var(--accent-strong);
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.workmate-employee-card-file-field {
+  min-width: 0;
+}
+
+.workmate-employee-file-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 64px;
+  padding: 14px 16px;
+  border: 1px solid rgba(223, 229, 240, 0.92);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  box-sizing: border-box;
+}
+
+.workmate-employee-file-summary-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.workmate-employee-file-summary strong {
+  overflow: hidden;
+  color: #18324b;
+  font-size: 0.92rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-employee-file-summary span {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
+.workmate-employee-card-download-button {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 8px 12px;
+}
+
+.workmate-employee-invite-channel-modal {
+  z-index: 140;
+}
+
+.workmate-employee-invite-channel-sheet {
+  width: min(520px, calc(100vw - 48px));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.workmate-employee-invite-channel-body {
+  display: grid;
+  gap: 12px;
+  padding-top: 18px;
+}
+
+.workmate-employee-invite-choice {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 18px 20px;
+  border: 1px solid rgba(203, 213, 225, 0.86);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #17324a;
+  text-align: left;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.workmate-employee-invite-choice:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 99, 245, 0.3);
+  box-shadow: 0 14px 28px rgba(45, 99, 245, 0.12);
+}
+
+.workmate-employee-invite-choice:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+  box-shadow: none;
+}
+
+.workmate-employee-invite-choice strong {
+  font-size: 0.98rem;
+}
+
+.workmate-employee-invite-choice span {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.workmate-employee-modal-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.workmate-employee-toolbar-left-actions,
+.workmate-employee-toolbar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.danger-primary-button {
+  background: linear-gradient(135deg, #dc2626, #f97316);
+  box-shadow: 0 14px 24px rgba(220, 38, 38, 0.22);
+}
+
+.workmate-employee-delete-modal {
+  z-index: 150;
+}
+
+.workmate-employee-delete-sheet {
+  width: min(520px, calc(100vw - 48px));
+}
+
+.workmate-employee-delete-body {
+  display: grid;
+  gap: 16px;
+  padding-top: 18px;
+}
+
+.workmate-employee-delete-warning {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 18px;
+  background: rgba(254, 242, 242, 0.82);
+}
+
+.workmate-employee-delete-warning strong {
+  color: #991b1b;
+}
+
+.workmate-employee-delete-warning span {
+  color: var(--text-dim);
+  font-size: 0.84rem;
+}
+
+.workmate-employee-delete-toolbar {
+  justify-content: flex-end;
+}
+
+.form-inline-message {
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(239, 68, 68, 0.08);
+  color: #b42318;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.workmate-worksite-modal-sheet {
+  width: min(1320px, calc(100vw - 48px));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.workmate-worksite-modal-body {
+  min-height: 0;
+  padding-top: 20px;
+}
+
+.workmate-worksite-search-modal {
+  z-index: 110;
+}
+
+.workmate-worksite-search-modal-sheet {
+  width: min(720px, calc(100vw - 48px));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.workmate-worksite-search-modal-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.workmate-worksite-search-modal-copy h3,
+.workmate-worksite-search-modal-copy p {
+  margin: 0;
+}
+
+.workmate-worksite-search-modal-copy p {
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.workmate-worksite-search-modal-body {
+  display: grid;
+  gap: 16px;
+  min-height: 0;
+  padding-top: 20px;
+}
+
+.workmate-work-policy-modal-sheet {
+  width: min(900px, calc(100vw - 48px));
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+.workmate-work-policy-modal-body {
+  min-height: 0;
+  padding-top: 20px;
+}
+
+.workmate-worksite-modal-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(360px, 0.9fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.workmate-work-policy-modal-panel,
+.workmate-worksite-modal-map-stack,
+.workmate-worksite-modal-form-stack {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.workmate-work-policy-modal-panel {
+  padding: 22px 24px;
+}
+
+.workmate-admin-worksites-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(360px, 0.95fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.workmate-worksite-map-panel,
+.workmate-worksite-form-panel,
+.workmate-worksite-record-panel,
+.workmate-work-policy-record-panel,
+.workmate-title-record-panel,

@@ -67,6 +67,22 @@
 
         workspaceInputHandler.handleDocumentChange(event);
       });
+
+      document.addEventListener("focusout", (event) => {
+        managementInputHandler.handleDocumentFocusOut?.(event);
+      });
+
+      document.addEventListener("dragover", (event) => {
+        managementInputHandler.handleDocumentDragOver?.(event);
+      });
+
+      document.addEventListener("dragleave", (event) => {
+        managementInputHandler.handleDocumentDragLeave?.(event);
+      });
+
+      document.addEventListener("drop", (event) => {
+        managementInputHandler.handleDocumentDrop?.(event);
+      });
     }
 
     return Object.freeze({

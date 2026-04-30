@@ -128,7 +128,7 @@
         <article class="workmate-grid-empty-row">
           <div class="workmate-worksite-grid-empty-copy">
             <strong>등록된 워크스페이스가 없습니다.</strong>
-            <p>직급 설정 메뉴의 빈 목록과 같은 톤으로, 여기서 바로 첫 워크스페이스를 추가할 수 있습니다.</p>
+            <p>직급 관리 메뉴의 빈 목록과 같은 톤으로, 여기서 바로 첫 워크스페이스를 추가할 수 있습니다.</p>
           </div>
         </article>
         <button

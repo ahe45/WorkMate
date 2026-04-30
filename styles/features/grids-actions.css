@@ -10,8 +10,10 @@
 .table-header-static {
   display: flex;
   align-items: center;
+  justify-content: center;
   min-height: 34px;
   padding: 0 8px;
+  text-align: center;
 }
 
 .table-inline-actions {

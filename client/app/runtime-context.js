@@ -11,6 +11,7 @@
       appConfig,
       createStateFactory,
       currentYear,
+      managementSectionStorageKey,
       personalScopeStorageKey,
       selectedOrganizationStorageKey,
     } = dependencies;
@@ -18,6 +19,7 @@
     if (
       !appConfig
       || typeof createStateFactory !== "function"
+      || !managementSectionStorageKey
       || !personalScopeStorageKey
       || !selectedOrganizationStorageKey
     ) {
@@ -52,6 +54,7 @@
       createEmptyManagementHolidayDraft,
       createDefaultManagementHolidayData,
       createDefaultManagementWorkPolicyDraft,
+      createDefaultManagementEmployeeDraft,
     } = stateFactory;
 
     const state = {
@@ -72,16 +75,57 @@
       managementHolidayLoading: false,
       managementHolidayModalOpen: false,
       managementHolidayYear: currentYear,
+      managementEmployeeDraft: createDefaultManagementEmployeeDraft(),
+      managementEmployeeDeleteConfirmOpen: false,
+      managementEmployeeExcelModalOpen: false,
+      managementEmployeeExcelUpload: null,
+      managementEmployeeInviteChannelModalOpen: false,
+      managementEmployeeInviteProgress: {
+        active: false,
+        channelLabel: "",
+        message: "",
+        progressLabel: "",
+      },
+      managementEmployeeModalOpen: false,
       managementJobTitleDraft: createDefaultManagementJobTitleDraft(),
       managementJobTitleModalOpen: false,
+      managementLeaveGroupEditId: "",
+      managementLeaveGroupModalOpen: false,
+      managementLeaveGroupParentId: "",
+      managementLeaveRuleEditIds: "",
+      managementLeaveManualGrantModalOpen: false,
+      managementLeaveRuleModalOpen: false,
+      managementModalUi: {
+        confirm: {
+          modalType: "",
+          open: false,
+        },
+        dirty: {
+          employee: false,
+          holiday: false,
+          jobTitle: false,
+          unit: false,
+          workPolicy: false,
+          worksite: false,
+        },
+        initialSnapshots: {
+          employee: "",
+          holiday: "",
+          jobTitle: "",
+          unit: "",
+          workPolicy: "",
+          worksite: "",
+        },
+      },
       managementWorkPolicyDraft: createDefaultManagementWorkPolicyDraft(),
       managementWorkPolicyModalOpen: false,
-      managementSection: DEFAULT_MANAGEMENT_SECTION,
+      managementSection: window.sessionStorage.getItem(managementSectionStorageKey) || DEFAULT_MANAGEMENT_SECTION,
       managementUnitDraft: createDefaultManagementUnitDraft(),
       managementUnitModalOpen: false,
       managementWorksiteDraft: createDefaultManagementWorksiteDraft(),
       managementWorksiteModalOpen: false,
       managementWorksiteSearchQuery: "",
+      managementWorksiteSearchModalOpen: false,
       managementWorksiteSearchResults: [],
       managementWorksiteSearchStatus: "",
       personalScopeEnabled: window.localStorage.getItem(personalScopeStorageKey) === "true",
@@ -99,8 +143,15 @@
       scheduleUserFilterSearch: "",
       scheduleViewMode: "month",
       selectedOrganizationId: window.localStorage.getItem(selectedOrganizationStorageKey) || "",
+      toast: {
+        message: "",
+        tone: "success",
+        visible: false,
+      },
       user: null,
     };
+
+    let toastHideTimerId = 0;
 
     const elements = {
       brandHome: document.getElementById("brandHome"),
@@ -131,6 +182,79 @@
 
       target.textContent = message;
       target.classList.toggle("hidden", !message);
+    }
+
+    function ensureToastRoot() {
+      let toastRoot = document.getElementById("workmate-toast-root");
+
+      if (toastRoot instanceof HTMLElement) {
+        return toastRoot;
+      }
+
+      toastRoot = document.createElement("div");
+      toastRoot.id = "workmate-toast-root";
+      toastRoot.className = "toast-root";
+      document.body.appendChild(toastRoot);
+      return toastRoot;
+    }
+
+    function syncToastUi() {
+      const toastRoot = ensureToastRoot();
+      const toastState = state.toast && typeof state.toast === "object"
+        ? state.toast
+        : { message: "", tone: "success", visible: false };
+
+      toastRoot.classList.toggle("has-toast", Boolean(toastState.visible && toastState.message));
+
+      if (!toastState.visible || !toastState.message) {
+        toastRoot.replaceChildren();
+        return;
+      }
+
+      const toastMessage = document.createElement("div");
+      toastMessage.className = `toast-message${String(toastState.tone || "").trim().toLowerCase() === "error" ? " is-error" : ""}`;
+      toastMessage.textContent = String(toastState.message || "").trim();
+      toastRoot.replaceChildren(toastMessage);
+    }
+
+    function hideToast() {
+      if (toastHideTimerId) {
+        window.clearTimeout(toastHideTimerId);
+        toastHideTimerId = 0;
+      }
+
+      state.toast = {
+        message: "",
+        tone: "success",
+        visible: false,
+      };
+      syncToastUi();
+    }
+
+    function showToast(message = "", options = {}) {
+      const normalizedMessage = String(message || "").trim();
+
+      if (!normalizedMessage) {
+        hideToast();
+        return;
+      }
+
+      if (toastHideTimerId) {
+        window.clearTimeout(toastHideTimerId);
+        toastHideTimerId = 0;
+      }
+
+      state.toast = {
+        message: normalizedMessage,
+        tone: String(options.tone || "success").trim().toLowerCase() === "error" ? "error" : "success",
+        visible: true,
+      };
+      syncToastUi();
+
+      const duration = Math.max(1200, Math.min(10000, Number(options.duration) || 2600));
+      toastHideTimerId = window.setTimeout(() => {
+        hideToast();
+      }, duration);
     }
 
     function resetScheduleCalendarState() {
@@ -175,12 +299,14 @@
       DEFAULT_WORKSITE_COORDS,
       LEAFLET_CSS_URL,
       LEAFLET_JS_URL,
+      MANAGEMENT_SECTION_STORAGE_KEY: managementSectionStorageKey,
       SOUTH_KOREA_VIEWBOX,
       createDefaultAttendanceRecordsState,
       createDefaultDashboardGridState,
       createDefaultDashboardGridTableState,
       createDefaultManagementHolidayData,
       createDefaultManagementHolidayDraft,
+      createDefaultManagementEmployeeDraft,
       createDefaultManagementJobTitleDraft,
       createDefaultManagementUnitDraft,
       createDefaultManagementWorksiteDraft,
@@ -194,6 +320,7 @@
       resetReportRecordsState,
       resetScheduleCalendarState,
       setInlineMessage,
+      showToast,
       state,
     });
   }

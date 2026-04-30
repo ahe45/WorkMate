@@ -27,6 +27,11 @@
   animation: toast-slide-in 180ms ease-out both;
 }
 
+.toast-message.is-error {
+  border-color: rgba(245, 99, 99, 0.34);
+  background: linear-gradient(135deg, rgba(112, 25, 35, 0.97), rgba(66, 16, 23, 0.99));
+}
+
 @keyframes toast-slide-in {
   from {
     opacity: 0;
@@ -167,33 +172,35 @@
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
+  gap: 11px;
 }
 
 .metric-card {
-  padding: 22px;
-  border-radius: 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  min-height: 55px;
+  padding: 12px 13px;
+  border-radius: 18px;
 }
 
 .metric-card p {
   margin: 0;
   color: var(--text-dim);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 .metric-card strong {
   display: block;
-  margin-top: 10px;
-  font-size: clamp(1.8rem, 3vw, 2.2rem);
-}
-
-.metric-meta {
-  display: inline-flex;
-  margin-top: 14px;
-  padding: 8px 10px;
-  border-radius: 999px;
-  font-size: 0.82rem;
-  color: var(--accent-strong);
-  background: rgba(45, 99, 245, 0.1);
+  margin: 0;
+  color: #17324a;
+  font-size: clamp(0.98rem, 1.7vw, 1.35rem);
+  line-height: 1.1;
+  text-align: right;
+  word-break: break-word;
 }
 
 .dashboard-chart-grid {
@@ -296,7 +303,7 @@
 .split-card,
 .timeline-card,
 .account-card {
-  padding: 10px 24px;
+  padding: 24px;
 }
 
 .table-card {

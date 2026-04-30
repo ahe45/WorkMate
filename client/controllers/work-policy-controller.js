@@ -16,6 +16,46 @@
       setInlineMessage,
       state,
     } = deps;
+    const workPolicyFormUtilsModule = globalThis.WorkMateWorkPolicyFormUtils
+      || (typeof require === "function" ? require("./work-policy-form-utils.js") : null);
+    const workPolicyPayloadBuilderModule = globalThis.WorkMateWorkPolicyPayloadBuilder
+      || (typeof require === "function" ? require("./work-policy-payload-builder.js") : null);
+    const workPolicyTimePickerModule = globalThis.WorkMateWorkPolicyTimePickerController
+      || (typeof require === "function" ? require("./work-policy-time-picker-controller.js") : null);
+
+    if (!workPolicyFormUtilsModule) {
+      throw new Error("client/controllers/work-policy-form-utils.js must be loaded before client/controllers/work-policy-controller.js.");
+    }
+
+    if (!workPolicyPayloadBuilderModule || typeof workPolicyPayloadBuilderModule.create !== "function") {
+      throw new Error("client/controllers/work-policy-payload-builder.js must be loaded before client/controllers/work-policy-controller.js.");
+    }
+
+    if (!workPolicyTimePickerModule || typeof workPolicyTimePickerModule.create !== "function") {
+      throw new Error("client/controllers/work-policy-time-picker-controller.js must be loaded before client/controllers/work-policy-controller.js.");
+    }
+
+    const {
+      buildManagementWorkPolicyDayRulesFromFormData,
+      createManagementWorkPolicyAutoBreakRange,
+      deriveManagementWorkPolicyMaximumRule,
+      deriveManagementWorkPolicyStandardRule,
+      formatManagementWorkPolicyCurrencyInputValue,
+      getManagementWorkPolicyNextDayOfWeek,
+      getManagementWorkPolicyPreviousDayOfWeek,
+      getManagementWorkPolicyPrimaryWeeklyHolidayDay,
+      getManagementWorkPolicyWorkingDaysFromDayRules,
+      normalizeManagementWorkPolicyBoolean,
+      normalizeManagementWorkPolicyEmploymentTargetType,
+      normalizeManagementWorkPolicyEnum,
+      normalizeManagementWorkPolicyNumber,
+      normalizeManagementWorkPolicyPayload,
+      normalizeManagementWorkPolicyTargetRulePayload,
+      sortManagementWorkPolicyAutoBreakRanges,
+    } = workPolicyFormUtilsModule;
+    const {
+      parseManagementWorkPolicyTimeValue,
+    } = workPolicyTimePickerModule;
 
     function getManagementWorkPolicies() {
       const policies = Array.isArray(state.bootstrap?.workPolicies) ? state.bootstrap.workPolicies : [];
@@ -113,7 +153,111 @@
       return values;
     }
 
+    function setManagementWorkPolicyElementVisibility(target, isVisible) {
+      const element = typeof target === "string"
+        ? document.getElementById(target)
+        : target;
+
+      if (!(element instanceof HTMLElement)) {
+        return;
+      }
+
+      element.hidden = !isVisible;
+    }
+
+    function syncManagementWorkPolicySharedPeriodFields() {
+      const periodUnitSelect = document.getElementById("management-work-policy-period-unit");
+      const periodRangeField = document.getElementById("management-work-policy-period-range-field");
+      const dayRangeFields = document.getElementById("management-work-policy-period-day-range-fields");
+      const weekRangeFields = document.getElementById("management-work-policy-period-week-range-fields");
+      const monthRangeFields = document.getElementById("management-work-policy-period-month-range-fields");
+      const weekStartSelect = document.getElementById("management-work-policy-period-week-start");
+      const weekEndSelect = document.getElementById("management-work-policy-period-week-end");
+      const monthStartSelect = document.getElementById("management-work-policy-period-month-start");
+      const monthEndSelect = document.getElementById("management-work-policy-period-month-end");
+      const rawPeriodUnit = periodUnitSelect instanceof HTMLSelectElement ? String(periodUnitSelect.value || "").trim().toUpperCase() : "";
+      const periodUnit = ["DAY", "WEEK", "MONTH"].includes(rawPeriodUnit) ? rawPeriodUnit : "";
+      const activeElementId = document.activeElement instanceof HTMLElement ? document.activeElement.id : "";
+
+      setManagementWorkPolicyElementVisibility(periodRangeField, Boolean(periodUnit));
+      setManagementWorkPolicyElementVisibility(dayRangeFields, periodUnit === "DAY");
+      setManagementWorkPolicyElementVisibility(weekRangeFields, periodUnit === "WEEK");
+      setManagementWorkPolicyElementVisibility(monthRangeFields, periodUnit === "MONTH");
+
+      if (!periodUnit) {
+        return;
+      }
+
+      if (periodUnit === "WEEK" && weekStartSelect instanceof HTMLSelectElement && weekEndSelect instanceof HTMLSelectElement) {
+        let weekStart = normalizeManagementWorkPolicyNumber(weekStartSelect.value, 1, 1, 7);
+        let weekEnd = normalizeManagementWorkPolicyNumber(weekEndSelect.value, getManagementWorkPolicyPreviousDayOfWeek(weekStart), 1, 7);
+
+        if (activeElementId === "management-work-policy-period-week-end") {
+          weekStart = getManagementWorkPolicyNextDayOfWeek(weekEnd);
+        } else {
+          weekEnd = getManagementWorkPolicyPreviousDayOfWeek(weekStart);
+        }
+
+        weekStartSelect.value = String(weekStart);
+        weekEndSelect.value = String(weekEnd);
+      }
+
+      if (periodUnit === "MONTH") {
+        if (monthStartSelect instanceof HTMLSelectElement && !monthStartSelect.value) {
+          monthStartSelect.value = "1";
+        }
+
+        if (monthEndSelect instanceof HTMLSelectElement && !monthEndSelect.value) {
+          monthEndSelect.value = "31";
+        }
+      }
+    }
+
+    function syncManagementWorkPolicyHourlyWageField() {
+      const employmentTargetTypeSelect = document.getElementById("management-work-policy-employment-target-type");
+      const hourlyWageInput = document.getElementById("management-work-policy-hourly-wage");
+      const employmentTargetType = normalizeManagementWorkPolicyEmploymentTargetType(
+        employmentTargetTypeSelect instanceof HTMLSelectElement ? employmentTargetTypeSelect.value : "FULL_TIME",
+        "FULL_TIME",
+      );
+      const isPartTimeTarget = employmentTargetType === "PART_TIME";
+
+      if (hourlyWageInput instanceof HTMLInputElement) {
+        hourlyWageInput.value = formatManagementWorkPolicyCurrencyInputValue(hourlyWageInput.value, {
+          fallback: "",
+        });
+        hourlyWageInput.disabled = !isPartTimeTarget;
+        hourlyWageInput.setAttribute("aria-disabled", isPartTimeTarget ? "false" : "true");
+      }
+    }
+
+    function syncManagementWorkPolicyBreakRuleFields() {
+      const breakModeSelect = document.getElementById("management-work-policy-break-mode");
+      const autoFields = document.getElementById("management-work-policy-break-auto-fields");
+      const fixedFields = document.getElementById("management-work-policy-break-fixed-fields");
+      const breakMode = normalizeManagementWorkPolicyEnum(
+        breakModeSelect instanceof HTMLSelectElement ? breakModeSelect.value : "",
+        "",
+      );
+
+      setManagementWorkPolicyElementVisibility(autoFields, breakMode === "AUTO");
+      setManagementWorkPolicyElementVisibility(fixedFields, breakMode === "FIXED");
+    }
+
+    function syncManagementWorkPolicyFormPresentation() {
+      const form = document.getElementById("management-work-policy-form");
+
+      if (!(form instanceof HTMLFormElement)) {
+        return;
+      }
+
+      syncManagementWorkPolicyHourlyWageField();
+      syncManagementWorkPolicySharedPeriodFields();
+      syncManagementWorkPolicyBreakRuleFields();
+    }
+
     function updateManagementWorkPolicyStageMetrics() {
+      syncManagementWorkPolicyFormPresentation();
       const root = document.querySelector(".workmate-work-schedule-stage-metrics");
       const info = readManagementWorkPolicyDraftFromDom();
 
@@ -144,7 +288,6 @@
 
         [
           ["standard", metric.standardLabel],
-          ["min", metric.minLabel],
           ["max", metric.maxLabel],
         ].forEach(([key, label]) => {
           const valueNode = card.querySelector(`[data-management-work-policy-value="${unit}:${key}"]`);
@@ -163,321 +306,113 @@
       });
     }
 
-    function formatManagementWorkPolicyTimeValue(totalMinutes = 0, maxMinutes = 60000) {
-      const normalizedMaxMinutes = Math.max(0, Math.round(Number(maxMinutes) || 60000));
-      const normalizedMinutes = Math.max(0, Math.min(normalizedMaxMinutes, Math.round(Number(totalMinutes) || 0)));
-      const hours = Math.floor(normalizedMinutes / 60);
-      const minutes = normalizedMinutes % 60;
+    const workPolicyTimePickerController = workPolicyTimePickerModule.create({
+      updateManagementWorkPolicyStageMetrics,
+    });
+    const {
+      closeManagementWorkPolicyTimePickers,
+      handleManagementWorkPolicyTimeOptionClick,
+      setManagementWorkPolicyTimePickerOpen,
+    } = workPolicyTimePickerController;
 
-      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+    function getManagementWorkPolicyDraftBasePolicy() {
+      const draftPolicyId = String(state.managementWorkPolicyDraft?.policyId || "").trim();
+
+      if (draftPolicyId) {
+        return getManagementWorkPolicyById(draftPolicyId);
+      }
+
+      return getManagementWorkPolicies().find((policy) => Boolean(policy?.isDefault))
+        || getManagementWorkPolicies()[0]
+        || null;
     }
 
-    function parseManagementWorkPolicyTimeValue(value) {
-      const matched = String(value || "").trim().match(/^(\d{1,4}):([0-5]\d)$/);
+    function getManagementWorkPolicyDraftWorkType() {
+      const basePolicy = getManagementWorkPolicyDraftBasePolicy();
 
-      if (!matched) {
-        return Number.NaN;
-      }
-
-      const hours = Number(matched[1]);
-      const minutes = Number(matched[2]);
-
-      if (!Number.isInteger(hours) || hours < 0) {
-        return Number.NaN;
-      }
-
-      return (hours * 60) + minutes;
+      return normalizeManagementWorkPolicyEnum(
+        basePolicy?.workInformation?.workType
+          || basePolicy?.policyJson?.workInformation?.workType
+          || basePolicy?.trackType,
+        "FIXED",
+      );
     }
 
-    function getManagementWorkPolicyTimeParts(value = "") {
-      const totalMinutes = parseManagementWorkPolicyTimeValue(value);
-      const normalizedMinutes = Number.isFinite(totalMinutes) ? totalMinutes : 0;
+    function getManagementWorkPolicyDraftEmploymentTargetType() {
+      const basePolicy = getManagementWorkPolicyDraftBasePolicy();
+      const storedHourlyWage = Number(
+        basePolicy?.workInformation?.hourlyWage
+          ?? basePolicy?.policyJson?.workInformation?.hourlyWage
+          ?? 0,
+      ) || 0;
 
-      return {
-        hours: Math.floor(normalizedMinutes / 60),
-        minutes: normalizedMinutes % 60,
-      };
+      return normalizeManagementWorkPolicyEmploymentTargetType(
+        basePolicy?.workInformation?.employmentTargetType
+          || basePolicy?.policyJson?.workInformation?.employmentTargetType,
+        storedHourlyWage > 0 ? "PART_TIME" : "FULL_TIME",
+      );
     }
 
-    function closeManagementWorkPolicyTimePickers(exceptPicker = null) {
-      document.querySelectorAll("[data-management-work-policy-time-picker]").forEach((picker) => {
-        if (!(picker instanceof HTMLElement) || picker === exceptPicker) {
-          return;
-        }
+    function getManagementWorkPolicyDraftTargetRule() {
+      const basePolicy = getManagementWorkPolicyDraftBasePolicy();
 
-        const trigger = picker.querySelector("[data-management-work-policy-time-toggle]");
-        const panel = picker.querySelector("[data-management-work-policy-time-panel]");
-
-        picker.classList.remove("is-open");
-
-        if (trigger instanceof HTMLElement) {
-          trigger.setAttribute("aria-expanded", "false");
-        }
-
-        if (panel instanceof HTMLElement) {
-          panel.hidden = true;
-        }
-      });
+      return normalizeManagementWorkPolicyTargetRulePayload(
+        basePolicy?.workInformation?.targetRule
+          || basePolicy?.policyJson?.workInformation?.targetRule
+        || { scope: "ORGANIZATION" },
+      );
     }
 
-    function setManagementWorkPolicyTimePickerOpen(picker, isOpen) {
-      if (!(picker instanceof HTMLElement)) {
-        return;
-      }
-
-      const trigger = picker.querySelector("[data-management-work-policy-time-toggle]");
-      const panel = picker.querySelector("[data-management-work-policy-time-panel]");
-
-      picker.classList.toggle("is-open", Boolean(isOpen));
-
-      if (trigger instanceof HTMLElement) {
-        trigger.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      }
-
-      if (panel instanceof HTMLElement) {
-        panel.hidden = !isOpen;
-      }
-    }
-
-    function syncManagementWorkPolicyTimePickerOptions(picker, value = "") {
-      if (!(picker instanceof HTMLElement)) {
-        return;
-      }
-
-      const { hours, minutes } = getManagementWorkPolicyTimeParts(value);
-      const maxMinutes = Math.max(0, Math.round(Number(picker.dataset.managementWorkPolicyTimeMax || 1440) || 1440));
-      const maxHour = Math.floor(maxMinutes / 60);
-      const maxMinute = maxMinutes % 60;
-
-      picker.querySelectorAll("[data-management-work-policy-time-option='hour']").forEach((option) => {
-        if (option instanceof HTMLElement) {
-          option.classList.toggle("is-active", Number(option.dataset.managementWorkPolicyTimeValue || -1) === hours);
-        }
-      });
-
-      picker.querySelectorAll("[data-management-work-policy-time-option='minute']").forEach((option) => {
-        if (!(option instanceof HTMLButtonElement)) {
-          return;
-        }
-
-        const minuteValue = Number(option.dataset.managementWorkPolicyTimeValue || -1);
-        const isDisabled = hours === maxHour && minuteValue > maxMinute;
-
-        option.disabled = isDisabled;
-        option.classList.toggle("is-active", minuteValue === minutes);
-      });
-    }
-
-    function setManagementWorkPolicyTimePickerValue(picker, nextValue = "") {
-      if (!(picker instanceof HTMLElement)) {
-        return;
-      }
-
-      const hiddenInput = picker.querySelector("[data-management-work-policy-time-hidden]");
-      const display = picker.querySelector("[data-management-work-policy-time-display]");
-      const maxMinutes = Math.max(0, Math.round(Number(picker.dataset.managementWorkPolicyTimeMax || 1440) || 1440));
-      const normalizedValue = formatManagementWorkPolicyTimeValue(parseManagementWorkPolicyTimeValue(nextValue), maxMinutes);
-
-      if (hiddenInput instanceof HTMLInputElement) {
-        hiddenInput.value = normalizedValue;
-      }
-
-      if (display instanceof HTMLElement) {
-        display.textContent = normalizedValue;
-      }
-
-      syncManagementWorkPolicyTimePickerOptions(picker, normalizedValue);
-      updateManagementWorkPolicyStageMetrics();
-    }
-
-    function handleManagementWorkPolicyTimeOptionClick(optionButton) {
-      if (!(optionButton instanceof HTMLElement)) {
-        return;
-      }
-
-      const picker = optionButton.closest("[data-management-work-policy-time-picker]");
-      const hiddenInput = picker?.querySelector("[data-management-work-policy-time-hidden]");
-
-      if (!(picker instanceof HTMLElement) || !(hiddenInput instanceof HTMLInputElement)) {
-        return;
-      }
-
-      const { hours, minutes } = getManagementWorkPolicyTimeParts(hiddenInput.value || "");
-      const optionType = String(optionButton.dataset.managementWorkPolicyTimeOption || "").trim();
-      const optionValue = Number(optionButton.dataset.managementWorkPolicyTimeValue || 0);
-      const maxMinutes = Math.max(0, Math.round(Number(picker.dataset.managementWorkPolicyTimeMax || 1440) || 1440));
-      const maxHour = Math.floor(maxMinutes / 60);
-      const maxMinute = maxMinutes % 60;
-      const nextHours = optionType === "hour" ? optionValue : hours;
-      const nextMinutes = nextHours === maxHour
-        ? Math.min(optionType === "minute" ? optionValue : minutes, maxMinute)
-        : optionType === "minute"
-          ? optionValue
-          : minutes;
-
-      setManagementWorkPolicyTimePickerValue(picker, formatManagementWorkPolicyTimeValue((nextHours * 60) + nextMinutes, maxMinutes));
-    }
-
-    function readManagementWorkPolicyMinutes(formData, fieldName, label, minMinutes = 0, maxMinutes = 1440) {
-      const totalMinutes = parseManagementWorkPolicyTimeValue(formData.get(fieldName));
-
-      if (!Number.isFinite(totalMinutes) || totalMinutes < minMinutes || totalMinutes > maxMinutes) {
-        throw new Error(`${label}을(를) 올바르게 입력하세요.`);
-      }
-
-      return totalMinutes;
-    }
-
-    function readManagementWorkPolicyMinutesForPayload(formData, fieldName, label, minMinutes = 0, maxMinutes = 1440, { validate = true } = {}) {
-      try {
-        return readManagementWorkPolicyMinutes(formData, fieldName, label, minMinutes, maxMinutes);
-      } catch (error) {
-        if (validate) {
-          throw error;
-        }
-
-        return Number.NaN;
-      }
-    }
-
-    function readManagementWorkPolicyAdjustmentPayload(formData, { validate = true } = {}) {
-      const indexes = new Set();
-
-      Array.from(formData.keys()).forEach((key) => {
-        const matched = String(key || "").match(/^minimumAdjustment(?:Name|Type|RepeatUnit|DayOfWeek|DayOfMonth|Minutes|OnlyIfWorkingDay|SkipIfHoliday|AppliesTo)_(\d+)$/);
-
-        if (matched) {
-          indexes.add(Number(matched[1]));
-        }
-      });
-
-      return Array.from(indexes).sort((left, right) => left - right).map((index) => {
-        const name = String(formData.get(`minimumAdjustmentName_${index}`) || "").trim();
-        const minutes = readManagementWorkPolicyMinutesForPayload(
-          formData,
-          `minimumAdjustmentMinutes_${index}`,
-          "최소근로시간 조정 시간",
-          0,
-          10080,
-          { validate: false },
-        );
-        const hasContent = Boolean(name) || (Number.isFinite(minutes) && minutes > 0);
-
-        if (!hasContent) {
-          return null;
-        }
-
-        if (validate && (!Number.isFinite(minutes) || minutes <= 0)) {
-          throw new Error("최소근로시간 조정 시간을 올바르게 입력하세요.");
-        }
-
-        return {
-          appliesTo: formData.getAll(`minimumAdjustmentAppliesTo_${index}`).map((value) => String(value || "").trim()).filter(Boolean),
-          dayOfMonth: Number(formData.get(`minimumAdjustmentDayOfMonth_${index}`) || 1),
-          dayOfWeek: Number(formData.get(`minimumAdjustmentDayOfWeek_${index}`) || 5),
-          minutes: Number.isFinite(minutes) ? minutes : 0,
-          name: name || "근로시간 조정",
-          onlyIfWorkingDay: formData.has(`minimumAdjustmentOnlyIfWorkingDay_${index}`),
-          repeatUnit: String(formData.get(`minimumAdjustmentRepeatUnit_${index}`) || "WEEK").trim().toUpperCase(),
-          skipIfHoliday: formData.has(`minimumAdjustmentSkipIfHoliday_${index}`),
-          type: String(formData.get(`minimumAdjustmentType_${index}`) || "DEDUCT").trim().toUpperCase(),
-        };
-      }).filter(Boolean);
-    }
-
-    function buildManagementWorkPolicyPayloadFromForm(formData, { validate = true } = {}) {
-      const workingDays = formData.getAll("workingDays")
-        .map((value) => Number(value))
-        .filter((day) => Number.isInteger(day) && day >= 1 && day <= 7);
-      const standardDailyMinutes = readManagementWorkPolicyMinutesForPayload(formData, "standardDailyTime", "하루 소정근로시간", 1, 1440, { validate });
-      const dailyMinMinutes = readManagementWorkPolicyMinutesForPayload(formData, "dailyMinTime", "하루 최소근로시간", 0, 1440, { validate });
-      const dailyMaxMinutes = readManagementWorkPolicyMinutesForPayload(formData, "dailyMaxTime", "일 최대근로시간", 1, 1440, { validate });
-      const standardWeeklyMinutes = readManagementWorkPolicyMinutesForPayload(formData, "standardWeeklyTime", "주 고정 소정시간", 0, 10080, { validate });
-      const standardMonthlyMinutes = readManagementWorkPolicyMinutesForPayload(formData, "standardMonthlyTime", "월 고정 소정시간", 0, 60000, { validate });
-      const weeklyMinMinutes = readManagementWorkPolicyMinutesForPayload(formData, "minimumWeeklyTime", "주 고정 최소근로시간", 0, 10080, { validate });
-      const monthlyMinMinutes = readManagementWorkPolicyMinutesForPayload(formData, "minimumMonthlyTime", "월 고정 최소근로시간", 0, 60000, { validate });
-      const weeklyMaxMinutes = readManagementWorkPolicyMinutesForPayload(formData, "weeklyMaxTime", "주 최대근로시간", 1, 10080, { validate });
-      const monthlyMaxMinutes = readManagementWorkPolicyMinutesForPayload(formData, "monthlyMaxTime", "월 고정 최대근로시간", 0, 60000, { validate });
-
-      return {
-        dailyMaxMinutes,
-        dailyMinMinutes,
-        includeCustomHolidays: !formData.has("excludeCustomHolidays"),
-        includePublicHolidays: !formData.has("excludePublicHolidays"),
-        includeSubstituteHolidays: !formData.has("excludeSubstituteHolidays"),
-        includeWeekends: formData.has("includeWeekends"),
-        maximumRule: {
-          alertOnDailyLimit: formData.has("alertOnDailyLimit"),
-          alertOnRestTime: formData.has("alertOnRestTime"),
-          alertOnWeeklyLimit: formData.has("alertOnWeeklyLimit"),
-          dailyMaxMinutes,
-          monthlyMaxMethod: String(formData.get("monthlyMaxMethod") || "WEEKLY_LIMIT_PRORATED").trim().toUpperCase(),
-          monthlyMaxMinutes,
-          weeklyMaxMinutes,
-        },
-        minimumRule: {
-          adjustments: readManagementWorkPolicyAdjustmentPayload(formData, { validate }),
-          dailyMinMinutes,
-          method: String(formData.get("minimumMethod") || "DAILY_MIN_SUM").trim().toUpperCase(),
-          monthlyMinMinutes,
-          weeklyMinMinutes,
-        },
-        policyName: String(formData.get("policyName") || "기본 근로정보").trim(),
-        settlementRule: {
-          customPeriodEndDay: Number(formData.get("customPeriodEndDay") || 31),
-          customPeriodStartDay: Number(formData.get("customPeriodStartDay") || 1),
-          excludeCustomHolidays: formData.has("excludeCustomHolidays"),
-          excludePublicHolidays: formData.has("excludePublicHolidays"),
-          excludeSubstituteHolidays: formData.has("excludeSubstituteHolidays"),
-          monthBasis: String(formData.get("monthBasis") || "CALENDAR_MONTH").trim().toUpperCase(),
-          unit: String(formData.get("settlementUnit") || "MONTH").trim().toUpperCase(),
-          weekStartsOn: Number(formData.get("weekStartsOn") || 1),
-        },
-        standardDailyMinutes,
-        standardRule: {
-          method: String(formData.get("standardMethod") || "WORKING_DAYS_TIMES_DAILY_STANDARD").trim().toUpperCase(),
-          standardMonthlyMinutes,
-          standardWeeklyMinutes,
-        },
-        targetRule: {
-          jobTitleIds: formData.getAll("targetJobTitleIds").map((value) => String(value || "").trim()).filter(Boolean),
-          scope: String(formData.get("targetScope") || "ORGANIZATION").trim().toUpperCase(),
-          siteIds: formData.getAll("targetSiteIds").map((value) => String(value || "").trim()).filter(Boolean),
-          unitIds: formData.getAll("targetUnitIds").map((value) => String(value || "").trim()).filter(Boolean),
-        },
-        workType: String(formData.get("workType") || "FIXED").trim().toUpperCase(),
-        workingDays,
-      };
-    }
+    const workPolicyPayloadBuilder = workPolicyPayloadBuilderModule.create({
+      buildManagementWorkPolicyDayRulesFromFormData,
+      createManagementWorkPolicyAutoBreakRange,
+      deriveManagementWorkPolicyMaximumRule,
+      deriveManagementWorkPolicyStandardRule,
+      getManagementWorkPolicyDraftEmploymentTargetType,
+      getManagementWorkPolicyDraftTargetRule,
+      getManagementWorkPolicyDraftWorkType,
+      getManagementWorkPolicyPrimaryWeeklyHolidayDay,
+      getManagementWorkPolicyWorkingDaysFromDayRules,
+      normalizeManagementWorkPolicyBoolean,
+      normalizeManagementWorkPolicyEmploymentTargetType,
+      normalizeManagementWorkPolicyEnum,
+      normalizeManagementWorkPolicyNumber,
+      normalizeManagementWorkPolicyPayload,
+      parseManagementWorkPolicyTimeValue,
+      sortManagementWorkPolicyAutoBreakRanges,
+    });
+    const {
+      buildManagementWorkPolicyPayloadFromForm,
+    } = workPolicyPayloadBuilder;
 
     async function submitManagementWorkPolicyForm() {
       const form = document.getElementById("management-work-policy-form");
 
       if (!(form instanceof HTMLFormElement)) {
-        throw new Error("근로정책 설정 폼을 찾을 수 없습니다.");
+        throw new Error("근로정책 관리 폼을 찾을 수 없습니다.");
       }
 
       setInlineMessage(document.getElementById("management-work-policy-error"), "");
 
       const formData = new FormData(form);
       const payload = buildManagementWorkPolicyPayloadFromForm(formData, { validate: true });
-      const { dailyMaxMinutes, dailyMinMinutes, standardDailyMinutes, workingDays } = payload;
+      const { dailyMaxMinutes, standardDailyMinutes, standardRule, maximumRule, workingDays } = payload;
 
       if (workingDays.length === 0) {
         throw new Error("근로 요일을 하나 이상 선택하세요.");
       }
 
-      if (dailyMinMinutes > standardDailyMinutes) {
-        throw new Error("최소 근로시간은 하루 기준 근로시간보다 클 수 없습니다.");
+      if (standardDailyMinutes > dailyMaxMinutes) {
+        throw new Error("소정근로시간이 연장근로 최대기준보다 클 수 없습니다.");
       }
 
-      if (standardDailyMinutes > dailyMaxMinutes) {
-        throw new Error("하루 기준 근로시간은 최대 근로시간보다 클 수 없습니다.");
+      if (Number(standardRule?.standardWeeklyMinutes || 0) > Number(maximumRule?.weeklyMaxMinutes || 0)) {
+        throw new Error("주 소정근로시간이 주 연장근로 최대기준보다 클 수 없습니다.");
       }
 
       const targetPolicyId = String(state.managementWorkPolicyDraft?.policyId || "").trim();
 
-      await api.requestWithAutoRefresh(
+      const savedPolicy = await api.requestWithAutoRefresh(
         targetPolicyId
           ? `/v1/orgs/${state.selectedOrganizationId}/work-policies/${targetPolicyId}`
           : `/v1/orgs/${state.selectedOrganizationId}/work-policies`,
@@ -488,9 +423,10 @@
       );
 
       closeManagementWorkPolicyTimePickers();
-      state.managementWorkPolicyDraft = createEmptyManagementWorkPolicyDraft("create");
-      state.managementWorkPolicyModalOpen = false;
+      state.managementWorkPolicyDraft = createEmptyManagementWorkPolicyDraft("edit", String(savedPolicy?.id || targetPolicyId || "").trim());
+      state.managementWorkPolicyModalOpen = true;
       await refreshWorkspaceData();
+      return savedPolicy;
     }
 
     async function deleteManagementWorkPolicy(policyId = "") {

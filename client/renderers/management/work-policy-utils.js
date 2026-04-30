@@ -25,6 +25,83 @@
       return Math.max(min, Math.min(max, numericValue));
     }
 
+    function parseManagementPolicyClockTime(value = "") {
+      const matched = String(value || "").trim().match(/^(\d{1,2}):([0-5]\d)$/);
+
+      if (!matched) {
+        return Number.NaN;
+      }
+
+      const hours = Number(matched[1]);
+      const minutes = Number(matched[2]);
+
+      if (!Number.isInteger(hours) || hours < 0 || hours > 23) {
+        return Number.NaN;
+      }
+
+      return (hours * 60) + minutes;
+    }
+
+    function getManagementPolicyBreakAutoRanges(breakRule = {}) {
+      const sourceRanges = Array.isArray(breakRule.autoBreakRanges)
+        ? breakRule.autoBreakRanges
+        : Array.isArray(breakRule.autoRanges)
+          ? breakRule.autoRanges
+          : [];
+      const normalizedRanges = sourceRanges.map((range) => ({
+        breakMinutes: normalizeManagementPolicyMinutes(
+          range?.breakMinutes ?? range?.autoBreakMinutes,
+          0,
+          0,
+          1440,
+        ),
+        minimumWorkMinutes: normalizeManagementPolicyMinutes(
+          range?.minimumWorkMinutes ?? range?.autoMinimumWorkMinutes,
+          0,
+          0,
+          60000,
+        ),
+      })).filter((range) => range.minimumWorkMinutes > 0 && range.breakMinutes > 0)
+        .sort((left, right) => left.minimumWorkMinutes - right.minimumWorkMinutes);
+
+      if (normalizedRanges.length > 0) {
+        return normalizedRanges;
+      }
+
+      const autoMinimumWorkMinutes = normalizeManagementPolicyMinutes(breakRule.autoMinimumWorkMinutes, 0, 0, 60000);
+      const autoBreakMinutes = normalizeManagementPolicyMinutes(breakRule.autoBreakMinutes, 0, 0, 1440);
+
+      return autoMinimumWorkMinutes > 0 && autoBreakMinutes > 0
+        ? [{ breakMinutes: autoBreakMinutes, minimumWorkMinutes: autoMinimumWorkMinutes }]
+        : [];
+    }
+
+    function getManagementWorkPolicyBreakMinutes(workInformation = {}, standardDailyMinutes = 0) {
+      const breakRule = workInformation?.breakRule && typeof workInformation.breakRule === "object"
+        ? workInformation.breakRule
+        : {};
+      const breakMode = String(breakRule.mode || "").trim().toUpperCase();
+
+      if (breakMode === "AUTO") {
+        return getManagementPolicyBreakAutoRanges(breakRule).reduce((appliedBreakMinutes, range) => (
+          standardDailyMinutes >= range.minimumWorkMinutes
+            ? range.breakMinutes
+            : appliedBreakMinutes
+        ), 0);
+      }
+
+      if (breakMode === "FIXED") {
+        const fixedStartMinutes = parseManagementPolicyClockTime(breakRule.fixedStartTime);
+        const fixedEndMinutes = parseManagementPolicyClockTime(breakRule.fixedEndTime);
+
+        if (Number.isFinite(fixedStartMinutes) && Number.isFinite(fixedEndMinutes) && fixedEndMinutes > fixedStartMinutes) {
+          return fixedEndMinutes - fixedStartMinutes;
+        }
+      }
+
+      return standardDailyMinutes >= 480 ? 60 : standardDailyMinutes >= 240 ? 30 : 0;
+    }
+
     function normalizeManagementPolicyWorkingDays(value, fallback = [1, 2, 3, 4, 5]) {
       const source = Array.isArray(value)
         ? value
@@ -40,7 +117,7 @@
     function buildWeekdayTemplateDays(workInformation = {}) {
       const workingDays = new Set(normalizeManagementPolicyWorkingDays(workInformation?.workingDays, [1, 2, 3, 4, 5]));
       const standardDailyMinutes = normalizeManagementPolicyMinutes(workInformation?.standardDailyMinutes, 480, 1, 1440);
-      const breakMinutes = standardDailyMinutes >= 480 ? 60 : standardDailyMinutes >= 240 ? 30 : 0;
+      const breakMinutes = getManagementWorkPolicyBreakMinutes(workInformation, standardDailyMinutes);
       const startMinutes = 9 * 60;
       const endTime = formatScheduleTimeFromMinutes(startMinutes + standardDailyMinutes + breakMinutes);
 
@@ -67,6 +144,7 @@
     return Object.freeze({
       buildWeekdayTemplateDays,
       formatScheduleTimeFromMinutes,
+      getManagementWorkPolicyBreakMinutes,
       normalizeManagementPolicyMinutes,
       normalizeManagementPolicyWorkingDays,
     });

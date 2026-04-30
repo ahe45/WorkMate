@@ -81,13 +81,10 @@
       }).map((role) => {
         const roleCode = String(role?.roleCode || "").trim();
         const map = {
-          APPROVER: "결재자",
-          AUDITOR: "감사 담당",
           EMPLOYEE: "구성원",
+          MASTER_ADMIN: "마스터관리자",
           ORG_ADMIN: "조직 관리자",
-          SITE_MANAGER: "사업장 관리자",
           SYSTEM_ADMIN: "시스템 관리자",
-          UNIT_MANAGER: "부서 관리자",
         };
 
         return map[roleCode] || roleCode;

@@ -18,8 +18,11 @@ function createBootstrapPayloadBuilder(deps = {}) {
       return [];
     }
 
-    const managedOrganizations = await organizationsService.listManagedOrganizations(principal.id);
+    const managedOrganizations = await organizationsService.listManagedOrganizations(principal);
     const managedOrganizationMap = new Map(managedOrganizations.map((organization) => [String(organization.id), organization]));
+    const accessibleOrganizationIds = Array.from(new Set((principal.accessibleOrganizationIds || [])
+      .map((organizationId) => String(organizationId || "").trim())
+      .filter(Boolean)));
 
     if (authService.hasPlatformRole(principal, ["SYSTEM_ADMIN"])) {
       const organizations = await organizationsService.listOrganizations();
@@ -27,26 +30,37 @@ function createBootstrapPayloadBuilder(deps = {}) {
       return organizations.map((organization) => managedOrganizationMap.get(String(organization.id)) || organization);
     }
 
-    if (authService.isPlatformAccount(principal)) {
-      return managedOrganizations;
-    }
+    const organizationSummaries = (await Promise.all(
+      accessibleOrganizationIds.map((organizationId) => organizationsService.getOrganizationSummary(organizationId)),
+    ))
+      .filter(Boolean)
+      .map((organization) => managedOrganizationMap.get(String(organization.id)) || organization);
 
-    const baseOrganization = await organizationsService.getOrganizationSummary(principal.organizationId);
+    const mergedById = new Map();
 
-    if (!baseOrganization || managedOrganizations.some((organization) => String(organization.id) === String(baseOrganization.id))) {
-      return managedOrganizations;
-    }
+    organizationSummaries.forEach((organization) => {
+      mergedById.set(String(organization.id), organization);
+    });
+    managedOrganizations.forEach((organization) => {
+      mergedById.set(String(organization.id), organization);
+    });
 
-    return [...managedOrganizations, baseOrganization];
+    return Array.from(mergedById.values())
+      .sort((left, right) => {
+        const leftIsCurrent = String(left?.id || "") === String(principal.organizationId || "");
+        const rightIsCurrent = String(right?.id || "") === String(principal.organizationId || "");
+
+        if (leftIsCurrent !== rightIsCurrent) {
+          return leftIsCurrent ? -1 : 1;
+        }
+
+        return String(right?.createdAt || "").localeCompare(String(left?.createdAt || ""));
+      });
   }
 
   function resolveRequestedOrganizationId(principal, requestedOrganizationId = "") {
     if (requestedOrganizationId) {
       return requestedOrganizationId;
-    }
-
-    if (authService.isPlatformAccount(principal)) {
-      return "";
     }
 
     return principal?.organizationId || "";
@@ -61,8 +75,12 @@ function createBootstrapPayloadBuilder(deps = {}) {
         dashboard: null,
         dashboardMonthlySessions: [],
         jobTitles: [],
+        leaveAccrualEntries: [],
+        leaveAccrualRules: [],
         leaveBalances: [],
+        leaveGroups: [],
         leaveRequests: [],
+        leaveTypes: [],
         organizationContext: null,
         organizations,
         workPolicy: null,
@@ -82,6 +100,8 @@ function createBootstrapPayloadBuilder(deps = {}) {
     const balanceYear = Number(targetDate.slice(0, 4));
     const monthStartDate = `${targetDate.slice(0, 8)}01`;
 
+    await leaveService.runDueLeaveAccrualRules(organizationId, targetDate);
+
     return {
       dashboard: await dashboardService.getLiveSummary(organizationId),
       dashboardMonthlySessions: await attendanceService.listAttendanceSessions({
@@ -90,8 +110,12 @@ function createBootstrapPayloadBuilder(deps = {}) {
         organizationId,
       }),
       jobTitles: await jobTitlesService.listJobTitles(organizationId),
+      leaveAccrualEntries: await leaveService.listLeaveAccrualEntries(organizationId),
+      leaveAccrualRules: await leaveService.listLeaveAccrualRules(organizationId),
       leaveBalances: await leaveService.listLeaveBalances(organizationId, balanceYear),
+      leaveGroups: await leaveService.listLeaveGroups(organizationId),
       leaveRequests: await leaveService.listLeaveRequests(organizationId, targetDate),
+      leaveTypes: await leaveService.listLeaveTypes(organizationId),
       organizationContext: await organizationsService.getOrganizationContext(organizationId),
       organizations,
       workPolicy: await schedulesService.getDefaultWorkPolicy(organizationId),

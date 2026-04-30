@@ -49,6 +49,17 @@
   line-height: 1;
 }
 
+.workmate-management-modal-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.workmate-management-modal-save-button {
+  min-width: 84px;
+}
+
 .modal-toolbar {
   border-bottom: 1px solid rgba(223, 229, 240, 0.92);
   background: rgba(255, 255, 255, 0.78);
@@ -65,6 +76,34 @@
   padding: 28px;
   background:
     linear-gradient(180deg, rgba(231, 238, 247, 0.92), rgba(244, 247, 252, 0.92));
+}
+
+.workmate-management-confirm-sheet {
+  width: min(100%, 520px);
+  max-height: none;
+}
+
+.workmate-management-confirm-header {
+  padding-bottom: 12px;
+  border-bottom: 0;
+}
+
+.workmate-management-confirm-header h3 {
+  margin: 0;
+}
+
+.workmate-management-confirm-header p {
+  margin: 8px 0 0;
+  color: var(--text-dim);
+}
+
+.workmate-management-confirm-body {
+  height: auto;
+  padding-top: 8px;
+}
+
+.workmate-management-confirm-actions {
+  justify-content: flex-end;
 }
 
 .busy-overlay {

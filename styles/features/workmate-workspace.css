@@ -199,7 +199,7 @@
   gap: 18px;
   height: 100%;
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .workmate-attendance-toolbar {
@@ -221,6 +221,10 @@
   min-height: 0;
   min-width: 0;
   overflow: hidden;
+}
+
+.workmate-attendance-board.list-view {
+  overflow: visible;
 }
 
 .workmate-attendance-month-scroll,
@@ -424,7 +428,7 @@
   gap: 16px;
   height: 100%;
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .workmate-report-toolbar {
@@ -521,7 +525,7 @@
 
 .workmate-report-grid-panel {
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .workmate-report-grid-panel .workmate-dashboard-table-shell {

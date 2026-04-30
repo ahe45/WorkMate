@@ -332,7 +332,7 @@
       const form = document.getElementById("management-job-title-form");
 
       if (!(form instanceof HTMLFormElement)) {
-        throw new Error("직급 설정 폼을 찾을 수 없습니다.");
+        throw new Error("직급 관리 폼을 찾을 수 없습니다.");
       }
 
       const formData = new FormData(form);
@@ -352,7 +352,7 @@
 
       const targetJobTitleId = String(draft.jobTitleId || "").trim();
 
-      await api.requestWithAutoRefresh(
+      const savedJobTitle = await api.requestWithAutoRefresh(
         targetJobTitleId
           ? `/v1/orgs/${state.selectedOrganizationId}/job-titles/${targetJobTitleId}`
           : `/v1/orgs/${state.selectedOrganizationId}/job-titles`,
@@ -362,9 +362,10 @@
         },
       );
 
-      state.managementJobTitleDraft = createEmptyManagementJobTitleDraft();
-      state.managementJobTitleModalOpen = false;
+      state.managementJobTitleDraft = createManagementJobTitleDraftFromRecord(savedJobTitle);
+      state.managementJobTitleModalOpen = true;
       await refreshWorkspaceData();
+      return savedJobTitle;
     }
 
     async function deleteManagementJobTitle(jobTitleId = "") {

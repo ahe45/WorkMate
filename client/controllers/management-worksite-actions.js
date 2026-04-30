@@ -24,6 +24,14 @@
       throw new Error("WorkMateManagementWorksiteActionController requires worksite action dependencies.");
     }
 
+    function notifyManagementWorksiteDraftInput() {
+      const nameInput = document.getElementById("management-worksite-name");
+
+      if (nameInput instanceof HTMLInputElement) {
+        nameInput.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    }
+
     function selectManagementWorksiteSearchResult(index) {
       syncManagementWorksiteDraftFromDom();
       const result = state.managementWorksiteSearchResults[Number(index)];
@@ -39,7 +47,10 @@
         mapMetadataJson: result.mapMetadataJson || state.managementWorksiteDraft.mapMetadataJson,
         name: String(state.managementWorksiteDraft.name || "").trim() || result.name,
       });
+      state.managementWorksiteSearchModalOpen = false;
       renderWorkspacePage();
+      notifyManagementWorksiteDraftInput();
+      document.getElementById("management-worksite-address")?.focus();
     }
 
     function selectManagementWorksite(siteId = "") {
@@ -56,6 +67,7 @@
     function resetManagementWorksiteDraft() {
       state.managementWorksiteDraft = createEmptyManagementWorksiteDraft();
       state.managementWorksiteSearchQuery = "";
+      state.managementWorksiteSearchModalOpen = false;
       state.managementWorksiteSearchResults = [];
       state.managementWorksiteSearchStatus = "";
       renderWorkspacePage();
@@ -63,6 +75,7 @@
 
     function openManagementWorksiteModal(siteId = "") {
       state.managementWorksiteSearchQuery = "";
+      state.managementWorksiteSearchModalOpen = false;
       state.managementWorksiteSearchResults = [];
       state.managementWorksiteSearchStatus = "";
 
@@ -88,8 +101,21 @@
         return;
       }
 
+      state.managementWorksiteSearchModalOpen = false;
       state.managementWorksiteModalOpen = false;
       renderWorkspacePage();
+    }
+
+    function closeManagementWorksiteSearchModal({ shouldRender = true } = {}) {
+      if (!state.managementWorksiteSearchModalOpen) {
+        return;
+      }
+
+      state.managementWorksiteSearchModalOpen = false;
+
+      if (shouldRender) {
+        renderWorkspacePage();
+      }
     }
 
     async function submitManagementWorksiteForm() {
@@ -142,8 +168,10 @@
         name: savedSite?.name || payload.name,
         primaryUnitId: savedSite?.primaryUnitId || payload.primaryUnitId,
       });
-      state.managementWorksiteModalOpen = false;
+      state.managementWorksiteSearchModalOpen = false;
+      state.managementWorksiteModalOpen = true;
       await refreshWorkspaceData();
+      return savedSite;
     }
 
     async function deleteManagementWorksite(siteId = "") {
@@ -166,6 +194,7 @@
 
       if (String(state.managementWorksiteDraft?.siteId || "").trim() === normalizedSiteId) {
         state.managementWorksiteDraft = createEmptyManagementWorksiteDraft();
+        state.managementWorksiteSearchModalOpen = false;
         state.managementWorksiteModalOpen = false;
       }
 
@@ -174,12 +203,14 @@
 
     return Object.freeze({
       closeManagementWorksiteModal,
+      closeManagementWorksiteSearchModal,
       deleteManagementWorksite,
       openManagementWorksiteModal,
       resetManagementWorksiteDraft,
       selectManagementWorksite,
       selectManagementWorksiteSearchResult,
       submitManagementWorksiteForm,
+      notifyManagementWorksiteDraftInput,
     });
   }
 

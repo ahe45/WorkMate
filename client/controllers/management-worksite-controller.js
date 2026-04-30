@@ -30,6 +30,12 @@
       throw new Error("WorkMateManagementWorksiteController requires worksite dependencies.");
     }
 
+    let managementWorksiteDragState = {
+      draggedId: "",
+      overId: "",
+      position: "",
+    };
+
     const resolverModule = globalThis.WorkMateAppModuleResolver
       || (typeof require === "function" ? require("../app/module-resolver.js") : null);
 
@@ -107,11 +113,217 @@
       syncManagementWorksiteDraftFromDom: draftController.syncManagementWorksiteDraftFromDom,
     });
 
+    function isManagementWorksiteReorderContext() {
+      return currentPage === "workspace"
+        && state.currentWorkspaceView === "management"
+        && normalizeManagementSection(state.managementSection) === "worksites";
+    }
+
+    function clearManagementWorksiteDragMarkers() {
+      document.querySelectorAll(".workmate-worksite-grid-row.is-dragging, .workmate-worksite-grid-row.drag-before, .workmate-worksite-grid-row.drag-after").forEach((element) => {
+        element.classList.remove("is-dragging", "drag-before", "drag-after");
+      });
+    }
+
+    function resetManagementWorksiteDragState() {
+      managementWorksiteDragState = {
+        draggedId: "",
+        overId: "",
+        position: "",
+      };
+      clearManagementWorksiteDragMarkers();
+    }
+
+    function getManagementWorksiteOrderedIdsFromDom() {
+      const grid = document.querySelector("[data-management-worksite-order]");
+      const rawValue = String(grid?.dataset?.managementWorksiteOrder || "").trim();
+
+      if (!rawValue) {
+        return [];
+      }
+
+      return rawValue.split(",").map((value) => String(value || "").trim()).filter(Boolean);
+    }
+
+    function setManagementWorksiteDragMarker(row, position = "before") {
+      if (!(row instanceof HTMLElement)) {
+        clearManagementWorksiteDragMarkers();
+        return;
+      }
+
+      document.querySelectorAll(".workmate-worksite-grid-row.drag-before, .workmate-worksite-grid-row.drag-after").forEach((element) => {
+        if (element !== row) {
+          element.classList.remove("drag-before", "drag-after");
+        }
+      });
+
+      row.classList.toggle("drag-before", position === "before");
+      row.classList.toggle("drag-after", position === "after");
+    }
+
+    function moveManagementWorksiteOrder(orderedIds = [], draggedId = "", targetId = "", position = "before") {
+      const normalizedDraggedId = String(draggedId || "").trim();
+      const normalizedTargetId = String(targetId || "").trim();
+      const sourceIds = Array.from(new Set((Array.isArray(orderedIds) ? orderedIds : []).map((value) => String(value || "").trim()).filter(Boolean)));
+
+      if (!normalizedDraggedId || !normalizedTargetId || normalizedDraggedId === normalizedTargetId) {
+        return sourceIds;
+      }
+
+      const nextIds = sourceIds.filter((value) => value !== normalizedDraggedId);
+      const targetIndex = nextIds.indexOf(normalizedTargetId);
+
+      if (targetIndex < 0) {
+        return sourceIds;
+      }
+
+      nextIds.splice(position === "after" ? targetIndex + 1 : targetIndex, 0, normalizedDraggedId);
+      return nextIds;
+    }
+
+    function areOrderedIdsEqual(left = [], right = []) {
+      if (left.length !== right.length) {
+        return false;
+      }
+
+      return left.every((value, index) => value === right[index]);
+    }
+
+    async function reorderManagementWorksites(orderedIds = []) {
+      const normalizedOrderedIds = Array.from(new Set((Array.isArray(orderedIds) ? orderedIds : []).map((value) => String(value || "").trim()).filter(Boolean)));
+
+      if (!state.selectedOrganizationId || normalizedOrderedIds.length === 0) {
+        return;
+      }
+
+      await api.requestWithAutoRefresh(`/v1/orgs/${state.selectedOrganizationId}/sites/reorder`, {
+        body: JSON.stringify({
+          orderedIds: normalizedOrderedIds,
+        }),
+        method: "POST",
+      });
+
+      await refreshWorkspaceData();
+    }
+
+    function handleManagementWorksiteDragStart(event) {
+      if (!isManagementWorksiteReorderContext() || !(event.target instanceof Element)) {
+        return;
+      }
+
+      const row = event.target.closest("[data-management-worksite-row]");
+
+      if (!(row instanceof HTMLElement)) {
+        return;
+      }
+
+      const draggedId = String(row.dataset.managementWorksiteRow || "").trim();
+      const orderedIds = getManagementWorksiteOrderedIdsFromDom();
+
+      if (!draggedId || orderedIds.length < 2) {
+        event.preventDefault();
+        return;
+      }
+
+      managementWorksiteDragState = {
+        draggedId,
+        overId: "",
+        position: "",
+      };
+      clearManagementWorksiteDragMarkers();
+      row.classList.add("is-dragging");
+
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", draggedId);
+      }
+    }
+
+    function handleManagementWorksiteDragOver(event) {
+      if (!isManagementWorksiteReorderContext() || !(event.target instanceof Element)) {
+        return;
+      }
+
+      const draggedId = String(managementWorksiteDragState.draggedId || "").trim();
+
+      if (!draggedId) {
+        return;
+      }
+
+      const row = event.target.closest("[data-management-worksite-row]");
+
+      if (!(row instanceof HTMLElement)) {
+        return;
+      }
+
+      const targetId = String(row.dataset.managementWorksiteRow || "").trim();
+
+      if (!targetId || targetId === draggedId) {
+        row.classList.remove("drag-before", "drag-after");
+        return;
+      }
+
+      event.preventDefault();
+
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "move";
+      }
+
+      const rect = row.getBoundingClientRect();
+      const position = event.clientY >= rect.top + rect.height / 2 ? "after" : "before";
+      managementWorksiteDragState.overId = targetId;
+      managementWorksiteDragState.position = position;
+      setManagementWorksiteDragMarker(row, position);
+    }
+
+    async function handleManagementWorksiteDrop(event) {
+      if (!isManagementWorksiteReorderContext() || !(event.target instanceof Element)) {
+        return;
+      }
+
+      const draggedId = String(managementWorksiteDragState.draggedId || "").trim();
+      const row = event.target.closest("[data-management-worksite-row]");
+
+      if (!draggedId || !(row instanceof HTMLElement)) {
+        resetManagementWorksiteDragState();
+        return;
+      }
+
+      const targetId = String(row.dataset.managementWorksiteRow || "").trim();
+      const position = managementWorksiteDragState.position === "after" ? "after" : "before";
+      const orderedIds = getManagementWorksiteOrderedIdsFromDom();
+      const nextOrderedIds = moveManagementWorksiteOrder(orderedIds, draggedId, targetId, position);
+      resetManagementWorksiteDragState();
+      event.preventDefault();
+
+      if (!targetId || areOrderedIdsEqual(orderedIds, nextOrderedIds)) {
+        return;
+      }
+
+      await reorderManagementWorksites(nextOrderedIds);
+    }
+
+    function handleManagementWorksiteDragEnd() {
+      resetManagementWorksiteDragState();
+    }
+
     return Object.freeze({
       ...draftController,
       ...searchController,
       ...mapController,
       ...actionController,
+      areOrderedIdsEqual,
+      clearManagementWorksiteDragMarkers,
+      getManagementWorksiteOrderedIdsFromDom,
+      handleManagementWorksiteDragEnd,
+      handleManagementWorksiteDragOver,
+      handleManagementWorksiteDragStart,
+      handleManagementWorksiteDrop,
+      isManagementWorksiteReorderContext,
+      moveManagementWorksiteOrder,
+      reorderManagementWorksites,
+      resetManagementWorksiteDragState,
+      setManagementWorksiteDragMarker,
     });
   }
 

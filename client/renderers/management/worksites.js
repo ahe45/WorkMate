@@ -14,6 +14,7 @@
       formatNumber,
       getDashboardGridState,
       hasDashboardGridFilter,
+      renderManagementModalHeaderActions,
       renderDashboardFilterMenu,
       resolveDashboardGridRecords,
       toArray,
@@ -47,6 +48,31 @@
     `;
   }
 
+  function renderManagementWorksiteSearchModal(state = {}) {
+    if (!state.managementWorksiteModalOpen || !state.managementWorksiteSearchModalOpen) {
+      return "";
+    }
+
+    const query = String(state.managementWorksiteSearchQuery || "").trim();
+    return `
+      <div class="modal workmate-worksite-search-modal" id="management-worksite-search-modal" aria-hidden="false" role="dialog" aria-modal="true" aria-labelledby="management-worksite-search-modal-title">
+        <div class="modal-backdrop" data-management-worksite-search-modal-close="true" aria-hidden="true"></div>
+        <section class="modal-sheet workmate-worksite-search-modal-sheet">
+          <header class="modal-header">
+            <div class="workmate-worksite-search-modal-copy">
+              <h3 id="management-worksite-search-modal-title">검색 결과 선택</h3>
+              <p>${escapeHtml(query ? `"${query}" 검색 결과입니다.` : "검색 결과를 선택하세요.")}</p>
+            </div>
+            <button class="icon-button" data-management-worksite-search-modal-close="true" type="button" aria-label="닫기">×</button>
+          </header>
+          <div class="modal-body workmate-worksite-search-modal-body">
+            ${renderWorksiteSearchResults(state)}
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
   function renderManagementOrderCell(value = "") {
     return `
       <div class="workmate-management-order-content">
@@ -72,10 +98,10 @@
         label: "근무지명",
         sortable: false,
       },
-      { filterable: false, key: "addressLine1", label: "위치 설명", sortable: false },
-      { filterable: false, key: "geofenceRadiusMeters", label: "인정 반경", sortable: false },
+      { filterable: false, key: "addressLine1", label: "주소", sortable: false },
       { filterable: false, key: "coordinates", label: "좌표", sortable: false },
-      { filterable: false, key: "settings", label: "설정", sortable: false },
+      { filterable: false, key: "geofenceRadiusMeters", label: "인정 반경", sortable: false },
+      { filterable: false, key: "settings", label: "관리", sortable: false },
       { filterable: false, key: "delete", label: "삭제", sortable: false },
     ];
   }
@@ -116,10 +142,10 @@
             </button>
           </span>
         </span>
-        <span>위치 설명</span>
-        <span>인정 반경</span>
+        <span>주소</span>
         <span>좌표</span>
-        <span class="workmate-worksite-grid-action-head">설정</span>
+        <span>인정 반경</span>
+        <span class="workmate-worksite-grid-action-head">관리</span>
         <span class="workmate-worksite-grid-action-head">삭제</span>
       </div>
     `;
@@ -130,6 +156,7 @@
     const sites = sortManagementWorksites(stats.sites);
     const worksiteGridColumns = getManagementWorksiteGridColumns();
     const worksiteGridState = getDashboardGridState(state, MANAGEMENT_WORKSITE_GRID_TABLE_ID);
+    const orderedSiteIds = sites.map((site) => String(site?.id || "").trim()).filter(Boolean);
     const unitNameById = new Map(
       toArray(stats.units)
         .filter((unit) => !(String(unit?.code || "").trim().toUpperCase() === "ROOT" && !String(unit?.parentUnitId || "").trim()))
@@ -171,15 +198,16 @@
     }
 
     return `
-      <div class="workmate-worksite-grid">
+      <div class="workmate-worksite-grid" data-management-worksite-order="${escapeAttribute(orderedSiteIds.join(","))}">
         ${renderWorksiteGridHead(isNameFilterActive)}
         ${filteredSites.map((site, index) => {
           const radius = Number(site?.geofenceRadiusMeters || 0);
           const isActive = selectedSiteId && String(site?.id || "") === selectedSiteId;
           const orderLabel = formatNumber(Number(site?.sortOrder || index + 1));
+          const siteId = String(site?.id || "").trim();
 
           return `
-            <article class="workmate-worksite-grid-row${isActive ? " is-active" : ""}">
+            <article class="workmate-worksite-grid-row${isActive ? " is-active" : ""}" data-management-worksite-row="${escapeAttribute(siteId)}" draggable="true">
               <div class="workmate-worksite-grid-cell workmate-management-order-cell">
                 ${renderManagementOrderCell(orderLabel)}
               </div>
@@ -193,13 +221,13 @@
                 <span>${escapeHtml(site?.addressLine1 || "설명 없음")}</span>
               </div>
               <div class="workmate-worksite-grid-cell">
-                <strong>${escapeHtml(`${formatNumber(radius || 0)}m`)}</strong>
-              </div>
-              <div class="workmate-worksite-grid-cell">
                 <span>${escapeHtml(`${formatCoordinate(site?.lat)}, ${formatCoordinate(site?.lng)}`)}</span>
               </div>
+              <div class="workmate-worksite-grid-cell">
+                <strong>${escapeHtml(`${formatNumber(radius || 0)}m`)}</strong>
+              </div>
               <div class="workmate-worksite-grid-cell workmate-worksite-grid-actions">
-                <button class="icon-button table-inline-icon-button workmate-worksite-record-action" data-management-worksite-open="${escapeAttribute(site?.id || "")}" type="button" aria-label="근무지 설정">
+                <button class="icon-button table-inline-icon-button workmate-worksite-record-action" data-management-worksite-open="${escapeAttribute(site?.id || "")}" type="button" aria-label="근무지 관리">
                   <svg class="button-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <circle cx="12" cy="12" r="2.6"></circle>
                     <path d="M19 12a7.4 7.4 0 0 0-.08-1.02l2.05-1.58-2-3.46-2.47 1a7.91 7.91 0 0 0-1.76-1.02L14.5 3h-5l-.24 2.92a7.91 7.91 0 0 0-1.76 1.02l-2.47-1-2 3.46 2.05 1.58A7.4 7.4 0 0 0 5 12c0 .34.03.68.08 1.02l-2.05 1.58 2 3.46 2.47-1a7.91 7.91 0 0 0 1.76 1.02L9.5 21h5l.24-2.92a7.91 7.91 0 0 0 1.76-1.02l2.47 1 2-3.46-2.05-1.58c.05-.34.08-.68.08-1.02Z"></path>
@@ -254,20 +282,20 @@
     }
 
     const draft = state.managementWorksiteDraft || {};
-    const saveLabel = draft.siteId ? "근무지 업데이트" : "근무지 저장";
-    const modalDescription = draft.siteId ? "저장된 근무지의 위치와 반경 설정을 수정합니다." : "근무지 이름, 위치, 인정 반경을 등록합니다.";
-
+    const searchStatus = String(state.managementWorksiteSearchStatus || "").trim();
     return `
       <div class="modal" id="management-worksite-modal" aria-hidden="false" role="dialog" aria-modal="true" aria-labelledby="management-worksite-modal-title">
         <div class="modal-backdrop" data-management-worksite-close="true" aria-hidden="true"></div>
         <section class="modal-sheet workmate-worksite-modal-sheet">
           <header class="modal-header">
             <div>
-              <p class="page-kicker">Geofence workspace</p>
-              <h3 id="management-worksite-modal-title">${escapeHtml(draft.siteId ? "근무지 설정 수정" : "근무지 설정 등록")}</h3>
-              <p>${escapeHtml(modalDescription)}</p>
+              <h3 id="management-worksite-modal-title">${escapeHtml(draft.siteId ? "근무지 관리 수정" : "근무지 관리 등록")}</h3>
             </div>
-            <button class="icon-button" data-management-worksite-close="true" type="button" aria-label="닫기">×</button>
+            ${renderManagementModalHeaderActions(state, {
+              closeAction: "data-management-worksite-close",
+              formId: "management-worksite-form",
+              modalType: "worksite",
+            })}
           </header>
           <div class="modal-body workmate-worksite-modal-body">
             <div class="workmate-worksite-modal-layout">
@@ -298,7 +326,7 @@
                     </div>
                   </label>
                 </form>
-                ${renderWorksiteSearchResults(state)}
+                <p class="workmate-worksite-search-helper">${escapeHtml(searchStatus || "검색 결과는 별도 창에서 선택할 수 있습니다.")}</p>
                 <div class="workmate-worksite-map-shell">
                   <div class="workmate-worksite-map" id="management-worksite-map" aria-label="근무지 지도"></div>
                 </div>
@@ -350,17 +378,13 @@
                   </div>
                   <input id="management-worksite-site-id" name="siteId" type="hidden" value="${escapeAttribute(draft.siteId || "")}" />
                   <input id="management-worksite-map-metadata" name="mapMetadataJson" type="hidden" value="${escapeAttribute(draft.mapMetadataJson || "")}" />
-                  <div class="toolbar-actions">
-                    <button class="outline-button" data-management-worksite-close="true" type="button">취소</button>
-                    <button class="outline-button" data-management-worksite-reset="true" type="button">초기화</button>
-                    <button class="primary-button" type="submit">${escapeHtml(saveLabel)}</button>
-                  </div>
                 </form>
               </section>
             </div>
           </div>
         </section>
       </div>
+      ${renderManagementWorksiteSearchModal(state)}
     `;
   }
 
@@ -370,11 +394,12 @@
     const hasWorksites = worksiteRecords.length > 0;
 
     return `
-      <section class="workmate-admin-content-stack">
+        <section class="workmate-admin-content-stack">
         <article class="panel-card workmate-worksite-record-panel">
           <div class="workmate-worksite-panel-head">
             <div>
-              <h4>근무지 설정</h4>
+              <h4>근무지 관리</h4>
+              <p>위치 설명, 좌표, 인정 반경, 연결 조직 기준으로 근무지를 관리합니다.</p>
             </div>
             ${hasWorksites ? `
               <div class="workmate-topbar-actions workmate-worksite-panel-controls">

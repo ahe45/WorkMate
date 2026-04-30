@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WorkMate 합류 확인</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/pages/auth.css" />
+  </head>
+  <body data-page="join-invite">
+    <div class="app-shell auth-locked" id="appShell">
+      <div class="auth-background-media" aria-hidden="true">
+        <img class="auth-background-media-image" src="/client/assets/bg.png" alt="" />
+      </div>
+      <main class="content-area">
+        <div class="login-shell login-single-shell workmate-auth-shell signup-shell">
+          <div class="login-brand-lockup" aria-hidden="true">
+            <img class="login-brand-mark" src="/client/assets/logo.png" alt="" width="42" height="42" />
+            <img class="login-brand-wordmark" src="/client/assets/workmate-wordmark.png" alt="" />
+          </div>
+          <article class="login-panel-card login-stage-panel login-composition-panel signup-composition-panel">
+            <div class="login-stage-panel-inner">
+              <section class="login-stage-form login-form login-composition-form signup-composition-form" aria-labelledby="join-invite-title">
+                <h3 class="login-composition-title" id="join-invite-title">워크스페이스 합류 확인</h3>
+                <p class="login-stage-description signup-stage-description" id="join-invite-description">
+                  합류 요청 정보를 확인하고 승인하면 워크스페이스 목록에 추가됩니다.
+                </p>
+
+                <div class="field login-field">
+                  <label for="join-invite-organization">워크스페이스</label>
+                  <input id="join-invite-organization" type="text" value="" readonly />
+                </div>
+
+                <div class="field login-field">
+                  <label for="join-invite-email">초대 이메일</label>
+                  <input id="join-invite-email" type="email" value="" readonly />
+                </div>
+
+                <div class="field login-field">
+                  <label for="join-invite-name">이름</label>
+                  <input id="join-invite-name" type="text" value="" readonly />
+                </div>
+
+                <p class="login-error hidden" id="join-invite-error" aria-live="polite"></p>
+                <div class="workmate-auth-action-row">
+                  <button class="outline-button login-submit-button workmate-auth-reject-button" id="join-invite-reject" type="button">합류 거절</button>
+                  <button class="primary-button login-submit-button" id="join-invite-accept" type="button">합류 승인</button>
+                </div>
+                <p class="workmate-auth-footer">
+                  다른 계정으로 진행하려면 <a href="/login" id="join-invite-login-link">로그인</a>으로 이동하세요.
+                </p>
+              </section>
+            </div>
+          </article>
+        </div>
+      </main>
+    </div>
+
+    <script src="/client/boot/asset-manifest.js"></script>
+    <script src="/client/boot/load-page-assets.js"></script>
+  </body>
+</html>

@@ -34,7 +34,7 @@ async function main() {
 
   try {
     await bootstrapService.applySchema(connection, { reset });
-    if (isEphemeralDatabaseName(databaseName) || process.env.SEED_DEMO_DATA === "true") {
+    if (process.env.SEED_DEMO_DATA === "true") {
       await bootstrapService.seedDemoData(connection);
     }
     console.log(`Database '${databaseName}' is ready.`);

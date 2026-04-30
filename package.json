@@ -6,6 +6,7 @@
   "main": "server.js",
   "scripts": {
     "db:setup": "node scripts/setup-db.js",
+    "db:cleanup-roles": "node scripts/cleanup-roles.js",
     "db:prune-unused-tables": "node scripts/prune-unused-tables.js",
     "db:seed-workforce": "node scripts/seed-demo-workforce.js",
     "start": "node server.js",
@@ -21,6 +22,7 @@
   "dependencies": {
     "dotenv": "^17.3.1",
     "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.20.0"
+    "mysql2": "^3.20.0",
+    "nodemailer": "^6.10.1"
   }
 }

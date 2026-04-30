@@ -124,7 +124,7 @@
       const form = document.getElementById("management-unit-form");
 
       if (!(form instanceof HTMLFormElement)) {
-        throw new Error("조직 설정 폼을 찾을 수 없습니다.");
+        throw new Error("조직 관리 폼을 찾을 수 없습니다.");
       }
 
       const formData = new FormData(form);
@@ -140,7 +140,7 @@
 
       const targetUnitId = String(draft.unitId || "").trim();
 
-      await api.requestWithAutoRefresh(
+      const savedUnit = await api.requestWithAutoRefresh(
         targetUnitId
           ? `/v1/orgs/${state.selectedOrganizationId}/units/${targetUnitId}`
           : `/v1/orgs/${state.selectedOrganizationId}/units`,
@@ -150,9 +150,10 @@
         },
       );
 
-      state.managementUnitDraft = createEmptyManagementUnitDraft();
-      state.managementUnitModalOpen = false;
+      state.managementUnitDraft = createManagementUnitDraftFromUnit(savedUnit);
+      state.managementUnitModalOpen = true;
       await refreshWorkspaceData();
+      return savedUnit;
     }
 
     async function deleteManagementUnit(unitId = "") {

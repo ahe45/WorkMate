@@ -8,46 +8,63 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, () => {
   function create(dependencies = {}) {
     const {
+      api,
       currentPage,
       CURRENT_YEAR,
+      MANAGEMENT_SECTION_STORAGE_KEY,
       closeManagementHolidayModal,
       closeManagementJobTitleModal,
-      closeManagementWorkPolicyModal,
+      closeManagementModalConfirm,
       closeManagementUnitModal,
       closeManagementWorkPolicyTimePickers,
       closeManagementWorksiteModal,
+      closeManagementWorksiteSearchModal,
       deleteManagementHoliday,
       deleteManagementJobTitle,
-      deleteManagementWorkPolicy,
       deleteManagementUnit,
       deleteManagementWorksite,
-      handleManagementWorkPolicyTimeOptionClick,
+      handleManagementModalConfirmAction,
       handleProtectedFailure,
       loadHolidayYear,
       loadManagementHolidayData,
       normalizeManagementSection,
       openManagementHolidayModal,
       openManagementJobTitleModal,
-      openManagementWorkPolicyModal,
       openManagementUnitEditModal,
       openManagementUnitModal,
       openManagementWorksiteModal,
       renderWorkspacePage,
       renderers,
-      resetManagementHolidayDraft,
-      resetManagementJobTitleDraft,
-      resetManagementWorkPolicyDraft,
-      resetManagementUnitDraft,
-      resetManagementWorksiteDraft,
+      refreshWorkspaceData,
+      setInlineMessage,
+      showToast,
       selectManagementWorksiteSearchResult,
-      setManagementWorkPolicyTimePickerOpen,
+      runWithManagementModalGuard,
       state,
       syncManagementWorksiteDraftFromDom,
-      updateManagementWorkPolicyStageMetrics,
+      syncManagementModalDirtyState,
     } = dependencies;
+    const managementLeaveClickModule = globalThis.WorkMateAppInteractionManagementLeaveClickHandler
+      || (typeof require === "function" ? require("./app-interaction-click-management-leave.js") : null);
+    const managementEmployeeClickModule = globalThis.WorkMateManagementEmployeeClickActions
+      || (typeof require === "function" ? require("./management-employee-click-actions.js") : null);
+    const managementWorkPolicyClickModule = globalThis.WorkMateManagementWorkPolicyClickActions
+      || (typeof require === "function" ? require("./management-work-policy-click-actions.js") : null);
 
     if (!renderWorkspacePage || !renderers || !state) {
       throw new Error("WorkMateAppInteractionManagementClickHandler requires management click dependencies.");
+    }
+
+    if (!managementLeaveClickModule || typeof managementLeaveClickModule.create !== "function") {
+      throw new Error("client/controllers/app-interaction-click-management-leave.js must be loaded before client/controllers/app-interaction-click-management.js.");
+    }
+
+    if (!managementEmployeeClickModule || typeof managementEmployeeClickModule.create !== "function") {
+      throw new Error("client/controllers/management-employee-click-actions.js must be loaded before client/controllers/app-interaction-click-management.js.");
+    }
+
+    if (!managementWorkPolicyClickModule || typeof managementWorkPolicyClickModule.create !== "function") {
+      throw new Error("client/controllers/management-work-policy-click-actions.js must be loaded before client/controllers/app-interaction-click-management.js.");
     }
 
     function isManagementView() {
@@ -57,6 +74,36 @@
     function isManagementSection(section = "") {
       return normalizeManagementSection(state.managementSection) === section;
     }
+
+    const managementLeaveClickHandler = managementLeaveClickModule.create({
+      api,
+      handleProtectedFailure,
+      isManagementSection,
+      refreshWorkspaceData,
+      renderWorkspacePage,
+      setInlineMessage,
+      showToast,
+      state,
+    });
+    const {
+      closeManagementLeaveGroupModal,
+      closeManagementLeaveRuleModal,
+      handleManagementLeaveClick,
+    } = managementLeaveClickHandler;
+    const managementEmployeeClickHandler = managementEmployeeClickModule.create({
+      ...dependencies,
+      isManagementSection,
+    });
+    const managementWorkPolicyClickHandler = managementWorkPolicyClickModule.create({
+      ...dependencies,
+      isManagementSection,
+    });
+    const {
+      handleManagementEmployeeClick,
+    } = managementEmployeeClickHandler;
+    const {
+      handleManagementWorkPolicyClick,
+    } = managementWorkPolicyClickHandler;
 
     function handleHolidayLoadFailure(error, fallbackMessage) {
       if (!handleProtectedFailure(error)) {
@@ -78,32 +125,37 @@
       const managementHolidayCloseButton = target.closest("[data-management-holiday-close]");
       const managementHolidayDeleteButton = target.closest("[data-management-holiday-delete]");
       const managementHolidayOpenButton = target.closest("[data-management-holiday-open]");
-      const managementHolidayResetButton = target.closest("[data-management-holiday-reset]");
       const managementHolidayYearNavButton = target.closest("[data-management-holiday-year-nav]");
       const managementJobTitleCloseButton = target.closest("[data-management-job-title-close]");
       const managementJobTitleDeleteButton = target.closest("[data-management-job-title-delete]");
       const managementJobTitleOpenButton = target.closest("[data-management-job-title-open]");
-      const managementJobTitleResetButton = target.closest("[data-management-job-title-reset]");
+      const managementModalConfirmActionButton = target.closest("[data-management-modal-confirm-action]");
+      const managementModalConfirmCloseButton = target.closest("[data-management-modal-confirm-close]");
       const managementSectionButton = target.closest("[data-management-section]");
       const managementUnitCloseButton = target.closest("[data-management-unit-close]");
       const managementUnitDeleteButton = target.closest("[data-management-unit-delete]");
       const managementUnitEditButton = target.closest("[data-management-unit-edit]");
       const managementUnitOpenButton = target.closest("[data-management-unit-open]");
-      const managementUnitResetButton = target.closest("[data-management-unit-reset]");
-      const managementWorkPolicyAdjustmentAddButton = target.closest("[data-management-work-policy-adjustment-add]");
-      const managementWorkPolicyCloseButton = target.closest("[data-management-work-policy-close]");
-      const managementWorkPolicyDeleteButton = target.closest("[data-management-work-policy-delete]");
-      const managementWorkPolicyOpenButton = target.closest("[data-management-work-policy-open]");
-      const managementWorkPolicyResetButton = target.closest("[data-management-work-policy-reset]");
-      const managementWorkPolicyTimeOptionButton = target.closest("[data-management-work-policy-time-option]");
-      const managementWorkPolicyTimePicker = target.closest("[data-management-work-policy-time-picker]");
-      const managementWorkPolicyTimeToggleButton = target.closest("[data-management-work-policy-time-toggle]");
       const managementWorksiteCloseButton = target.closest("[data-management-worksite-close]");
       const managementWorksiteDeleteButton = target.closest("[data-management-worksite-delete]");
       const managementWorksiteOpenButton = target.closest("[data-management-worksite-open]");
-      const managementWorksiteResetButton = target.closest("[data-management-worksite-reset]");
+      const managementWorksiteSearchModalCloseButton = target.closest("[data-management-worksite-search-modal-close]");
       const managementWorksiteSearchResultButton = target.closest("[data-management-worksite-search-result]");
       const managementWorksiteSelectButton = target.closest("[data-management-worksite-select]");
+
+      if (managementModalConfirmActionButton) {
+        await handleManagementModalConfirmAction(managementModalConfirmActionButton.dataset.managementModalConfirmAction || "");
+        return true;
+      }
+
+      if (managementModalConfirmCloseButton) {
+        closeManagementModalConfirm();
+        return true;
+      }
+
+      if (await handleManagementEmployeeClick(target)) {
+        return true;
+      }
 
       if (managementUnitCloseButton) {
         closeManagementUnitModal();
@@ -120,70 +172,49 @@
         return true;
       }
 
-      if (managementWorkPolicyCloseButton) {
-        closeManagementWorkPolicyModal();
-        return true;
-      }
-
       if (managementWorksiteCloseButton) {
         closeManagementWorksiteModal();
         return true;
       }
 
-      if (isManagementSection("work-schedules")) {
-        if (managementWorkPolicyAdjustmentAddButton) {
-          const list = document.querySelector("[data-management-work-policy-adjustment-list='true']");
+      if (managementWorksiteSearchModalCloseButton) {
+        closeManagementWorksiteSearchModal();
+        return true;
+      }
 
-          if (list instanceof HTMLElement && typeof renderers.renderManagementWorkPolicyAdjustmentRow === "function") {
-            const nextIndex = list.querySelectorAll(".workmate-work-policy-adjustment-row").length;
-            list.insertAdjacentHTML("beforeend", renderers.renderManagementWorkPolicyAdjustmentRow({}, nextIndex));
-            updateManagementWorkPolicyStageMetrics();
-          }
-
-          return true;
-        }
-
-        if (managementWorkPolicyTimeToggleButton) {
-          const picker = managementWorkPolicyTimeToggleButton.closest("[data-management-work-policy-time-picker]");
-
-          if (picker instanceof HTMLElement) {
-            const isOpen = picker.classList.contains("is-open");
-            closeManagementWorkPolicyTimePickers(picker);
-            setManagementWorkPolicyTimePickerOpen(picker, !isOpen);
-          }
-
-          return true;
-        }
-
-        if (managementWorkPolicyTimeOptionButton) {
-          handleManagementWorkPolicyTimeOptionClick(managementWorkPolicyTimeOptionButton);
-          return true;
-        }
-
-        if (!managementWorkPolicyTimePicker) {
-          closeManagementWorkPolicyTimePickers();
-        }
+      if (await handleManagementWorkPolicyClick(target)) {
+        return true;
       }
 
       if (managementSectionButton) {
-        syncManagementWorksiteDraftFromDom();
-        closeManagementWorkPolicyTimePickers();
-        state.managementHolidayModalOpen = false;
-        state.managementJobTitleModalOpen = false;
-        state.managementWorkPolicyModalOpen = false;
-        state.managementUnitModalOpen = false;
-        state.managementWorksiteModalOpen = false;
-        state.managementSection = normalizeManagementSection(managementSectionButton.dataset.managementSection || "");
+        const nextSection = normalizeManagementSection(managementSectionButton.dataset.managementSection || "");
 
-        if (state.managementSection === "holidays") {
-          loadManagementHolidayData({ force: false }).then(() => {
-            renderWorkspacePage();
-          }).catch((error) => {
-            handleHolidayLoadFailure(error, "공휴일 정보를 불러오지 못했습니다.");
-          });
-        }
+        await runWithManagementModalGuard(async () => {
+          syncManagementWorksiteDraftFromDom();
+          closeManagementWorkPolicyTimePickers();
+          closeManagementLeaveGroupModal();
+          state.managementLeaveManualGrantModalOpen = false;
+          closeManagementLeaveRuleModal();
+          state.managementSection = nextSection;
 
-        renderWorkspacePage();
+          if (MANAGEMENT_SECTION_STORAGE_KEY) {
+            window.sessionStorage.setItem(MANAGEMENT_SECTION_STORAGE_KEY, state.managementSection);
+          }
+
+          if (state.managementSection === "holidays") {
+            loadManagementHolidayData({ force: false }).then(() => {
+              renderWorkspacePage();
+            }).catch((error) => {
+              handleHolidayLoadFailure(error, "공휴일 정보를 불러오지 못했습니다.");
+            });
+          }
+
+          renderWorkspacePage();
+        });
+        return true;
+      }
+
+      if (await handleManagementLeaveClick(target)) {
         return true;
       }
 
@@ -204,26 +235,6 @@
         return true;
       }
 
-      if (managementHolidayResetButton && isManagementSection("holidays")) {
-        resetManagementHolidayDraft();
-        return true;
-      }
-
-      if (managementWorkPolicyOpenButton && isManagementSection("work-schedules")) {
-        openManagementWorkPolicyModal(managementWorkPolicyOpenButton.dataset.managementWorkPolicyOpen || "");
-        return true;
-      }
-
-      if (managementWorkPolicyDeleteButton && isManagementSection("work-schedules")) {
-        await deleteManagementWorkPolicy(managementWorkPolicyDeleteButton.dataset.managementWorkPolicyDelete || "");
-        return true;
-      }
-
-      if (managementWorkPolicyResetButton && isManagementSection("work-schedules")) {
-        resetManagementWorkPolicyDraft();
-        return true;
-      }
-
       if (managementJobTitleOpenButton) {
         openManagementJobTitleModal(managementJobTitleOpenButton.dataset.managementJobTitleOpen || "");
         return true;
@@ -231,11 +242,6 @@
 
       if (managementJobTitleDeleteButton) {
         await deleteManagementJobTitle(managementJobTitleDeleteButton.dataset.managementJobTitleDelete || "");
-        return true;
-      }
-
-      if (managementJobTitleResetButton) {
-        resetManagementJobTitleDraft();
         return true;
       }
 
@@ -254,11 +260,6 @@
         return true;
       }
 
-      if (managementUnitResetButton) {
-        resetManagementUnitDraft();
-        return true;
-      }
-
       if (managementWorksiteOpenButton) {
         openManagementWorksiteModal(managementWorksiteOpenButton.dataset.managementWorksiteOpen || "");
         return true;
@@ -269,13 +270,9 @@
         return true;
       }
 
-      if (managementWorksiteResetButton) {
-        resetManagementWorksiteDraft();
-        return true;
-      }
-
       if (managementWorksiteSearchResultButton) {
         selectManagementWorksiteSearchResult(managementWorksiteSearchResultButton.dataset.managementWorksiteSearchResult || "");
+        syncManagementModalDirtyState("worksite");
         return true;
       }
 

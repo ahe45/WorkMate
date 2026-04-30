@@ -1,0 +1,182 @@
+﻿/* WorkMate responsive rules up to 1200px */
+
+@media (max-width: 1200px) {
+  .workmate-admin-shell,
+  .workmate-admin-worksites-grid,
+  .workmate-worksite-modal-layout,
+  .workmate-management-grid,
+  .workmate-info-grid,
+  .workmate-dashboard-dual-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-admin-subnav {
+    position: static;
+  }
+
+  .workmate-admin-stage {
+    padding: 18px;
+  }
+
+  .workmate-admin-stage-head,
+  .workmate-worksite-panel-head,
+  .workmate-holiday-year-controls,
+  .workmate-worksite-record-head,
+  .workmate-unit-card-head {
+    flex-direction: column;
+  }
+
+  .workmate-unit-card-row {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .workmate-unit-card-row .workmate-unit-card-meta {
+    flex-wrap: wrap;
+    width: auto;
+  }
+
+  .workmate-unit-card-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .workmate-unit-card-row .workmate-unit-card-path {
+    white-space: normal;
+  }
+
+  .workmate-worksite-panel-controls {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .workmate-worksite-grid-head,
+  .workmate-worksite-grid-row,
+  .workmate-work-policy-record-grid-head,
+  .workmate-work-policy-record-grid-row,
+  .workmate-work-schedule-grid-head,
+  .workmate-work-schedule-grid-row,
+  .workmate-holiday-grid-head,
+  .workmate-holiday-grid-row,
+  .workmate-leave-policy-record-grid-head,
+  .workmate-leave-policy-record-grid-row,
+  .workmate-leave-rule-record-grid-head,
+  .workmate-leave-rule-record-grid-row,
+  .workmate-title-record-grid-head,
+  .workmate-title-record-grid-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workmate-worksite-grid-actions {
+    justify-content: center;
+  }
+
+  .workmate-work-policy-day-rule-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .workmate-work-policy-contractual-time-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .workmate-work-policy-contractual-options-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  }
+
+  .workmate-work-policy-identity-grid {
+    grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  }
+
+  .workmate-work-policy-field-grid,
+  .workmate-work-policy-toggle-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workmate-employee-field-grid,
+  .workmate-employee-history-grid,
+  .workmate-employee-upload-row {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-employee-file-summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workmate-employee-card-dropzone-box {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workmate-employee-card-download-button {
+    width: 100%;
+  }
+
+  .workmate-job-title-unit-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workmate-unit-add-child-button {
+    width: 100%;
+  }
+
+  .workmate-admin-stage-metrics {
+    min-width: 0;
+  }
+
+  .workmate-leave-policy-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workmate-leave-policy-step-layout,
+  .workmate-leave-management-layout,
+  .workmate-leave-manual-modal-body,
+  .workmate-leave-policy-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-schedule-toolbar-row,
+  .workmate-schedule-filter-group,
+  .workmate-attendance-filter-group {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workmate-schedule-filter-group,
+  .workmate-attendance-filter-group {
+    flex-basis: auto;
+  }
+
+  .workmate-schedule-user-filter,
+  .workmate-schedule-toolbar-actions {
+    width: 100%;
+  }
+
+  .workmate-schedule-user-filter-menu {
+    left: 0;
+    right: 0;
+    width: auto;
+  }
+
+  .workmate-dashboard-summary-row {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-dashboard-top-stack {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workmate-dashboard-hero {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "company"
+      "leave"
+      "summary";
+  }
+
+  .workmate-dashboard-detail-summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

@@ -139,4 +139,54 @@
   .lookup-search-grid-actions .lookup-filter-actions {
     grid-column: auto;
   }
+
+  .upload-grid.workmate-employee-excel-upload-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .upload-panel-footer.workmate-employee-excel-toolbar,
+  .workmate-employee-modal-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    justify-content: stretch;
+  }
+
+  .upload-preview-summary-grid,
+  .workmate-employee-field-pair,
+  .workmate-employee-field-grid,
+  .workmate-employee-section-grid,
+  .workmate-employee-upload-row {
+    grid-template-columns: 1fr;
+  }
+
+  .workmate-employee-section-head {
+    display: grid;
+  }
+
+  .workmate-employee-section-head span {
+    max-width: none;
+    text-align: left;
+  }
+
+  .upload-panel-footer.workmate-employee-excel-toolbar button,
+  .workmate-employee-modal-toolbar > button,
+  .workmate-employee-toolbar-actions {
+    width: 100%;
+  }
+
+  .workmate-employee-toolbar-actions {
+    display: grid;
+    gap: 10px;
+  }
+
+  .workmate-employee-toolbar-actions button {
+    width: 100%;
+  }
+
+  .workmate-employee-excel-card-meta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }

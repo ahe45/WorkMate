@@ -12,11 +12,15 @@
       closeDashboardDetailModal,
       closeDashboardGridFilterMenu,
       closeDashboardSummaryModal,
+      closeManagementEmployeeExcelModal,
+      closeManagementEmployeeModal,
       closeManagementHolidayModal,
       closeManagementJobTitleModal,
+      closeManagementModalConfirm,
       closeManagementWorkPolicyModal,
       closeManagementUnitModal,
       closeManagementWorksiteModal,
+      closeManagementWorksiteSearchModal,
       closeScheduleUserFilter,
       currentPage,
       isWorkspaceGridContext,
@@ -60,13 +64,49 @@
         return true;
       }
 
+      if (state.currentWorkspaceView === "management" && state.managementModalUi?.confirm?.open) {
+        closeManagementModalConfirm();
+        return true;
+      }
+
       if (state.currentWorkspaceView === "management" && state.managementHolidayModalOpen) {
         closeManagementHolidayModal();
         return true;
       }
 
+      if (state.currentWorkspaceView === "management" && state.managementEmployeeExcelModalOpen) {
+        closeManagementEmployeeExcelModal();
+        return true;
+      }
+
+      if (state.currentWorkspaceView === "management" && state.managementEmployeeModalOpen) {
+        closeManagementEmployeeModal();
+        return true;
+      }
+
       if (state.currentWorkspaceView === "management" && state.managementJobTitleModalOpen) {
         closeManagementJobTitleModal();
+        return true;
+      }
+
+      if (state.currentWorkspaceView === "management" && state.managementLeaveGroupModalOpen) {
+        state.managementLeaveGroupModalOpen = false;
+        state.managementLeaveGroupEditId = "";
+        state.managementLeaveGroupParentId = "";
+        renderWorkspacePage();
+        return true;
+      }
+
+      if (state.currentWorkspaceView === "management" && state.managementLeaveRuleModalOpen) {
+        state.managementLeaveRuleModalOpen = false;
+        state.managementLeaveRuleEditIds = "";
+        renderWorkspacePage();
+        return true;
+      }
+
+      if (state.currentWorkspaceView === "management" && state.managementLeaveManualGrantModalOpen) {
+        state.managementLeaveManualGrantModalOpen = false;
+        renderWorkspacePage();
         return true;
       }
 
@@ -81,6 +121,11 @@
       }
 
       if (state.currentWorkspaceView === "management" && state.managementWorksiteModalOpen) {
+        if (state.managementWorksiteSearchModalOpen) {
+          closeManagementWorksiteSearchModal();
+          return true;
+        }
+
         closeManagementWorksiteModal();
         return true;
       }

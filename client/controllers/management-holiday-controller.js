@@ -110,7 +110,7 @@
         throw new Error("조회 중인 연도 안에서 지정 공휴일을 추가하세요.");
       }
 
-      await api.requestWithAutoRefresh(
+      const savedHoliday = await api.requestWithAutoRefresh(
         targetHolidayId
           ? `/v1/orgs/${state.selectedOrganizationId}/holidays/custom/${targetHolidayId}`
           : `/v1/orgs/${state.selectedOrganizationId}/holidays/custom`,
@@ -124,10 +124,11 @@
         },
       );
 
-      state.managementHolidayDraft = createEmptyManagementHolidayDraft(selectedYear);
-      state.managementHolidayModalOpen = false;
+      state.managementHolidayDraft = createManagementHolidayDraftFromItem(savedHoliday);
+      state.managementHolidayModalOpen = true;
       await loadManagementHolidayData({ force: true, year: selectedYear });
       renderWorkspacePage();
+      return savedHoliday;
     }
 
     async function deleteManagementHoliday(holidayId = "") {

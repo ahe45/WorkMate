@@ -82,6 +82,7 @@
       state.managementWorksiteSearchQuery = normalizedQuery;
 
       if (!normalizedQuery) {
+        state.managementWorksiteSearchModalOpen = false;
         state.managementWorksiteSearchResults = [];
         state.managementWorksiteSearchStatus = "검색어를 입력하세요.";
         renderWorkspacePage();
@@ -139,7 +140,13 @@
         state.managementWorksiteSearchStatus = error.message || "지도 위치 검색에 실패했습니다.";
       }
 
+      state.managementWorksiteSearchModalOpen = true;
       renderWorkspacePage();
+      window.requestAnimationFrame(() => {
+        const focusTarget = document.querySelector("[data-management-worksite-search-result]")
+          || document.querySelector("[data-management-worksite-search-modal-close]");
+        focusTarget?.focus();
+      });
     }
 
     async function reverseGeocodeManagementWorksite(lat, lng, { updateName = false } = {}) {

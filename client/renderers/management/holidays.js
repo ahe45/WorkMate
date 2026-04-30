@@ -11,6 +11,7 @@
       escapeAttribute,
       escapeHtml,
       formatNumber,
+      renderManagementModalHeaderActions,
       renderBadge,
       renderEmptyState,
       toArray,
@@ -70,7 +71,7 @@
           <span>공휴일</span>
           <span>분류</span>
           <span>비고</span>
-          <span class="workmate-worksite-grid-action-head">설정</span>
+          <span class="workmate-worksite-grid-action-head">관리</span>
           <span class="workmate-worksite-grid-action-head">삭제</span>
         </div>
         ${rows.map((item) => `
@@ -100,7 +101,7 @@
             <div class="workmate-holiday-grid-cell workmate-worksite-grid-actions">
               ${item?.isCustom && item?.id
                 ? `
-                  <button class="icon-button table-inline-icon-button workmate-worksite-record-action" data-management-holiday-open="${escapeAttribute(item?.id || "")}" type="button" aria-label="지정 공휴일 설정">
+                  <button class="icon-button table-inline-icon-button workmate-worksite-record-action" data-management-holiday-open="${escapeAttribute(item?.id || "")}" type="button" aria-label="지정 공휴일 관리">
                     <svg class="button-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <circle cx="12" cy="12" r="2.6"></circle>
                       <path d="M19 12a7.4 7.4 0 0 0-.08-1.02l2.05-1.58-2-3.46-2.47 1a7.91 7.91 0 0 0-1.76-1.02L14.5 3h-5l-.24 2.92a7.91 7.91 0 0 0-1.76 1.02l-2.47-1-2 3.46 2.05 1.58A7.4 7.4 0 0 0 5 12c0 .34.03.68.08 1.02l-2.05 1.58 2 3.46 2.47-1a7.91 7.91 0 0 0 1.76 1.02L9.5 21h5l.24-2.92a7.91 7.91 0 0 0 1.76-1.02l2.47 1 2-3.46-2.05-1.58c.05-.34.08-.68.08-1.02Z"></path>
@@ -154,26 +155,20 @@
     const isEditMode = Boolean(String(draft.holidayId || "").trim());
     const minDate = isEditMode ? "1900-01-01" : `${selectedYear}-01-01`;
     const maxDate = isEditMode ? "2100-12-31" : `${selectedYear}-12-31`;
-    const modalTitle = isEditMode ? "지정 공휴일 설정 수정" : "지정 공휴일 추가";
-    const modalDescription = isEditMode
-      ? "저장된 지정 공휴일의 날짜, 이름, 반복 주기를 수정합니다."
-      : "창립기념일처럼 회사에서 직접 운영하는 휴일을 추가합니다.";
-    const submitLabel = isEditMode ? "지정 공휴일 업데이트" : "지정 공휴일 추가";
-    const hint = isEditMode
-      ? "반복 규칙은 기준일을 바탕으로 선택한 연도 목록에 자동 반영됩니다."
-      : `${selectedYear}년 안에서만 지정 공휴일을 추가할 수 있습니다.`;
-
+    const modalTitle = isEditMode ? "지정 공휴일 관리 수정" : "지정 공휴일 추가";
     return `
       <div class="modal" id="management-holiday-modal" aria-hidden="false" role="dialog" aria-modal="true" aria-labelledby="management-holiday-modal-title">
         <div class="modal-backdrop" data-management-holiday-close="true" aria-hidden="true"></div>
         <section class="modal-sheet workmate-holiday-modal-sheet">
           <header class="modal-header">
             <div>
-              <p class="page-kicker">Custom holiday</p>
               <h3 id="management-holiday-modal-title">${escapeHtml(modalTitle)}</h3>
-              <p>${escapeHtml(modalDescription)}</p>
             </div>
-            <button class="icon-button" data-management-holiday-close="true" type="button" aria-label="닫기">×</button>
+            ${renderManagementModalHeaderActions(state, {
+              closeAction: "data-management-holiday-close",
+              formId: "management-holiday-form",
+              modalType: "holiday",
+            })}
           </header>
           <div class="modal-body workmate-holiday-modal-body">
             <form class="workmate-form-stack" id="management-holiday-form">
@@ -191,12 +186,6 @@
                   ${renderManagementHolidayRepeatOptions(draft.repeatUnit || "NONE")}
                 </select>
               </label>
-              <p class="workmate-holiday-modal-hint">${escapeHtml(hint)}</p>
-              <div class="toolbar-actions">
-                <button class="outline-button" data-management-holiday-close="true" type="button">취소</button>
-                <button class="outline-button" data-management-holiday-reset="true" type="button">초기화</button>
-                <button class="primary-button" type="submit">${escapeHtml(submitLabel)}</button>
-              </div>
             </form>
           </div>
         </section>
@@ -220,7 +209,8 @@
         <article class="panel-card workmate-holiday-record-panel">
           <div class="workmate-worksite-panel-head">
             <div>
-              <h4>공휴일 설정</h4>
+              <h4>공휴일 관리</h4>
+              <p>선택한 연도의 공휴일, 대체공휴일, 회사 지정 휴일을 함께 관리합니다.</p>
             </div>
             <div class="workmate-topbar-actions workmate-worksite-panel-controls workmate-holiday-panel-controls">
               <div class="workmate-holiday-year-controls">

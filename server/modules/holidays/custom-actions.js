@@ -18,8 +18,7 @@ function createCustomHolidayActions({ holidayStore, withTransaction }) {
     return withTransaction(async (connection) => {
       const queryRunner = connection.query.bind(connection);
       await holidayStore.ensureOrganizationExists(queryRunner, organizationId);
-      const calendar = await holidayStore.findOrCreateDefaultCalendar(queryRunner, organizationId);
-      const existingHoliday = await holidayStore.findCustomHolidayByDate(queryRunner, calendar.id, holidayDate);
+      const existingHoliday = await holidayStore.findCustomHolidayByDate(queryRunner, organizationId, holidayDate);
 
       if (existingHoliday) {
         throw createHttpError(409, "이미 지정 공휴일이 등록된 날짜입니다.", "HOLIDAY_CUSTOM_DATE_EXISTS");
@@ -31,7 +30,7 @@ function createCustomHolidayActions({ holidayStore, withTransaction }) {
         `
           INSERT INTO holiday_dates (
             id,
-            holiday_calendar_id,
+            organization_id,
             holiday_date,
             name,
             is_paid_holiday,
@@ -40,7 +39,7 @@ function createCustomHolidayActions({ holidayStore, withTransaction }) {
           )
           VALUES (?, ?, ?, ?, ?, ?, ?)
         `,
-        [holidayId, calendar.id, holidayDate, name, 1, HOLIDAY_SOURCE.CUSTOM, repeatUnit],
+        [holidayId, organizationId, holidayDate, name, 1, HOLIDAY_SOURCE.CUSTOM, repeatUnit],
       );
 
       return createCustomHolidayItem({
@@ -74,7 +73,7 @@ function createCustomHolidayActions({ holidayStore, withTransaction }) {
 
       const duplicateHoliday = await holidayStore.findCustomHolidayByDate(
         queryRunner,
-        targetHoliday.holidayCalendarId,
+        targetHoliday.organizationId,
         holidayDate,
         normalizedHolidayId,
       );

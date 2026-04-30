@@ -178,5 +178,6 @@
     getRefreshToken,
     requestWithAutoRefresh,
     setAuthTokens,
+    usesPersistentAuthStorage,
   };
 });

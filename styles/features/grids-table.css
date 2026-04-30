@@ -33,9 +33,12 @@ thead th {
 
 tbody td {
   padding: 10px 3px;
+  max-width: 0;
+  overflow: hidden;
   font-size: 0.85rem;
   border-bottom: 1px solid var(--grid-row-line);
   text-align: center;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -124,7 +127,19 @@ tbody tr:last-child td {
 .result-grid-card tbody td {
   height: var(--grid-row-height);
   padding: 3px 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   vertical-align: middle;
+}
+
+.result-grid-card tbody td > strong,
+.result-grid-card tbody td > span:not(.badge),
+.result-grid-card tbody td > small {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .result-grid-card th.table-header-enhanced {
@@ -134,10 +149,13 @@ tbody tr:last-child td {
 .table-header-shell {
   position: relative;
   display: block;
+  box-sizing: border-box;
   width: 100%;
+  text-align: center;
 }
 
 .table-header-shell.has-filter {
+  padding-left: 24px;
   padding-right: 24px;
 }
 
@@ -168,8 +186,10 @@ tbody tr:last-child td {
 }
 
 .table-header-label {
+  display: block;
   min-width: 0;
   overflow: hidden;
+  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

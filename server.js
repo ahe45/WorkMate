@@ -10,12 +10,14 @@ const { readJsonBody } = require("./server/http/body");
 const { createApiRoutes } = require("./server/http/api-routes");
 const { dispatchRoute } = require("./server/http/router");
 const { getCorsHeaders, sendJson } = require("./server/http/response");
+const { createAccountsService } = require("./server/modules/accounts/service");
 const { createAttendanceService } = require("./server/modules/attendance/service");
 const { createAuthService } = require("./server/modules/auth/service");
 const { hashPassword, verifyPassword } = require("./server/modules/auth/passwords");
 const { createBootstrapService } = require("./server/modules/bootstrap/service");
 const { createDashboardService } = require("./server/modules/dashboard/service");
 const { createHolidaysService } = require("./server/modules/holidays/service");
+const { createJoinInvitationsService } = require("./server/modules/join-invitations/service");
 const { createJobTitlesService } = require("./server/modules/job-titles/service");
 const { createLeaveService } = require("./server/modules/leave/service");
 const { createOrganizationsService } = require("./server/modules/organizations/service");
@@ -28,14 +30,16 @@ const root = __dirname;
 const workspaceRoutePattern = /^\/companies\/[^/]+\/workspace(?:\/.*)?$/i;
 const bootstrapService = createBootstrapService({ hashPassword });
 
+const accountsService = createAccountsService({ hashPassword, query });
 const organizationsService = createOrganizationsService({ query, withTransaction });
 const sitesService = createSitesService({ query, withTransaction });
-const usersService = createUsersService({ hashPassword, query, withTransaction });
+const joinInvitationsService = createJoinInvitationsService({ accountsService, withTransaction });
+const usersService = createUsersService({ accountsService, joinInvitationsService, query, withTransaction });
 const schedulesService = createSchedulesService({ query, withTransaction });
 const jobTitlesService = createJobTitlesService({ query, withTransaction });
 const holidaysService = createHolidaysService({ query, withTransaction });
-const leaveService = createLeaveService({ query });
-const authService = createAuthService({ hashPassword, organizationsService, query, verifyPassword, withTransaction });
+const leaveService = createLeaveService({ query, withTransaction });
+const authService = createAuthService({ accountsService, hashPassword, joinInvitationsService, organizationsService, query, verifyPassword, withTransaction });
 const attendanceService = createAttendanceService({ authService, query, withTransaction });
 const dashboardService = createDashboardService({ query });
 const apiRoutes = createApiRoutes({
@@ -68,6 +72,14 @@ function resolveStaticFile(pathname) {
 
   if (pathname === "/signup" || pathname === "/signup.html") {
     return path.join(root, "signup.html");
+  }
+
+  if (pathname === "/join-invite" || pathname === "/join-invite.html") {
+    return path.join(root, "join-invite.html");
+  }
+
+  if (pathname === "/join-invite/signup" || pathname === "/join-invite-signup.html") {
+    return path.join(root, "join-invite-signup.html");
   }
 
   if (pathname.startsWith("/styles/")) {

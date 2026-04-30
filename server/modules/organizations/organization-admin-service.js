@@ -45,6 +45,22 @@ function createOrganizationAdminService({
     };
   }
 
+  function parseMetadataValue(value) {
+    if (!value) {
+      return {};
+    }
+
+    if (typeof value === "object") {
+      return value;
+    }
+
+    try {
+      return JSON.parse(String(value || "{}"));
+    } catch (error) {
+      return {};
+    }
+  }
+
   async function fetchOrganizationById(queryRunner, organizationId) {
     const [rows] = await queryRunner(
       `
@@ -109,14 +125,185 @@ function createOrganizationAdminService({
     };
   }
 
-  async function assignAdminOrganization(connection, adminUserId, organizationId) {
+  async function loadAdminAccountSource(queryRunner, accountId) {
+    const [rows] = await queryRunner(
+      `
+        SELECT
+          id,
+          login_email AS loginEmail,
+          password_hash AS passwordHash,
+          name,
+          phone,
+          role_code AS roleCode
+        FROM accounts
+        WHERE id = ?
+          AND deleted_at IS NULL
+        LIMIT 1
+      `,
+      [accountId],
+    );
+
+    return rows[0] || null;
+  }
+
+  async function findMembershipUserByAccount(queryRunner, organizationId, accountId) {
+    const normalizedOrganizationId = String(organizationId || "").trim();
+    const normalizedAccountId = String(accountId || "").trim();
+
+    if (!normalizedOrganizationId || !normalizedAccountId) {
+      return null;
+    }
+
+    const [rows] = await queryRunner(
+      `
+        SELECT id
+        FROM users
+        WHERE organization_id = ?
+          AND account_id = ?
+          AND deleted_at IS NULL
+          AND employment_status <> 'RETIRED'
+        ORDER BY
+          CASE employment_status
+            WHEN 'ACTIVE' THEN 0
+            WHEN 'INVITED' THEN 1
+            WHEN 'PENDING' THEN 2
+            WHEN 'DRAFT' THEN 3
+            ELSE 4
+          END ASC,
+          created_at ASC
+        LIMIT 1
+      `,
+      [normalizedOrganizationId, normalizedAccountId],
+    );
+
+    return rows[0] || null;
+  }
+
+  async function ensureManagedOrganizationAdminRole(connection, userId, organizationId) {
+    const queryRunner = connection.query.bind(connection);
+    await ensureSystemRoles(queryRunner);
+    const roleId = await requireSystemRoleId(queryRunner, SYSTEM_ROLE_CODES.SYSTEM_ADMIN);
     const [existingRows] = await connection.query(
       `
-        SELECT COUNT(*) AS count
-        FROM admin_account_organizations
-        WHERE admin_user_id = ?
+        SELECT id
+        FROM user_roles
+        WHERE organization_id = ?
+          AND user_id = ?
+          AND role_id = ?
+          AND (effective_to IS NULL OR effective_to >= UTC_TIMESTAMP(3))
+        LIMIT 1
       `,
-      [adminUserId],
+      [organizationId, userId, roleId],
+    );
+
+    if (existingRows[0]?.id) {
+      return String(existingRows[0].id);
+    }
+
+    const bindingId = generateId();
+    await connection.query(
+      `
+        INSERT INTO user_roles (id, organization_id, user_id, role_id, scope_type, scope_id)
+        VALUES (?, ?, ?, ?, 'organization', ?)
+      `,
+      [bindingId, organizationId, userId, roleId, organizationId],
+    );
+
+    return bindingId;
+  }
+
+  async function createManagedOrganizationMembership(connection, adminPrincipal = {}, createdOrganization = {}) {
+    const queryRunner = connection.query.bind(connection);
+    const normalizedAccountId = String(adminPrincipal.accountId || "").trim();
+
+    if (!normalizedAccountId) {
+      throw createHttpError(400, "관리자 계정 연결 정보가 없습니다.", "ORG_ADMIN_ACCOUNT_MISSING");
+    }
+
+    const sourceAccount = await loadAdminAccountSource(queryRunner, normalizedAccountId);
+
+    if (!sourceAccount) {
+      throw createHttpError(404, "조직을 생성한 관리자 계정을 찾을 수 없습니다.", "ORG_ADMIN_USER_NOT_FOUND");
+    }
+
+    const existingMembership = await findMembershipUserByAccount(queryRunner, createdOrganization.organizationId, normalizedAccountId);
+
+    if (existingMembership?.id) {
+      await ensureManagedOrganizationAdminRole(connection, existingMembership.id, createdOrganization.organizationId);
+      return {
+        accountId: normalizedAccountId,
+        userId: String(existingMembership.id),
+      };
+    }
+
+    const membershipUserId = generateId();
+    const employeeNo = `E${generateId().replace(/-/g, "").slice(0, 8).toUpperCase()}`;
+    const nextMetadata = {
+      managedMembership: true,
+      source: "account",
+    };
+
+    await connection.query(
+      `
+        INSERT INTO users (
+          id, organization_id, account_id, employee_no, login_email, password_hash, name, phone, employment_status,
+          employment_type, join_date, timezone, primary_unit_id, default_site_id, track_type, work_policy_id,
+          manager_user_id, metadata_json
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE', ?, ?, ?, ?, NULL, ?, ?, NULL, ?)
+      `,
+      [
+        membershipUserId,
+        createdOrganization.organizationId,
+        normalizedAccountId,
+        employeeNo,
+        String(sourceAccount.loginEmail || "").trim() || null,
+        String(sourceAccount.passwordHash || "").trim() || null,
+        String(sourceAccount.name || "").trim() || "조직 관리자",
+        String(sourceAccount.phone || "").trim() || null,
+        "FULL_TIME",
+        new Date(),
+        "Asia/Seoul",
+        null,
+        "FIXED",
+        null,
+        JSON.stringify(nextMetadata),
+      ],
+    );
+
+    await ensureManagedOrganizationAdminRole(connection, membershipUserId, createdOrganization.organizationId);
+
+    return {
+      accountId: normalizedAccountId,
+      userId: membershipUserId,
+    };
+  }
+
+  async function assignAdminOrganization(connection, adminUserId, organizationId, accountId = "") {
+    const normalizedAdminUserId = String(adminUserId || "").trim();
+    const normalizedOrganizationId = String(organizationId || "").trim();
+    const normalizedAccountId = String(accountId || "").trim();
+
+    if (!normalizedAdminUserId || !normalizedOrganizationId) {
+      throw createHttpError(400, "관리 조직 매핑에 필요한 정보가 부족합니다.", "ORG_ADMIN_MAPPING_INVALID");
+    }
+
+    const [existingRows] = await connection.query(
+      normalizedAccountId
+        ? `
+            SELECT COUNT(*) AS count
+            FROM admin_account_organizations map
+            INNER JOIN users mapped_admin
+              ON mapped_admin.id = map.admin_user_id
+             AND mapped_admin.deleted_at IS NULL
+            WHERE mapped_admin.account_id = ?
+          `
+        : `
+            SELECT COUNT(*) AS count
+            FROM admin_account_organizations
+            WHERE admin_user_id = ?
+          `,
+      [normalizedAccountId || normalizedAdminUserId],
     );
     const isDefault = Number(existingRows[0]?.count || 0) === 0 ? 1 : 0;
 
@@ -128,21 +315,7 @@ function createOrganizationAdminService({
           updated_at = CURRENT_TIMESTAMP(3),
           is_default = VALUES(is_default)
       `,
-      [generateId(), adminUserId, organizationId, isDefault],
-    );
-  }
-
-  async function assignOrganizationAdminRole(connection, userId, organizationId) {
-    const queryRunner = connection.query.bind(connection);
-    await ensureSystemRoles(queryRunner);
-    const roleId = await requireSystemRoleId(queryRunner, SYSTEM_ROLE_CODES.ORG_ADMIN);
-
-    await connection.query(
-      `
-        INSERT INTO user_roles (id, organization_id, user_id, role_id, scope_type, scope_id)
-        VALUES (?, ?, ?, ?, 'organization', ?)
-      `,
-      [generateId(), organizationId, userId, roleId, organizationId],
+      [generateId(), normalizedAdminUserId, normalizedOrganizationId, isDefault],
     );
   }
 
@@ -157,12 +330,12 @@ function createOrganizationAdminService({
     }
   }
 
-  async function createManagedOrganization(adminUserId, payload = {}) {
+  async function createManagedOrganization(adminPrincipal, payload = {}) {
     try {
       return await withTransaction(async (connection) => {
         const created = await insertOrganizationGraph(connection, payload, "account");
-        await assignAdminOrganization(connection, adminUserId, created.organizationId);
-        await assignOrganizationAdminRole(connection, adminUserId, created.organizationId);
+        const adminMembership = await createManagedOrganizationMembership(connection, adminPrincipal, created);
+        await assignAdminOrganization(connection, adminMembership.userId, created.organizationId, adminMembership.accountId);
         return created.organization;
       });
     } catch (error) {
@@ -170,14 +343,14 @@ function createOrganizationAdminService({
     }
   }
 
-  async function updateManagedOrganization(adminUserId, organizationId, payload = {}) {
+  async function updateManagedOrganization(adminPrincipal, organizationId, payload = {}) {
     const organization = await getOrganizationById(organizationId);
 
     if (!organization) {
       throw createHttpError(404, "회사를 찾을 수 없습니다.", "ORG_NOT_FOUND");
     }
 
-    if (!(await isManagedOrganization(adminUserId, organizationId))) {
+    if (!(await isManagedOrganization(adminPrincipal, organizationId))) {
       throw createHttpError(403, "수정할 수 없는 회사입니다.", "ORG_UPDATE_FORBIDDEN");
     }
 

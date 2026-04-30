@@ -1,0 +1,82 @@
+﻿/* WorkMate management holiday styles */
+
+.workmate-holiday-grid-head,
+.workmate-holiday-grid-row {
+  display: grid;
+  grid-template-columns: 160px 72px minmax(220px, 1.5fr) 132px minmax(180px, 1fr) 72px 72px;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 18px;
+}
+
+.workmate-holiday-grid-head {
+  background: var(--grid-head);
+  color: var(--grid-head-text);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.workmate-holiday-grid-row {
+  border: 1px solid rgba(223, 229, 240, 0.92);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.workmate-holiday-grid-row.is-custom {
+  border-color: rgba(124, 58, 237, 0.2);
+  background: rgba(247, 243, 255, 0.78);
+}
+
+.workmate-holiday-grid-row.is-substitute {
+  border-color: rgba(245, 158, 11, 0.24);
+  background: rgba(255, 249, 235, 0.8);
+}
+
+.workmate-holiday-grid-cell {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-holiday-grid-cell strong {
+  display: block;
+  overflow: hidden;
+  color: #17324a;
+  font-size: 0.92rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-holiday-grid-cell span {
+  display: block;
+  overflow: hidden;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workmate-holiday-grid-action-placeholder {
+  display: block;
+  color: var(--text-dim);
+  font-size: 0.84rem;
+  text-align: center;
+}
+
+.workmate-holiday-modal-sheet {
+  width: min(560px, calc(100vw - 48px));
+}
+
+.workmate-holiday-modal-body {
+  padding-top: 20px;
+}
+
+.workmate-holiday-modal-hint {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}

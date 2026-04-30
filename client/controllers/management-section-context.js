@@ -38,7 +38,7 @@
       }
 
       return state.currentWorkspaceView === "management"
-        && ["worksites", "job-titles", "work-schedules"].includes(normalizeManagementSection(state.managementSection));
+        && ["worksites", "job-titles", "employees", "work-schedules", "leave-accrual-entries"].includes(normalizeManagementSection(state.managementSection));
     }
 
     return Object.freeze({

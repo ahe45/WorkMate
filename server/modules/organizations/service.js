@@ -2,6 +2,14 @@ const { createOrganizationAdminService } = require("./organization-admin-service
 const { createOrganizationUnitService } = require("./unit-service");
 
 function createOrganizationsService({ query, withTransaction }) {
+  function normalizeAccountId(principalOrAccountId = "") {
+    if (principalOrAccountId && typeof principalOrAccountId === "object") {
+      return String(principalOrAccountId.accountId || "").trim();
+    }
+
+    return String(principalOrAccountId || "").trim();
+  }
+
   async function listOrganizations() {
     return query(`
       SELECT
@@ -17,7 +25,6 @@ function createOrganizationsService({ query, withTransaction }) {
         updated_at AS updatedAt
       FROM organizations
       WHERE deleted_at IS NULL
-        AND code <> 'WORKMATE_PLATFORM'
       ORDER BY created_at DESC
     `);
   }
@@ -104,7 +111,13 @@ function createOrganizationsService({ query, withTransaction }) {
     return rows[0] || null;
   }
 
-  async function listManagedOrganizations(adminUserId) {
+  async function listManagedOrganizations(principalOrAccountId) {
+    const normalizedAccountId = normalizeAccountId(principalOrAccountId);
+
+    if (!normalizedAccountId) {
+      return [];
+    }
+
     return query(
       `
         SELECT
@@ -120,6 +133,9 @@ function createOrganizationsService({ query, withTransaction }) {
           COUNT(DISTINCT u.id) AS userCount,
           COUNT(DISTINCT s.id) AS siteCount
         FROM admin_account_organizations map
+        INNER JOIN users mapped_admin
+          ON mapped_admin.id = map.admin_user_id
+         AND mapped_admin.deleted_at IS NULL
         INNER JOIN organizations o
           ON o.id = map.organization_id
          AND o.deleted_at IS NULL
@@ -127,25 +143,34 @@ function createOrganizationsService({ query, withTransaction }) {
           ON u.organization_id = o.id
          AND u.deleted_at IS NULL
         LEFT JOIN sites s
-          ON s.organization_id = o.id
+         ON s.organization_id = o.id
          AND s.deleted_at IS NULL
-        WHERE map.admin_user_id = :adminUserId
+        WHERE mapped_admin.account_id = :accountId
         GROUP BY o.id, o.code, o.name, o.status, o.timezone, o.created_at, o.updated_at, map.is_default
         ORDER BY map.is_default DESC, o.created_at DESC
       `,
-      { adminUserId },
+      { accountId: normalizedAccountId },
     );
   }
 
-  async function isManagedOrganization(adminUserId, organizationId) {
+  async function isManagedOrganization(principalOrAccountId, organizationId) {
+    const normalizedAccountId = normalizeAccountId(principalOrAccountId);
+
+    if (!normalizedAccountId) {
+      return false;
+    }
+
     const rows = await query(
       `
         SELECT COUNT(*) AS count
-        FROM admin_account_organizations
-        WHERE admin_user_id = :adminUserId
-          AND organization_id = :organizationId
+        FROM admin_account_organizations map
+        INNER JOIN users mapped_admin
+          ON mapped_admin.id = map.admin_user_id
+         AND mapped_admin.deleted_at IS NULL
+        WHERE map.organization_id = :organizationId
+          AND mapped_admin.account_id = :accountId
       `,
-      { adminUserId, organizationId },
+      { accountId: normalizedAccountId, organizationId },
     );
 
     return Number(rows[0]?.count || 0) > 0;

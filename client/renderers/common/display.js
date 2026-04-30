@@ -26,11 +26,14 @@
     }
 
     function renderMetricCard(label, value, meta, tone = "tone-blue") {
+      const titleAttribute = String(meta || "").trim()
+        ? ` title="${escapeAttribute(String(meta || "").trim())}"`
+        : "";
+
       return `
-      <article class="metric-card ${escapeAttribute(tone)}">
+      <article class="metric-card ${escapeAttribute(tone)}"${titleAttribute}>
         <p>${escapeHtml(label)}</p>
         <strong>${escapeHtml(value)}</strong>
-        <span class="metric-meta">${escapeHtml(meta)}</span>
       </article>
     `;
     }

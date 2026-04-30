@@ -35,6 +35,7 @@
       renderWorkspacePage,
       renderers,
       resetScheduleUserFilter,
+      runWithManagementModalGuard,
       setDashboardGridPage,
       setDashboardGridPageSize,
       setLoading,
@@ -274,15 +275,19 @@
       if (viewLink) {
         const route = appConfig.getWorkspaceRoute(window.location.pathname);
         const companyCode = findCompanyByCode(route?.companyCode)?.code || route?.companyCode || "";
-        navigateToWorkspaceView(companyCode, viewLink.dataset.viewLink || appConfig.defaultWorkspaceView);
-        closeSidebar();
+        await runWithManagementModalGuard(async () => {
+          navigateToWorkspaceView(companyCode, viewLink.dataset.viewLink || appConfig.defaultWorkspaceView);
+          closeSidebar();
+        });
         return true;
       }
 
       if (navButton) {
         const route = appConfig.getWorkspaceRoute(window.location.pathname);
-        navigateToWorkspaceView(route?.companyCode || "", navButton.dataset.view || appConfig.defaultWorkspaceView);
-        closeSidebar();
+        await runWithManagementModalGuard(async () => {
+          navigateToWorkspaceView(route?.companyCode || "", navButton.dataset.view || appConfig.defaultWorkspaceView);
+          closeSidebar();
+        });
         return true;
       }
 

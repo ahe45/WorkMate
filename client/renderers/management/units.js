@@ -11,6 +11,7 @@
       escapeAttribute,
       escapeHtml,
       formatNumber,
+      renderManagementModalHeaderActions,
       toArray,
     } = deps;
 
@@ -287,8 +288,8 @@
                   class="icon-button table-inline-icon-button workmate-worksite-record-action"
                   data-management-unit-edit="${escapeAttribute(unitId)}"
                   type="button"
-                  aria-label="조직 설정"
-                  title="조직 설정"
+                  aria-label="조직 관리"
+                  title="조직 관리"
                 >
                   <svg class="button-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <circle cx="12" cy="12" r="2.6"></circle>
@@ -361,25 +362,20 @@
     const targetUnit = isEditMode ? model.unitById.get(normalizedUnitId) : null;
     const parentUnit = model.unitById.get(String(draft.parentUnitId || "").trim()) || null;
     const organizationName = String(model.organizationRootNode?.unit?.name || stats.context?.name || "").trim() || "현재 회사";
-    const modalTitle = isEditMode ? "조직 설정" : "조직 추가";
-    const saveLabel = isEditMode ? "조직 업데이트" : "조직 저장";
-    const modalDescription = isEditMode
-      ? `${targetUnit?.name || "조직"}의 이름과 상위 조직을 수정합니다.`
-      : parentUnit
-        ? `${parentUnit.name} 아래에 새 하위 조직을 추가합니다.`
-        : `${organizationName} 아래에 새 최상위 조직을 추가합니다.`;
-
+    const modalTitle = isEditMode ? "조직 관리" : "조직 추가";
     return `
       <div class="modal" id="management-unit-modal" aria-hidden="false" role="dialog" aria-modal="true" aria-labelledby="management-unit-modal-title">
         <div class="modal-backdrop" data-management-unit-close="true" aria-hidden="true"></div>
         <section class="modal-sheet workmate-unit-modal-sheet">
           <header class="modal-header">
             <div>
-              <p class="page-kicker">Organization structure</p>
               <h3 id="management-unit-modal-title">${escapeHtml(modalTitle)}</h3>
-              <p>${escapeHtml(modalDescription)}</p>
             </div>
-            <button class="icon-button" data-management-unit-close="true" type="button" aria-label="닫기">×</button>
+            ${renderManagementModalHeaderActions(state, {
+              closeAction: "data-management-unit-close",
+              formId: "management-unit-form",
+              modalType: "unit",
+            })}
           </header>
           <div class="modal-body workmate-unit-modal-body">
             <form class="workmate-form-stack" id="management-unit-form">
@@ -394,10 +390,6 @@
                 <input id="management-unit-name" name="name" placeholder="예: 운영본부" required type="text" value="${escapeAttribute(draft.name || "")}" />
               </label>
               <p class="workmate-unit-modal-hint">${escapeHtml(isEditMode ? "상위 조직을 바꾸면 해당 조직이 선택한 상위 조직 아래로 이동합니다." : "상위 조직을 선택하면 해당 조직 아래에 새 하위 조직이 생성됩니다.")}</p>
-              <div class="toolbar-actions">
-                <button class="outline-button" data-management-unit-close="true" type="button">취소</button>
-                <button class="primary-button" type="submit">${escapeHtml(saveLabel)}</button>
-              </div>
             </form>
           </div>
         </section>
@@ -413,10 +405,8 @@
         <article class="panel-card workmate-unit-record-panel">
           <div class="workmate-worksite-panel-head">
             <div>
-              <h4>조직 설정</h4>
-            </div>
-            <div class="workmate-topbar-actions workmate-worksite-panel-controls">
-              <button class="primary-button" data-management-unit-open="" type="button">조직 추가</button>
+              <h4>조직 관리</h4>
+              <p>최상위 조직 아래 하위 조직을 구성하고 사용자 연결 기준을 관리합니다.</p>
             </div>
           </div>
           <div class="workmate-admin-stage-metrics workmate-unit-stage-metrics">

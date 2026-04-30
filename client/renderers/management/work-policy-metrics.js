@@ -16,7 +16,6 @@
       normalizeManagementPolicyDayOfMonth,
       normalizeManagementPolicyHolidayDateRules,
       normalizeManagementPolicyMaximumRule,
-      normalizeManagementPolicyMinimumRule,
       normalizeManagementPolicySettlementRule,
       normalizeManagementPolicyStandardRule,
       normalizeManagementPolicyWorkingDays,
@@ -168,11 +167,9 @@
     }).format(date);
   }
 
-  function formatManagementPolicyMetricPeriodLabel(unit = "", startDate = new Date(), endDate = startDate, workdayCount = 0) {
-    const workdayLabel = `근로일 ${formatNumber(workdayCount)}일`;
-
+  function formatManagementPolicyMetricPeriodLabel(unit = "", startDate = new Date(), endDate = startDate) {
     if (unit === "day") {
-      return `${formatManagementPolicyMetricDate(startDate)} · ${workdayLabel}`;
+      return formatManagementPolicyMetricDate(startDate);
     }
 
     if (unit === "month") {
@@ -182,11 +179,11 @@
         && endDate.getDate() === new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
 
       if (isCalendarMonth) {
-        return `${formatManagementPolicyMetricDate(startDate, { day: undefined })} · ${workdayLabel}`;
+        return formatManagementPolicyMetricDate(startDate, { day: undefined });
       }
     }
 
-    return `${formatManagementPolicyMetricDate(startDate)} - ${formatManagementPolicyMetricDate(endDate)} · ${workdayLabel}`;
+    return `${formatManagementPolicyMetricDate(startDate)} - ${formatManagementPolicyMetricDate(endDate)}`;
   }
 
   function normalizeManagementWorkPolicyMetricInfo(info = {}) {
@@ -196,17 +193,14 @@
     };
     const workingDays = normalizeManagementPolicyWorkingDays(info.workingDays, []);
     const standardDailyMinutes = readMinutes(info.standardDailyMinutes);
-    const dailyMinMinutes = readMinutes(info.dailyMinMinutes);
     const dailyMaxMinutes = readMinutes(info.dailyMaxMinutes);
     const settlementRule = normalizeManagementPolicySettlementRule(info.settlementRule, info);
 
     return {
       dailyMaxMinutes,
-      dailyMinMinutes,
       holidayDateRules: normalizeManagementPolicyHolidayDateRules(info.holidayDateRules),
       includeWeekends: normalizeManagementPolicyBoolean(info.includeWeekends, false),
       maximumRule: normalizeManagementPolicyMaximumRule(info.maximumRule, dailyMaxMinutes),
-      minimumRule: normalizeManagementPolicyMinimumRule(info.minimumRule, dailyMinMinutes, workingDays),
       settlementRule,
       standardDailyMinutes,
       standardRule: normalizeManagementPolicyStandardRule(info.standardRule, workingDays, standardDailyMinutes),
@@ -248,10 +242,6 @@
       const dayOfWeek = getManagementPolicyDayOfWeek(cursor);
 
       if (!workingDaySet.has(dayOfWeek)) {
-        continue;
-      }
-
-      if (dayOfWeek >= 6 && !info.includeWeekends) {
         continue;
       }
 
@@ -311,97 +301,6 @@
     return Number.isFinite(info.standardDailyMinutes) ? info.standardDailyMinutes * workDates.length : Number.NaN;
   }
 
-  function getManagementPolicyAdjustmentMatches(adjustment = {}, info = {}, unit = "day", workDates = [], startDate = new Date(), endDate = startDate) {
-    const appliesTo = adjustment.appliesTo.length > 0 ? adjustment.appliesTo : ["DAY", "WEEK", "MONTH", "CUSTOM"];
-    const normalizedUnit = String(unit || "").toUpperCase();
-
-    if (!appliesTo.includes(normalizedUnit)) {
-      return [];
-    }
-
-    return workDates.filter((date) => {
-      const dayOfWeek = getManagementPolicyDayOfWeek(date);
-
-      if (adjustment.repeatUnit === "WEEK" && dayOfWeek !== adjustment.dayOfWeek) {
-        return false;
-      }
-
-      if (adjustment.repeatUnit === "MONTH" && date.getDate() !== normalizeManagementPolicyDayOfMonth(adjustment.dayOfMonth, 1)) {
-        return false;
-      }
-
-      if (adjustment.onlyIfWorkingDay) {
-        const workingDaySet = new Set(info.workingDays.map((day) => Number(day)));
-
-        if (!workingDaySet.has(dayOfWeek)) {
-          return false;
-        }
-      }
-
-      if (adjustment.skipIfHoliday && getManagementPolicyHolidayRule(date, info)) {
-        return false;
-      }
-
-      return date.getTime() >= startDate.getTime() && date.getTime() <= endDate.getTime();
-    });
-  }
-
-  function calculateManagementPolicyMinimumMetric(info = {}, unit = "day", standardMinutes = 0, workDates = [], startDate = new Date(), endDate = startDate) {
-    const method = info.minimumRule?.method || "DAILY_MIN_SUM";
-    const breakdown = [];
-
-    if (method === "SAME_AS_STANDARD") {
-      return {
-        breakdown: ["소정근로시간과 동일"],
-        minutes: standardMinutes,
-      };
-    }
-
-    if (method === "FIXED") {
-      const fixedMinutes = unit === "week"
-        ? info.minimumRule.weeklyMinMinutes
-        : unit === "month"
-          ? info.minimumRule.monthlyMinMinutes
-          : info.minimumRule.dailyMinMinutes;
-
-      return {
-        breakdown: [`고정 최소 ${formatManagementPolicyDuration(fixedMinutes)}`],
-        minutes: fixedMinutes,
-      };
-    }
-
-    if (method === "STANDARD_MINUS_ADJUSTMENTS") {
-      let minutes = standardMinutes;
-
-      info.minimumRule.adjustments.forEach((adjustment) => {
-        const matches = getManagementPolicyAdjustmentMatches(adjustment, info, unit, workDates, startDate, endDate);
-        const adjustmentMinutes = matches.length * adjustment.minutes;
-
-        if (adjustmentMinutes <= 0) {
-          return;
-        }
-
-        if (adjustment.type === "ADD") {
-          minutes += adjustmentMinutes;
-        } else {
-          minutes -= adjustmentMinutes;
-        }
-
-        breakdown.push(`${adjustment.name} ${matches.length}회 ${adjustment.type === "ADD" ? "+" : "-"}${formatManagementPolicyDuration(adjustmentMinutes)}`);
-      });
-
-      return {
-        breakdown: breakdown.length > 0 ? breakdown : ["적용된 조정 규칙 없음"],
-        minutes: Math.max(0, minutes),
-      };
-    }
-
-    return {
-      breakdown: [`근로일 ${formatNumber(workDates.length)}일 × ${formatManagementPolicyDuration(info.minimumRule.dailyMinMinutes)}`],
-      minutes: info.minimumRule.dailyMinMinutes * workDates.length,
-    };
-  }
-
   function calculateManagementPolicyMaximumMinutes(info = {}, unit = "day", startDate = new Date(), endDate = startDate) {
     if (unit === "week") {
       return info.maximumRule.weeklyMaxMinutes;
@@ -449,7 +348,6 @@
     const workDates = getManagementWorkPolicyDates(normalizedInfo, startDate, endDate);
     const workdayCount = workDates.length;
     const standardMinutes = calculateManagementPolicyStandardMinutes(normalizedInfo, unit, workDates, startDate, endDate);
-    const minimumMetric = calculateManagementPolicyMinimumMetric(normalizedInfo, unit, standardMinutes, workDates, startDate, endDate);
     const maxMinutes = calculateManagementPolicyMaximumMinutes(normalizedInfo, unit, startDate, endDate);
     const standardBreakdown = normalizedInfo.standardRule.method === "WORKING_DAYS_TIMES_DAILY_STANDARD" || normalizedInfo.standardRule.method === "SCHEDULE_TEMPLATE_SUM"
       ? [`근로일 ${formatNumber(workdayCount)}일 × ${formatManagementPolicyDuration(normalizedInfo.standardDailyMinutes)}`]
@@ -463,7 +361,6 @@
     return {
       breakdown: {
         max: maxBreakdown,
-        min: minimumMetric.breakdown,
         standard: standardBreakdown,
       },
       endDate,
@@ -471,8 +368,7 @@
       inputValue: metricInputValue,
       label,
       maxLabel: formatManagementPolicyDuration(maxMinutes),
-      minLabel: formatManagementPolicyDuration(minimumMetric.minutes),
-      periodLabel: formatManagementPolicyMetricPeriodLabel(unit, startDate, endDate, workdayCount),
+      periodLabel: formatManagementPolicyMetricPeriodLabel(unit, startDate, endDate),
       standardLabel: formatManagementPolicyDuration(standardMinutes),
       startDate,
       unit,
@@ -498,42 +394,40 @@
     return ["day", "week", "month"].map((unit) => buildManagementWorkPolicyPeriodMetric(unit, info, values[unit], referenceDate));
   }
 
-  function renderManagementWorkPolicyStageMetrics(info = {}) {
-    const metrics = calculateManagementWorkPolicyStageMetrics(info);
+    function renderManagementWorkPolicyStageMetrics(info = {}) {
+      const metrics = calculateManagementWorkPolicyStageMetrics(info);
 
-    return `
-      <div class="workmate-admin-stage-metrics workmate-work-schedule-stage-metrics">
-        ${metrics.map((metric) => `
-          <div class="workmate-work-policy-metric-card" data-management-work-policy-unit="${escapeAttribute(metric.unit)}">
-            <div class="workmate-work-policy-metric-head">
-              <label class="workmate-work-policy-metric-control">
-                <span>${escapeHtml(metric.label)}</span>
-                <input data-management-work-policy-period="${escapeAttribute(metric.unit)}" type="${escapeAttribute(metric.inputType)}" value="${escapeAttribute(metric.inputValue)}" aria-label="${escapeAttribute(`${metric.label} 기준 기간`)}" />
-              </label>
-              <span class="workmate-work-policy-metric-range" data-management-work-policy-range="${escapeAttribute(metric.unit)}">${escapeHtml(metric.periodLabel)}</span>
+      return `
+      <section class="workmate-work-policy-stage-metrics-stack">
+        <div class="workmate-work-policy-stage-metrics-label">기간별 기준</div>
+        <div class="workmate-admin-stage-metrics workmate-work-schedule-stage-metrics">
+          ${metrics.map((metric) => `
+            <div class="workmate-work-policy-metric-card" data-management-work-policy-unit="${escapeAttribute(metric.unit)}">
+              <div class="workmate-work-policy-metric-head">
+                <label class="workmate-work-policy-metric-control">
+                  <span>${escapeHtml(metric.label)}</span>
+                  <input data-management-work-policy-period="${escapeAttribute(metric.unit)}" type="${escapeAttribute(metric.inputType)}" value="${escapeAttribute(metric.inputValue)}" aria-label="${escapeAttribute(`${metric.label} 기준 기간`)}" />
+                </label>
+                <span class="workmate-work-policy-metric-range" data-management-work-policy-range="${escapeAttribute(metric.unit)}">${escapeHtml(metric.periodLabel)}</span>
+              </div>
+              <dl class="workmate-work-policy-metric-values">
+                <div>
+                  <dt>소정</dt>
+                  <dd data-management-work-policy-value="${escapeAttribute(`${metric.unit}:standard`)}">${escapeHtml(metric.standardLabel)}</dd>
+                </div>
+                <div>
+                  <dt>최대</dt>
+                  <dd data-management-work-policy-value="${escapeAttribute(`${metric.unit}:max`)}">${escapeHtml(metric.maxLabel)}</dd>
+                </div>
+              </dl>
+              <div class="workmate-work-policy-metric-breakdown">
+                <span data-management-work-policy-breakdown="${escapeAttribute(`${metric.unit}:standard`)}">${escapeHtml(toArray(metric.breakdown?.standard)[0] || "")}</span>
+                <span data-management-work-policy-breakdown="${escapeAttribute(`${metric.unit}:max`)}">${escapeHtml(toArray(metric.breakdown?.max)[0] || "")}</span>
+              </div>
             </div>
-            <dl class="workmate-work-policy-metric-values">
-              <div>
-                <dt>소정</dt>
-                <dd data-management-work-policy-value="${escapeAttribute(`${metric.unit}:standard`)}">${escapeHtml(metric.standardLabel)}</dd>
-              </div>
-              <div>
-                <dt>최소</dt>
-                <dd data-management-work-policy-value="${escapeAttribute(`${metric.unit}:min`)}">${escapeHtml(metric.minLabel)}</dd>
-              </div>
-              <div>
-                <dt>최대</dt>
-                <dd data-management-work-policy-value="${escapeAttribute(`${metric.unit}:max`)}">${escapeHtml(metric.maxLabel)}</dd>
-              </div>
-            </dl>
-            <div class="workmate-work-policy-metric-breakdown">
-              <span data-management-work-policy-breakdown="${escapeAttribute(`${metric.unit}:standard`)}">${escapeHtml(toArray(metric.breakdown?.standard)[0] || "")}</span>
-              <span data-management-work-policy-breakdown="${escapeAttribute(`${metric.unit}:min`)}">${escapeHtml(toArray(metric.breakdown?.min)[0] || "")}</span>
-              <span data-management-work-policy-breakdown="${escapeAttribute(`${metric.unit}:max`)}">${escapeHtml(toArray(metric.breakdown?.max)[0] || "")}</span>
-            </div>
-          </div>
-        `).join("")}
-      </div>
+          `).join("")}
+        </div>
+      </section>
     `;
   }
 

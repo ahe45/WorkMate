@@ -1,39 +1,47 @@
 const { spawnSync } = require("child_process");
+const mysql = require("mysql2/promise");
 const path = require("path");
 const { getCurrentDateKey } = require("../server/modules/common/date");
-const { ensureServer } = require("./lib/test-server");
 const { applyEphemeralDatabaseName, loadProjectEnv } = require("./lib/database-targets");
+const { jsonHeaders, request } = require("./lib/http-test-client");
+const { runMembershipSmokeScenario } = require("./lib/smoke-membership-scenario");
+const { ensureServer } = require("./lib/test-server");
 
 const root = path.join(__dirname, "..");
 loadProjectEnv(root);
 const smokeBaseUrl = process.env.SMOKE_BASE_URL || "";
+let isolatedDatabaseName = "";
 
 if (!smokeBaseUrl) {
   const { databaseName } = applyEphemeralDatabaseName(root, "test");
+  isolatedDatabaseName = databaseName;
   console.log(`Using isolated smoke test database '${databaseName}'.`);
 }
 
-async function request(baseUrl, resource, options = {}) {
-  const response = await fetch(`${baseUrl}${resource}`, options);
-  const payload = await response.json();
-
-  if (!response.ok) {
-    throw new Error(`${resource} failed: ${payload.message || payload.error || response.status}`);
-  }
-
-  return payload;
-}
-
 async function main() {
+  let databaseConnection = null;
+
   if (!smokeBaseUrl) {
     const setupResult = spawnSync(process.execPath, ["scripts/setup-db.js", "--reset"], {
       cwd: root,
+      env: {
+        ...process.env,
+        SEED_DEMO_DATA: "true",
+      },
       stdio: "inherit",
     });
 
     if (setupResult.status !== 0) {
       throw new Error("Database setup failed.");
     }
+
+    databaseConnection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT || 3306),
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: isolatedDatabaseName,
+    });
   }
 
   const serverSession = await ensureServer(root, {
@@ -48,15 +56,10 @@ async function main() {
         loginEmail: "admin@workmate.local",
         password: "Passw0rd!",
       }),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: jsonHeaders(),
       method: "POST",
     });
-    const authHeaders = {
-      Authorization: `Bearer ${loginResult.accessToken}`,
-      "Content-Type": "application/json",
-    };
+    const authHeaders = jsonHeaders(loginResult.accessToken);
 
     const me = await request(baseUrl, "/v1/me", {
       headers: authHeaders,
@@ -130,10 +133,24 @@ async function main() {
       headers: authHeaders,
     });
 
+    if (databaseConnection) {
+      await runMembershipSmokeScenario({
+        authHeaders,
+        baseUrl,
+        currentDate,
+        databaseConnection,
+        originalOrganizationId: me.user.organizationId,
+      });
+    }
+
     console.log("SMOKE TEST PASSED");
   } finally {
     if (serverSession.child) {
       serverSession.child.kill("SIGTERM");
+    }
+
+    if (databaseConnection) {
+      await databaseConnection.end();
     }
   }
 }

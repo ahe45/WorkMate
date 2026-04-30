@@ -1,7 +1,12 @@
 const { createHttpError } = require("../common/http-error");
 const { generateId } = require("../common/ids");
+const { getNextSortOrder } = require("../common/ordered-records");
 
 const UNIT_TYPES = new Set(["HEADQUARTERS", "DEPARTMENT", "TEAM"]);
+const UNITS_ORDERING = Object.freeze({
+  parentColumn: "parent_unit_id",
+  tableName: "units",
+});
 
 function createOrganizationUnitService({ getOrganizationById, query, withTransaction }) {
   if (typeof getOrganizationById !== "function" || typeof query !== "function" || typeof withTransaction !== "function") {
@@ -114,29 +119,11 @@ function createOrganizationUnitService({ getOrganizationById, query, withTransac
   }
 
   async function getNextUnitSortOrder(queryRunner, organizationId, parentUnitId = null) {
-    const [rows] = parentUnitId
-      ? await queryRunner(
-        `
-          SELECT COALESCE(MAX(sort_order), 0) + 1 AS nextSortOrder
-          FROM units
-          WHERE organization_id = ?
-            AND parent_unit_id = ?
-            AND deleted_at IS NULL
-        `,
-        [organizationId, parentUnitId],
-      )
-      : await queryRunner(
-        `
-          SELECT COALESCE(MAX(sort_order), 0) + 1 AS nextSortOrder
-          FROM units
-          WHERE organization_id = ?
-            AND parent_unit_id IS NULL
-            AND deleted_at IS NULL
-        `,
-        [organizationId],
-      );
-
-    return Math.max(1, Number(rows[0]?.nextSortOrder || 1));
+    return getNextSortOrder(queryRunner, {
+      ...UNITS_ORDERING,
+      organizationId,
+      parentId: parentUnitId,
+    });
   }
 
   async function getUnitDeleteUsage(queryRunner, organizationId, unitId) {

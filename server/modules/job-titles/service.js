@@ -1,19 +1,21 @@
 const { createHttpError } = require("../common/http-error");
 const { generateId } = require("../common/ids");
+const {
+  assertCompleteReorder,
+  getNextSortOrder,
+  listActiveOrderedIds,
+  normalizeIdList,
+  resequenceSortOrders,
+} = require("../common/ordered-records");
+
+const JOB_TITLES_ORDERING = Object.freeze({
+  orderBy: "sort_order ASC, created_at DESC, name ASC, id ASC",
+  tableName: "job_titles",
+});
 
 function createJobTitlesService({ query, withTransaction }) {
   function normalizeJobTitleName(value = "") {
     return String(value || "").trim();
-  }
-
-  function normalizeIdList(value = []) {
-    const source = Array.isArray(value)
-      ? value
-      : value == null
-        ? []
-        : [value];
-
-    return Array.from(new Set(source.map((item) => String(item || "").trim()).filter(Boolean)));
   }
 
   function normalizeUnitIds(value = []) {
@@ -67,56 +69,25 @@ function createJobTitlesService({ query, withTransaction }) {
   }
 
   async function listActiveJobTitleIds(queryRunner, organizationId) {
-    const [rows] = await queryRunner(
-      `
-        SELECT id
-        FROM job_titles
-        WHERE organization_id = ?
-          AND deleted_at IS NULL
-        ORDER BY sort_order ASC, created_at DESC, name ASC, id ASC
-      `,
-      [organizationId],
-    );
-
-    return rows.map((row) => String(row?.id || "").trim()).filter(Boolean);
+    return listActiveOrderedIds(queryRunner, {
+      ...JOB_TITLES_ORDERING,
+      organizationId,
+    });
   }
 
   async function getNextJobTitleSortOrder(queryRunner, organizationId) {
-    const [rows] = await queryRunner(
-      `
-        SELECT COALESCE(MAX(sort_order), 0) + 1 AS nextSortOrder
-        FROM job_titles
-        WHERE organization_id = ?
-          AND deleted_at IS NULL
-      `,
-      [organizationId],
-    );
-
-    return Math.max(1, Number(rows[0]?.nextSortOrder || 1));
+    return getNextSortOrder(queryRunner, {
+      ...JOB_TITLES_ORDERING,
+      organizationId,
+    });
   }
 
   async function resequenceJobTitleSortOrders(queryRunner, organizationId, orderedIds = []) {
-    const normalizedOrderedIds = normalizeIdList(orderedIds);
-    const targetIds = normalizedOrderedIds.length > 0
-      ? normalizedOrderedIds
-      : await listActiveJobTitleIds(queryRunner, organizationId);
-
-    for (let index = 0; index < targetIds.length; index += 1) {
-      await queryRunner(
-        `
-          UPDATE job_titles
-          SET
-            sort_order = ?,
-            updated_at = CURRENT_TIMESTAMP(3)
-          WHERE organization_id = ?
-            AND id = ?
-            AND deleted_at IS NULL
-        `,
-        [index + 1, organizationId, targetIds[index]],
-      );
-    }
-
-    return targetIds;
+    return resequenceSortOrders(queryRunner, {
+      ...JOB_TITLES_ORDERING,
+      orderedIds,
+      organizationId,
+    });
   }
 
   async function assertNoDuplicateJobTitleName(queryRunner, organizationId, name, excludedJobTitleId = "") {
@@ -464,20 +435,16 @@ function createJobTitlesService({ query, withTransaction }) {
       await ensureOrganizationExists(queryRunner, organizationId);
       const currentIds = await listActiveJobTitleIds(queryRunner, organizationId);
 
-      if (currentIds.length === 0) {
-        throw createHttpError(400, "재정렬할 직급이 없습니다.", "JOB_TITLE_REORDER_EMPTY");
-      }
-
-      if (orderedIds.length !== currentIds.length) {
-        throw createHttpError(400, "직급 순서 정보가 올바르지 않습니다.", "JOB_TITLE_REORDER_INVALID");
-      }
-
-      const currentIdSet = new Set(currentIds);
-
-      if (orderedIds.some((jobTitleId) => !currentIdSet.has(jobTitleId))) {
-        throw createHttpError(400, "유효하지 않은 직급이 포함되어 있습니다.", "JOB_TITLE_REORDER_INVALID");
-      }
-
+      assertCompleteReorder({
+        currentIds,
+        emptyCode: "JOB_TITLE_REORDER_EMPTY",
+        emptyMessage: "재정렬할 직급이 없습니다.",
+        invalidCode: "JOB_TITLE_REORDER_INVALID",
+        invalidMessage: "직급 순서 정보가 올바르지 않습니다.",
+        orderedIds,
+        unknownIdCode: "JOB_TITLE_REORDER_INVALID",
+        unknownIdMessage: "유효하지 않은 직급이 포함되어 있습니다.",
+      });
       await resequenceJobTitleSortOrders(queryRunner, organizationId, orderedIds);
 
       return {

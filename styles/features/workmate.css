@@ -1,4 +1,8 @@
 @import url("./workmate-shell.css");
 @import url("./workmate-workspace.css");
 @import url("./workmate-management-panels.css");
+@import url("./workmate-management-leave.css");
+@import url("./workmate-management-employees.css");
+@import url("./workmate-management-holidays.css");
+@import url("./workmate-management-worksites.css");
 @import url("./workmate-responsive-rules.css");

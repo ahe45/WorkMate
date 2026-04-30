@@ -34,6 +34,14 @@
       marker: null,
     };
 
+    function notifyManagementWorksiteDraftInput() {
+      const latInput = document.getElementById("management-worksite-lat");
+
+      if (latInput instanceof HTMLInputElement) {
+        latInput.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    }
+
     function destroyManagementMap() {
       if (managementMapContext.map) {
         managementMapContext.map.off();
@@ -178,6 +186,7 @@
           });
           updateManagementWorksiteFormFields();
           syncManagementWorksiteMapGeometry(false);
+          notifyManagementWorksiteDraftInput();
           reverseGeocodeManagementWorksite(state.managementWorksiteDraft.lat, state.managementWorksiteDraft.lng, {
             updateName: !String(state.managementWorksiteDraft.name || "").trim(),
           }).catch(() => {});
@@ -192,6 +201,7 @@
           });
           updateManagementWorksiteFormFields();
           syncManagementWorksiteMapGeometry(false);
+          notifyManagementWorksiteDraftInput();
           reverseGeocodeManagementWorksite(state.managementWorksiteDraft.lat, state.managementWorksiteDraft.lng, {
             updateName: !String(state.managementWorksiteDraft.name || "").trim(),
           }).catch(() => {});
@@ -213,6 +223,7 @@
     return Object.freeze({
       destroyManagementMap,
       ensureLeafletAssets,
+      notifyManagementWorksiteDraftInput,
       syncManagementWorksiteMapGeometry,
       syncManagementWorksiteMapUi,
     });

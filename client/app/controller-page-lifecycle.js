@@ -33,6 +33,7 @@
     const { resolve } = resolverModule;
     const runtime = typeof globalThis !== "undefined" ? globalThis : globalScope;
     const {
+      MANAGEMENT_SECTION_STORAGE_KEY,
       createDefaultAttendanceRecordsState,
       createDefaultDashboardGridState,
       createDefaultManagementHolidayData,
@@ -71,6 +72,7 @@
       loadScheduleCalendarData: sharedControllers.loadScheduleCalendarData,
       navigateTo: shellController.navigateTo,
       navigationModule,
+      MANAGEMENT_SECTION_STORAGE_KEY,
       normalizeManagementSection: sharedControllers.normalizeManagementSection,
       persistSelectedOrganizationId: shellController.persistSelectedOrganizationId,
       renderers,

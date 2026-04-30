@@ -1,5 +1,17 @@
 const { createHttpError } = require("../common/http-error");
 const { generateId } = require("../common/ids");
+const {
+  assertCompleteReorder,
+  getNextSortOrder,
+  listActiveOrderedIds,
+  normalizeIdList,
+  resequenceSortOrders,
+} = require("../common/ordered-records");
+
+const SITES_ORDERING = Object.freeze({
+  orderBy: "sort_order ASC, created_at DESC, name ASC, id ASC",
+  tableName: "sites",
+});
 
 function createSitesService({ query, withTransaction }) {
   function serializeJsonColumn(value, fallback = {}) {
@@ -80,51 +92,25 @@ function createSitesService({ query, withTransaction }) {
   }
 
   async function listActiveSiteIds(queryRunner, organizationId) {
-    const [rows] = await queryRunner(
-      `
-        SELECT id
-        FROM sites
-        WHERE organization_id = ?
-          AND deleted_at IS NULL
-        ORDER BY sort_order ASC, created_at DESC, name ASC, id ASC
-      `,
-      [organizationId],
-    );
-
-    return rows.map((row) => String(row?.id || "").trim()).filter(Boolean);
+    return listActiveOrderedIds(queryRunner, {
+      ...SITES_ORDERING,
+      organizationId,
+    });
   }
 
   async function getNextSiteSortOrder(queryRunner, organizationId) {
-    const [rows] = await queryRunner(
-      `
-        SELECT COALESCE(MAX(sort_order), 0) + 1 AS nextSortOrder
-        FROM sites
-        WHERE organization_id = ?
-          AND deleted_at IS NULL
-      `,
-      [organizationId],
-    );
-
-    return Math.max(1, Number(rows[0]?.nextSortOrder || 1));
+    return getNextSortOrder(queryRunner, {
+      ...SITES_ORDERING,
+      organizationId,
+    });
   }
 
-  async function resequenceSiteSortOrders(queryRunner, organizationId) {
-    const siteIds = await listActiveSiteIds(queryRunner, organizationId);
-
-    for (let index = 0; index < siteIds.length; index += 1) {
-      await queryRunner(
-        `
-          UPDATE sites
-          SET
-            sort_order = ?,
-            updated_at = CURRENT_TIMESTAMP(3)
-          WHERE organization_id = ?
-            AND id = ?
-            AND deleted_at IS NULL
-        `,
-        [index + 1, organizationId, siteIds[index]],
-      );
-    }
+  async function resequenceSiteSortOrders(queryRunner, organizationId, orderedIds = []) {
+    return resequenceSortOrders(queryRunner, {
+      ...SITES_ORDERING,
+      orderedIds,
+      organizationId,
+    });
   }
 
   async function listSites(organizationId, filters = {}) {
@@ -345,10 +331,42 @@ function createSitesService({ query, withTransaction }) {
     });
   }
 
+  async function reorderSites(organizationId, payload = {}) {
+    const orderedIds = normalizeIdList(payload.orderedIds);
+
+    if (orderedIds.length === 0) {
+      throw createHttpError(400, "근무지 순서 정보가 비어 있습니다.", "SITE_REORDER_INVALID");
+    }
+
+    return withTransaction(async (connection) => {
+      const queryRunner = connection.query.bind(connection);
+      await ensureOrganizationExists(queryRunner, organizationId);
+      const currentIds = await listActiveSiteIds(queryRunner, organizationId);
+
+      assertCompleteReorder({
+        currentIds,
+        emptyCode: "SITE_REORDER_EMPTY",
+        emptyMessage: "재정렬할 근무지가 없습니다.",
+        invalidCode: "SITE_REORDER_INVALID",
+        invalidMessage: "근무지 순서 정보가 올바르지 않습니다.",
+        orderedIds,
+        unknownIdCode: "SITE_REORDER_INVALID",
+        unknownIdMessage: "유효하지 않은 근무지가 포함되어 있습니다.",
+      });
+      await resequenceSiteSortOrders(queryRunner, organizationId, orderedIds);
+
+      return {
+        orderedIds,
+        success: true,
+      };
+    });
+  }
+
   return {
     createSite,
     deleteSite,
     listSites,
+    reorderSites,
     updateSite,
   };
 }

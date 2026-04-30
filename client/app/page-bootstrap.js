@@ -52,6 +52,7 @@
       appConfig,
       createStateFactory: stateFactoryModule.create,
       currentYear,
+      managementSectionStorageKey: "workmate.managementSection",
       personalScopeStorageKey: "workmate.personalScopeEnabled",
       selectedOrganizationStorageKey: "workmate.selectedOrganizationId",
     });

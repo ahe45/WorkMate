@@ -14,6 +14,7 @@
       formatNumber,
       getDashboardGridState,
       hasDashboardGridFilter,
+      renderManagementModalHeaderActions,
       renderDashboardFilterMenu,
       renderManagementOrderCell,
       resolveDashboardGridRecords,
@@ -47,7 +48,7 @@
         label: "적용 조직",
         sortable: false,
       },
-      { filterable: false, key: "settings", label: "설정", sortable: false },
+      { filterable: false, key: "settings", label: "관리", sortable: false },
       { filterable: false, key: "delete", label: "삭제", sortable: false },
     ];
   }
@@ -179,7 +180,7 @@
           </span>
         </span>
         <span>적용 조직</span>
-        <span class="workmate-worksite-grid-action-head">설정</span>
+        <span class="workmate-worksite-grid-action-head">관리</span>
         <span class="workmate-worksite-grid-action-head">삭제</span>
       </div>
     `;
@@ -270,7 +271,7 @@
                 </div>
               </div>
               <div class="workmate-worksite-grid-cell workmate-worksite-grid-actions">
-                <button class="icon-button table-inline-icon-button workmate-worksite-record-action" data-management-job-title-open="${escapeAttribute(record?.id || "")}" type="button" aria-label="직급 설정">
+                <button class="icon-button table-inline-icon-button workmate-worksite-record-action" data-management-job-title-open="${escapeAttribute(record?.id || "")}" type="button" aria-label="직급 관리">
                   <svg class="button-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <circle cx="12" cy="12" r="2.6"></circle>
                     <path d="M19 12a7.4 7.4 0 0 0-.08-1.02l2.05-1.58-2-3.46-2.47 1a7.91 7.91 0 0 0-1.76-1.02L14.5 3h-5l-.24 2.92a7.91 7.91 0 0 0-1.76 1.02l-2.47-1-2 3.46 2.05 1.58A7.4 7.4 0 0 0 5 12c0 .34.03.68.08 1.02l-2.05 1.58 2 3.46 2.47-1a7.91 7.91 0 0 0 1.76 1.02L9.5 21h5l.24-2.92a7.91 7.91 0 0 0 1.76-1.02l2.47 1 2-3.46-2.05-1.58c.05-.34.08-.68.08-1.02Z"></path>
@@ -303,7 +304,7 @@
       return `
         <div class="workmate-job-title-unit-empty">
           <strong>선택 가능한 조직이 없습니다.</strong>
-          <span>조직 설정에서 먼저 적용 대상 조직을 생성하세요.</span>
+          <span>조직 관리에서 먼저 적용 대상 조직을 생성하세요.</span>
         </div>
       `;
     }
@@ -381,22 +382,20 @@
     const draft = state.managementJobTitleDraft || {};
     const model = buildManagementJobTitleModel(stats);
     const isEditMode = Boolean(String(draft.jobTitleId || "").trim());
-    const modalDescription = isEditMode
-      ? "저장된 직급의 이름과 적용 조직을 수정합니다."
-      : "직급명을 입력하고 적용할 조직을 체크박스로 선택하세요.";
-    const saveLabel = isEditMode ? "직급 업데이트" : "직급 저장";
-
     return `
       <div class="modal" id="management-job-title-modal" aria-hidden="false" role="dialog" aria-modal="true" aria-labelledby="management-job-title-modal-title">
         <div class="modal-backdrop" data-management-job-title-close="true" aria-hidden="true"></div>
         <section class="modal-sheet workmate-job-title-modal-sheet">
           <header class="modal-header">
             <div>
-              <p class="page-kicker">Job title setup</p>
-              <h3 id="management-job-title-modal-title">${escapeHtml(isEditMode ? "직급 설정 수정" : "직급 설정 등록")}</h3>
-              <p>${escapeHtml(modalDescription)}</p>
+              <h3 id="management-job-title-modal-title">${escapeHtml(isEditMode ? "직급 관리 수정" : "직급 관리 등록")}</h3>
             </div>
-            <button class="icon-button" data-management-job-title-close="true" type="button" aria-label="닫기">×</button>
+            ${renderManagementModalHeaderActions(state, {
+              closeAction: "data-management-job-title-close",
+              disabled: model.selectableUnits.length === 0,
+              formId: "management-job-title-form",
+              modalType: "jobTitle",
+            })}
           </header>
           <div class="modal-body workmate-job-title-modal-body">
             <form class="workmate-form-stack" id="management-job-title-form">
@@ -413,11 +412,6 @@
                 </div>
                 ${renderManagementJobTitleUnitChecklist(model, draft.unitIds)}
               </section>
-              <div class="toolbar-actions">
-                <button class="outline-button" data-management-job-title-close="true" type="button">취소</button>
-                <button class="outline-button" data-management-job-title-reset="true" type="button">초기화</button>
-                <button class="primary-button" type="submit"${model.selectableUnits.length === 0 ? " disabled" : ""}>${escapeHtml(saveLabel)}</button>
-              </div>
             </form>
           </div>
         </section>
@@ -437,7 +431,8 @@
         <article class="panel-card workmate-title-record-panel">
           <div class="workmate-worksite-panel-head">
             <div>
-              <h4>직급 설정</h4>
+              <h4>직급 관리</h4>
+              <p>조직별로 사용할 직급명을 등록하고 노출 순서를 관리합니다.</p>
             </div>
             ${hasJobTitles && canAddJobTitles ? `
               <div class="workmate-topbar-actions workmate-worksite-panel-controls">

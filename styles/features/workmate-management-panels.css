@@ -1,3 +1,5 @@
+﻿/* WorkMate management base, unit, title, and schedule panel styles */
+
 
 .workmate-company-card-meta span,
 .workmate-info-card span {
@@ -245,7 +247,7 @@
 
 .workmate-admin-shell {
   display: grid;
-  grid-template-columns: 248px minmax(0, 1fr);
+  grid-template-columns: 208px minmax(0, 1fr);
   gap: 10px;
   min-height: 100%;
   align-items: start;
@@ -254,8 +256,8 @@
 .workmate-admin-subnav {
   position: sticky;
   display: grid;
-  gap: 18px;
-  padding: 22px 18px;
+  gap: 14px;
+  padding: 18px 14px;
   border-radius: 24px;
   border: 1px solid rgba(223, 229, 240, 0.92);
   background:
@@ -265,27 +267,19 @@
 
 .workmate-admin-subnav-group {
   display: grid;
-  gap: 10px;
-}
-
-.workmate-admin-subnav-title {
-  margin: 0;
-  color: #516174;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  gap: 8px;
 }
 
 .workmate-admin-subnav-items {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .workmate-admin-subnav-item {
   display: grid;
-  gap: 4px;
+  gap: 0;
   width: 100%;
-  padding: 14px 14px 14px 16px;
+  padding: 12px 12px 12px 14px;
   border: 1px solid transparent;
   border-radius: 18px;
   background: transparent;
@@ -301,12 +295,6 @@
 .workmate-admin-subnav-item strong {
   font-size: 0.95rem;
   color: #18324b;
-}
-
-.workmate-admin-subnav-item span {
-  color: var(--text-dim);
-  font-size: 0.76rem;
-  line-height: 1.45;
 }
 
 .workmate-admin-subnav-item:hover {
@@ -356,6 +344,7 @@
 .workmate-worksite-panel-head p {
   margin: 6px 0 0;
   color: var(--text-dim);
+  font-size: 0.84rem;
   line-height: 1.6;
 }
 
@@ -387,62 +376,22 @@
   color: #18324b;
 }
 
-.workmate-worksite-modal-sheet {
-  width: min(1320px, calc(100vw - 48px));
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+.workmate-employee-panel-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.workmate-worksite-modal-body {
+.workmate-management-employee-metric-grid {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.workmate-management-employee-grid-card {
   min-height: 0;
-  padding-top: 20px;
 }
 
-.workmate-work-policy-modal-sheet {
-  width: min(1520px, calc(100vw - 48px));
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
-}
 
-.workmate-work-policy-modal-body {
-  min-height: 0;
-  padding-top: 20px;
-}
-
-.workmate-work-policy-modal-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(420px, 0.95fr);
-  gap: 22px;
-  align-items: start;
-}
-
-.workmate-worksite-modal-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(360px, 0.9fr);
-  gap: 22px;
-  align-items: start;
-}
-
-.workmate-work-policy-modal-panel,
-.workmate-worksite-modal-map-stack,
-.workmate-worksite-modal-form-stack {
-  display: grid;
-  gap: 18px;
-  align-content: start;
-}
-
-.workmate-admin-worksites-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(360px, 0.95fr);
-  gap: 22px;
-  align-items: start;
-}
-
-.workmate-worksite-map-panel,
-.workmate-worksite-form-panel,
-.workmate-worksite-record-panel,
-.workmate-title-record-panel,
-.workmate-work-schedule-record-panel,
 .workmate-unit-record-panel {
   display: grid;
   gap: 18px;
@@ -539,8 +488,18 @@
 .workmate-work-policy-record-grid-head,
 .workmate-work-policy-record-grid-row {
   display: grid;
-  grid-template-columns: 72px minmax(220px, 1.15fr) minmax(220px, 1.05fr) minmax(280px, 1.45fr) 120px 64px 64px;
-  gap: 12px;
+  grid-template-columns:
+    60px
+    minmax(0, 1.06fr)
+    minmax(0, 1.02fr)
+    minmax(0, 0.92fr)
+    minmax(0, 0.92fr)
+    minmax(0, 0.92fr)
+    minmax(0, 1.28fr)
+    minmax(0, 1.28fr)
+    56px
+    56px;
+  gap: 10px;
   align-items: center;
   padding: 14px 16px;
   border-radius: 18px;
@@ -551,6 +510,7 @@
   color: var(--grid-head-text);
   font-size: 0.8rem;
   font-weight: 800;
+  text-align: center;
 }
 
 .workmate-work-policy-record-grid-row {
@@ -587,18 +547,6 @@
 
 .workmate-work-policy-record-grid-cell {
   min-width: 0;
-}
-
-.workmate-work-policy-record-name {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-}
-
-.workmate-work-policy-record-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
 }
 
 .workmate-work-policy-record-grid-cell strong {
@@ -648,6 +596,7 @@
   color: var(--grid-head-text);
   font-size: 0.8rem;
   font-weight: 800;
+  text-align: center;
 }
 
 .workmate-work-schedule-grid-row {
@@ -681,286 +630,4 @@
 .workmate-holiday-grid {
   display: grid;
   gap: 10px;
-}
-
-.workmate-holiday-grid-head,
-.workmate-holiday-grid-row {
-  display: grid;
-  grid-template-columns: 160px 72px minmax(220px, 1.5fr) 132px minmax(180px, 1fr) 72px 72px;
-  gap: 12px;
-  align-items: center;
-  padding: 14px 16px;
-  border-radius: 18px;
-}
-
-.workmate-holiday-grid-head {
-  background: var(--grid-head);
-  color: var(--grid-head-text);
-  font-size: 0.8rem;
-  font-weight: 800;
-}
-
-.workmate-holiday-grid-row {
-  border: 1px solid rgba(223, 229, 240, 0.92);
-  background: rgba(255, 255, 255, 0.96);
-}
-
-.workmate-holiday-grid-row.is-custom {
-  border-color: rgba(124, 58, 237, 0.2);
-  background: rgba(247, 243, 255, 0.78);
-}
-
-.workmate-holiday-grid-row.is-substitute {
-  border-color: rgba(245, 158, 11, 0.24);
-  background: rgba(255, 249, 235, 0.8);
-}
-
-.workmate-holiday-grid-cell {
-  min-width: 0;
-}
-
-.workmate-holiday-grid-cell strong {
-  display: block;
-  color: #17324a;
-  font-size: 0.92rem;
-}
-
-.workmate-holiday-grid-cell span {
-  display: block;
-  overflow: hidden;
-  color: var(--text-dim);
-  font-size: 0.8rem;
-  line-height: 1.45;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.workmate-holiday-grid-action-placeholder {
-  display: block;
-  color: var(--text-dim);
-  font-size: 0.84rem;
-  text-align: center;
-}
-
-.workmate-holiday-modal-sheet {
-  width: min(560px, calc(100vw - 48px));
-}
-
-.workmate-holiday-modal-body {
-  padding-top: 20px;
-}
-
-.workmate-holiday-modal-hint {
-  margin: 0;
-  color: var(--text-dim);
-  font-size: 0.82rem;
-  line-height: 1.6;
-}
-
-.workmate-worksite-panel-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.workmate-worksite-panel-controls {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.workmate-worksite-panel-controls.is-placeholder {
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.workmate-worksite-search-form {
-  display: grid;
-  gap: 10px;
-}
-
-.workmate-worksite-search-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.workmate-worksite-search-row input {
-  min-width: 0;
-}
-
-.workmate-worksite-search-submit {
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
-  min-height: 44px;
-  padding: 0;
-  flex: 0 0 44px;
-}
-
-.workmate-worksite-search-submit .button-icon {
-  width: 18px;
-  height: 18px;
-}
-
-.workmate-worksite-search-results,
-.workmate-worksite-record-list {
-  display: grid;
-  gap: 10px;
-}
-
-.workmate-worksite-grid {
-  display: grid;
-  gap: 10px;
-}
-
-.workmate-grid-empty-row {
-  display: grid;
-  gap: 14px;
-  min-width: 0;
-  padding: 18px;
-  border: 1px solid rgba(223, 229, 240, 0.92);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.92);
-}
-
-.workmate-worksite-grid-empty-copy {
-  display: grid;
-  gap: 6px;
-}
-
-.workmate-worksite-grid-empty-copy strong {
-  color: #17324a;
-  font-size: 0.96rem;
-}
-
-.workmate-worksite-grid-empty-copy p {
-  margin: 0;
-  color: var(--text-dim);
-  font-size: 0.84rem;
-  line-height: 1.5;
-}
-
-.workmate-worksite-grid-head,
-.workmate-worksite-grid-row {
-  display: grid;
-  grid-template-columns: 72px minmax(160px, 1.05fr) minmax(220px, 1.75fr) 120px 180px 64px 64px;
-  gap: 12px;
-  align-items: center;
-  padding: 14px 16px;
-  border-radius: 18px;
-}
-
-.workmate-worksite-grid-head {
-  background: var(--grid-head);
-  color: var(--grid-head-text);
-  font-size: 0.8rem;
-  font-weight: 800;
-}
-
-.workmate-worksite-grid-head-cell {
-  display: block;
-  min-width: 0;
-}
-
-.workmate-worksite-grid-head-label {
-  display: block;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.workmate-worksite-grid-head-cell .table-filter-button {
-  color: var(--grid-head-text);
-}
-
-.workmate-worksite-grid-head-cell.is-filter-active .table-filter-button {
-  background: rgba(234, 244, 255, 0.18);
-  color: #ffffff;
-}
-
-.workmate-worksite-grid-action-head {
-  text-align: center;
-}
-
-.workmate-worksite-grid-row {
-  border: 1px solid rgba(223, 229, 240, 0.92);
-  background: rgba(255, 255, 255, 0.96);
-}
-
-.workmate-worksite-grid-row.is-active {
-  border-color: rgba(45, 99, 245, 0.24);
-  box-shadow: 0 12px 24px rgba(45, 99, 245, 0.08);
-}
-
-.workmate-worksite-grid-cell {
-  min-width: 0;
-}
-
-.workmate-management-order-cell {
-  text-align: center;
-}
-
-.workmate-management-order-content {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.workmate-management-order-handle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  color: #7a8ea3;
-}
-
-.workmate-management-order-handle svg {
-  width: 16px;
-  height: 16px;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.8;
-}
-
-.workmate-management-order-content strong {
-  color: #17324a;
-  font-size: 0.88rem;
-}
-
-.workmate-worksite-grid-cell strong {
-  display: block;
-  color: #17324a;
-  font-size: 0.92rem;
-}
-
-.workmate-worksite-grid-cell span {
-  display: block;
-  overflow: hidden;
-  color: var(--text-dim);
-  font-size: 0.8rem;
-  line-height: 1.45;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.workmate-worksite-grid-actions {
-  display: flex;
-  justify-content: center;
-}
-
-.workmate-worksite-record-action {
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
-  min-height: 44px;
-  padding: 0;
-  border-radius: 12px;
 }

@@ -38,6 +38,8 @@
       return {
         attendanceRecords: createDefaultDashboardGridTableState(),
         leaveBalances: createDefaultDashboardGridTableState(),
+        managementLeaveAccrualEntries: createDefaultDashboardGridTableState([{ direction: "desc", key: "accrualDate" }]),
+        managementEmployees: createDefaultDashboardGridTableState([{ direction: "asc", key: "name" }]),
         overview: createDefaultDashboardGridTableState(),
         reports: createDefaultDashboardGridTableState(),
       };
@@ -106,6 +108,30 @@
         ...overrides,
       };
     }
+
+    function createDefaultManagementEmployeeDraft(overrides = {}) {
+      return {
+        employeeId: "",
+        employeeNo: "",
+        employmentStatus: "DRAFT",
+        firstName: "",
+        inviteChannels: ["EMAIL"],
+        joinDate: formatLocalDateKey(),
+        jobTitleId: "",
+        lastName: "",
+        loginEmail: "",
+        managementStatus: "DRAFT",
+        name: "",
+        note: "",
+        personnelCard: null,
+        phone: "",
+        primaryUnitId: "",
+        retireDate: "",
+        roleCode: "",
+        workPolicyId: "",
+        ...overrides,
+      };
+    }
     
     function createDefaultManagementHolidayDraft(overrides = {}) {
       return {
@@ -162,6 +188,7 @@
       createEmptyManagementHolidayDraft,
       createDefaultManagementHolidayData,
       createDefaultManagementWorkPolicyDraft,
+      createDefaultManagementEmployeeDraft,
     });
   }
 

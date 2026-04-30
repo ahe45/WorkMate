@@ -1,0 +1,21 @@
+﻿/* WorkMate responsive rules for wide screens */
+
+@media (min-width: 1600px) {
+  .workmate-attendance-month-board {
+    grid-template-columns: 65px repeat(var(--attendance-days), minmax(0, 1fr)) 64px;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .workmate-attendance-user-cell {
+    padding: 8px 9px;
+  }
+
+  .workmate-attendance-month-cell {
+    padding: 5px 2px;
+  }
+
+  .workmate-attendance-total-cell {
+    padding: 6px 4px;
+  }
+}

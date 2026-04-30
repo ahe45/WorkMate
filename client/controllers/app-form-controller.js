@@ -18,6 +18,7 @@
       renderers,
       searchManagementWorksiteLocations,
       setInlineMessage,
+      showToast,
       state,
       submitClock,
       submitManagementHolidayForm,
@@ -27,9 +28,8 @@
       submitManagementWorksiteForm,
       syncManagementWorksiteDraftFromDom,
       updateUserMeta,
-      closeAccountSettingsModal,
       closeCompanyCreateModal,
-      closeCompanySettingsModal,
+      openCompanySettingsModal,
     } = dependencies;
 
     if (!api || !setInlineMessage || !state) {
@@ -57,13 +57,8 @@
           });
 
           state.user = payload?.user || state.user;
-          closeAccountSettingsModal();
-
-          if (currentPage === "companies") {
-            renderCompaniesPage();
-          } else {
-            updateUserMeta();
-          }
+          updateUserMeta();
+          showToast?.("계정 정보를 저장했습니다.");
         } catch (error) {
           if (!handleProtectedFailure(error)) {
             setInlineMessage(document.getElementById("account-settings-error"), error.message || "계정 정보를 저장하지 못했습니다.");
@@ -77,17 +72,28 @@
         setInlineMessage(document.getElementById("company-settings-error"), "");
 
         try {
-          await api.requestWithAutoRefresh(`/v1/account/organizations/${document.getElementById("company-settings-id")?.value || ""}`, {
+          const companyId = String(document.getElementById("company-settings-id")?.value || "").trim();
+          const nextCode = document.getElementById("company-settings-code")?.value || "";
+          const nextName = document.getElementById("company-settings-name")?.value || "";
+
+          await api.requestWithAutoRefresh(`/v1/account/organizations/${companyId}`, {
             body: JSON.stringify({
-              code: document.getElementById("company-settings-code")?.value || "",
-              name: document.getElementById("company-settings-name")?.value || "",
+              code: nextCode,
+              name: nextName,
             }),
             method: "PATCH",
           });
 
-          closeCompanySettingsModal();
           await loadCompanies();
           renderCompaniesPage();
+          openCompanySettingsModal?.({
+            dataset: {
+              companyCode: state.companies.find((company) => String(company?.id || "").trim() === companyId)?.code || nextCode,
+              companyId,
+              companyName: state.companies.find((company) => String(company?.id || "").trim() === companyId)?.name || nextName,
+            },
+          });
+          showToast?.("워크스페이스 정보를 저장했습니다.");
         } catch (error) {
           if (!handleProtectedFailure(error)) {
             setInlineMessage(document.getElementById("company-settings-error"), error.message || "워크스페이스 정보를 저장하지 못했습니다.");
